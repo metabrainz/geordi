@@ -38,7 +38,7 @@ my $app = sub {
     }
     else {
         if (my $search = $req->param('query')) {
-            my $search_res = $ua->get('http://0.0.0.0:9200/umg/product/_search?q=' . $search);
+            my $search_res = $ua->get('http://0.0.0.0:9200/_search?q=' . $search);
             my $results = $json->jsonToObj($search_res->decoded_content);
             my $body = $tx->render('results.tx', {
                 results => $results->{hits},
