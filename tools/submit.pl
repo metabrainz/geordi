@@ -53,8 +53,7 @@ foreach my $f (@ARGV) {
 
     my $json = $conv->convert($xml);
     my $req = HTTP::Request->new(PUT => $url);
-    $req->content(encode("utf-8", $json));
+    $req->content($json);
     $ua->request($req);
 
-    print "$url\n";
 }
