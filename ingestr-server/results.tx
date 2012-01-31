@@ -1,0 +1,102 @@
+: cascade 'layout.tx'
+
+: macro artist_type -> $type_name {
+:   given ($type_name) {
+:     when('artist_name') { 'Artist name' }
+:     when('composer') { 'Composer' }
+:     when('performer') { 'Performer' }
+:     when('abbreviated_composer') { 'Abbreviated composer' }
+:     default { $type_name }
+:   }
+: }
+
+: macro show_artists -> $artists {
+  <dl>
+    : for $artists.kv() -> $contributor_type {
+    <dt><: artist_type($contributor_type.key) :></dt>
+    <dd>
+      <ul>
+        : for [].merge($contributor_type.value) -> $artist {
+        <li><: $artist.text :></li>
+        : }
+      </ul>
+    </dd>
+    : }
+  </dl>
+: }
+
+: around content -> {
+  <h1>Results</h1>
+  <div class="row">
+    <div class="span3">
+      <ul class="span3" id="results" data-scrollspy="scrollspy">
+        : for $results.hits -> $result {
+        <li>
+          <strong><a href="#<: $result._id :>"><: $result._source.product.prd_title.text :></a></strong>
+        </li>
+        : }
+      </ul>
+    </div>
+    <div class="span13">
+      <ul>
+        : for $results.hits -> $result {
+        <li id="<: $result._id :>">
+          <h2><a href="/<: $result._id :>"><: $result._source.product.prd_title.text :></a></h2>
+          <h3>Summary</h3>
+          <table class="condensed-table">
+            <tbody>
+              <tr>
+                <th>Artist:</tH>
+                <td>
+                  <: show_artists($result._source.product.prd_contributors) :>
+                </td>
+              </tr>
+              <tr>
+                <th>Track count:</th>
+                <td><: $result._source.product.track_count.text :></td>
+              </tr>
+              <tr>
+                <th>Label:</th>
+                <td><: $result._source.product.prd_label_name.text :></td>
+              </tr>
+              <tr>
+                <th>UPC:</tH>
+                <td><: $result._source.product._upc :></td>
+              </tR>
+              <tr>
+                <th>Release Date:</th>
+                <td><: $result._source.product.release_date.text :></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>Tracklist</h3>
+          <table class="condensed-table zebra-striped">
+            <thead>
+              <tr>
+                <th>#</tH>
+                <th>Name</th>
+                <th>Artists</tH>
+                <th>ISRC</th>
+                <th>Length</th>
+              </tr>
+            </thead>
+            <tbody>
+              : for [].merge($result._source.product.tracks.track) -> $track {
+              <tr>
+                <td><: $track.volume.text :>.<: $track.track_number.text :></td>
+                <td><: $track.track_title.text :></td>
+                <td><: show_artists($track.track_contributors) :></td>
+                <td><: $track._isrc :></td>
+                <td><: $track.track_length.text :></td>
+              </tr>
+              : }
+            </tbody>
+          </table>
+          <pre class="hide"><: json($result['_source']) :></pre>
+        </li>
+        : }
+      </ul>
+    </div>
+  </ul>
+: }
