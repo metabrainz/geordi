@@ -1,0 +1,8 @@
+This project allows the consumption of label feed XML files.
+
+
+tools subdir:
+
+submit.pl 
+   Submits files to the local elastic search server
+   Requires: XML::XML2JSON LWP::UserAgent HTTP::Request URI::Escape Encode

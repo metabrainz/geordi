@@ -27,8 +27,10 @@ if ($help) {
 }
 
 local $/;
-my $conv = XML::XML2JSON->new();
+my $conv = XML::XML2JSON->new("content_key" => "text", "attribute_prefix" => "_");
 my $ua = LWP::UserAgent->new;
+
+binmode STDOUT, ":utf8";
 
 foreach my $f (@ARGV) {
     my $base = $f;
@@ -45,6 +47,7 @@ foreach my $f (@ARGV) {
 
     print "process $f\n";
     open(XML, $f) or die;
+    binmode XML, ":utf8";
     my $xml = <XML>;
     close XML;
 
