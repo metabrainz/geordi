@@ -16,12 +16,6 @@ my $tx = Text::Xslate->new(
 );
 my $ua = LWP::UserAgent->new;
 
-my $paths = [
-    parse_mapping_paths($json->jsonToObj(
-        $ua->get('http://0.0.0.0:9200/umg/product/_mapping')->decoded_content
-    )->{product})
-];
-
 my $app = sub {
     my ($env) = @_;
     my $req = Plack::Request->new($env);
@@ -42,7 +36,6 @@ my $app = sub {
             my $results = $json->jsonToObj($search_res->decoded_content);
             my $body = $tx->render('results.tx', {
                 results => $results->{hits},
-                paths => $paths
             });
             $res = Plack::Response->new(200,
                                         [
@@ -52,7 +45,7 @@ my $app = sub {
         } else {
             $res = Plack::Response->new(
                 200, [],
-                $tx->render('index.tx', { paths => $paths })
+                $tx->render('index.tx', {  })
             );
         }
     }
@@ -61,16 +54,3 @@ my $app = sub {
 };
 
 $app;
-
-sub parse_mapping_paths {
-    my $mapping = shift;
-    my $prefix = shift || '';
-    my $nest = $prefix ? "$prefix." : "";
-    if (exists $mapping->{properties}) {
-        return map { parse_mapping_paths($mapping->{properties}{$_}, "$nest" . "$_") }
-                         keys %{ $mapping->{properties} };
-    }
-    else {
-        return ( "$prefix" );
-    }
-}
