@@ -8,6 +8,17 @@ use Plack::Request;
 use Plack::Response;
 use Text::Xslate;
 
+my $processors = {
+    wcd => sub {
+        my $input_json = shift;
+        return {
+                 release_title => $input_json->{"_source"}{"meta.xml"}{metadata}{album}{text},
+                 release_date => $input_json->{"_source"}{"meta.xml"}{metadata}{year}{text},
+                 release_artist => $input_json->{"_source"}{"meta.xml"}{metadata}{artist}{text}
+               }
+    }
+};
+
 my $json = JSON::Any->new( pretty => 1, utf8 => 1 );
 my $tx = Text::Xslate->new(
     function => {
@@ -34,6 +45,10 @@ my $app = sub {
         if (my $search = $req->param('query')) {
             my $search_res = $ua->get('http://0.0.0.0:9200/_search?q=' . $search);
             my $results = $json->jsonToObj($search_res->decoded_content);
+            for my $result (@{ $results->{hits}->{hits} }) {
+                my $res_copy = $result;
+                $result->{"_ingestr"} = $processors->{$result->{_index}}($res_copy);
+            }
             my $body = $tx->render('results.tx', {
                 results => $results->{hits},
             });

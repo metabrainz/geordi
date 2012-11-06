@@ -41,7 +41,7 @@
       <ul class="span3" id="results" data-scrollspy="scrollspy">
         : for $results.hits -> $result {
         <li>
-          <strong><a href="#<: $result._id :>"><: $result._source.product.prd_title.text :></a></strong>
+          <strong><a href="#<: $result._id :>"><: $result._ingestr.release_title :></a></strong>
         </li>
         : }
       </ul>
@@ -49,17 +49,20 @@
     <div class="span13">
       <ul>
         : for $results.hits -> $result {
+        : my $release_artist = show_artists($result._source.product.prd_contributors)
         <li id="<: $result._id :>">
-          <h2><a href="/<: $result._index :>/<: $result._id :>"><: $result._id :>: <: $result._source.product.prd_title.text :></a></h2>
+          <h2><a href="/<: $result._index :>/<: $result._id :>"><: $result._id :>
+              <: if $result._ingestr.release_title { :>: <: $result._ingestr.release_title :><: } :>
+              </a></h2>
           <h3>Summary</h3>
           <table class="condensed-table">
             <tbody>
               <: row('Data Source (index)', $result._index, $result._index) :>
-              <: row('Artist', show_artists($result._source.product.prd_contributors), $result._source.product.prd_contributors) :>
+              <: row('Artist', $result._ingestr.release_artist, $result._ingestr.release_artist) :>
               <: row('Track count', $result._source.product.track_count.text, $result._source.product) :>
               <: row('Label', $result._source.product.prd_label_name.text, $result._source.product) :>
               <: row('UPC', $result._source.product._upc, $result._source.product) :>
-              <: row('Release Date', $result._source.product.release_date.text, $result._source.product) :>
+              <: row('Release Date', $result._ingestr.release_date, $result._ingestr.release_date) :>
             </tbody>
           </table>
 
@@ -86,7 +89,8 @@
               : }
             </tbody>
           </table>
-          <pre class="hide"><: json($result['_source']) :></pre>
+          <pre class="hide"><: json($result._source) :></pre>
+          <pre class="hide"><: json($result._ingestr) :></pre>
         </li>
         : }
       </ul>
