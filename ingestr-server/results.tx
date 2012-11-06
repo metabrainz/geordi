@@ -59,7 +59,7 @@
             <tbody>
               <: row('Data Source (index)', $result._index, $result._index) :>
               <: row('Artist', $result._ingestr.release_artist, $result._ingestr.release_artist) :>
-              <: row('Track count', $result._source.product.track_count.text, $result._source.product) :>
+              <: row('Track count', $result._ingestr.track_count, $result._ingestr.track_count) :>
               <: row('Label', $result._source.product.prd_label_name.text, $result._source.product) :>
               <: row('UPC', $result._source.product._upc, $result._source.product) :>
               <: row('Release Date', $result._ingestr.release_date, $result._ingestr.release_date) :>
@@ -73,18 +73,22 @@
                 <th>#</tH>
                 <th>Name</th>
                 <th>Artists</tH>
-                <th>ISRC</th>
                 <th>Length</th>
+                <: if $result._ingestr.print_isrc { :><th>ISRC</th><: } :>
+                <: if $result._ingestr.print_acoustid { :><th>AcoustID</th><: } :>
               </tr>
             </thead>
             <tbody>
-              : for [].merge($result._source.product.tracks.track) -> $track {
+              : for $result._ingestr.tracks -> $track {
               <tr>
-                <td><: $track.volume.text :>.<: $track.track_number.text :></td>
-                <td><: $track.track_title.text :></td>
-                <td><: show_artists($track.track_contributors) :></td>
-                <td><: $track._isrc :></td>
-                <td><: $track.track_length.text :></td>
+                <td><: $track.number :></td>
+                <td><: $track.title :></td>
+                <td><: $track.artist :></td>
+                <td><: $track.length :></td>
+                <: if $result._ingestr.print_isrc { :><td><: $track.isrc :></td><: } :>
+                <: if $result._ingestr.print_acoustid { :><td>
+                    <: if $track.acoustid { :><a href="https://acoustid.org/track/<: $track.acoustid :>"><: $track.acoustid :></a><: } :>
+                </td><: } :>
               </tr>
               : }
             </tbody>

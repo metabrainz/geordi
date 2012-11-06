@@ -7,14 +7,33 @@ use LWP::UserAgent;
 use Plack::Request;
 use Plack::Response;
 use Text::Xslate;
+use List::UtilsBy qw( sort_by );
+
+sub extract_acoustid
+{
+   my $acoustid = shift;
+   $acoustid =~ s/urn:acoustid://;
+   return $acoustid unless $acoustid eq 'unknown';
+}
 
 my $processors = {
     wcd => sub {
         my $input_json = shift;
+        my $track_count = scalar grep {$_->{"_source"} eq "original" && $_->{format}{text} eq "Flac"} @{ $input_json->{"_source"}{"files.xml"}{files}{file} };
+        my $tracks = [ sort_by { $_->{number} }
+                       map +{ number => $_->{track}{text},
+                              length => $_->{length}{text},
+                              artist => $_->{artist}{text},
+                              title => $_->{title}{text},
+                              acoustid => extract_acoustid($_->{"external-identifier"}{text})
+                            }, grep {$_->{"_source"} eq "original" && $_->{format}{text} eq "Flac"} @{ $input_json->{"_source"}{"files.xml"}{files}{file} } ];
         return {
                  release_title => $input_json->{"_source"}{"meta.xml"}{metadata}{album}{text},
                  release_date => $input_json->{"_source"}{"meta.xml"}{metadata}{year}{text},
-                 release_artist => $input_json->{"_source"}{"meta.xml"}{metadata}{artist}{text}
+                 release_artist => $input_json->{"_source"}{"meta.xml"}{metadata}{artist}{text},
+                 track_count => $track_count,
+                 print_acoustid => 1,
+                 tracks => $tracks
                }
     }
 };
