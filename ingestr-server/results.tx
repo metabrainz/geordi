@@ -51,8 +51,8 @@
         : for $results.hits -> $result {
         : my $release_artist = show_artists($result._source.product.prd_contributors)
         <li id="<: $result._id :>">
-          <h2><a href="/<: $result._index :>/<: $result._id :>"><: $result._id :>
-              <: if $result._ingestr.release_title { :>: <: $result._ingestr.release_title :><: } :>
+          <h2><a href="/<: $result._index :>/<: $result._id :>">
+              <: if $result._ingestr.release_title { :><: $result._ingestr.release_title :> <: } :><small><: $result._id :></small>
               </a></h2>
           <h3>Summary</h3>
           <table class="condensed-table">

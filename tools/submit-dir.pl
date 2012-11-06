@@ -9,6 +9,7 @@ use HTTP::Request;
 use URI::Escape;
 use Encode;
 use JSON;
+use Try::Tiny;
 
 use File::Slurp qw( read_file read_dir );
 
@@ -67,7 +68,12 @@ foreach my $dir (@ARGV) {
             my $xml_to_json = $conv->convert($filecontent);
             $json{$filebase} = decode_json($xml_to_json);
         } elsif ($file =~ /\.json$/) {
-            $json{$filebase} = decode_json($filecontent);
+            try {
+                $json{$filebase} = decode_json($filecontent);
+            } catch {
+                print "JSON file $file threw an error, skipping.\n";
+                next;
+            }
         } else {
             $json{$filebase} = $filecontent;
         }

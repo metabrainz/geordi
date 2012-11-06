@@ -11,7 +11,14 @@ use List::UtilsBy qw( sort_by );
 
 sub extract_acoustid
 {
-   my $acoustid = shift;
+   my $block = shift;
+   my $acoustid;
+   if (ref($block) eq 'ARRAY') {
+       my @acoustids = grep { $_->{text} =~ /acoustid/ } @{ $block };
+       $acoustid = $acoustids[0]->{text};
+   } else {
+       $acoustid = $block->{text};
+   }
    $acoustid =~ s/urn:acoustid://;
    return $acoustid unless $acoustid eq 'unknown';
 }
@@ -25,10 +32,10 @@ my $processors = {
                               length => $_->{length}{text},
                               artist => $_->{artist}{text},
                               title => $_->{title}{text},
-                              acoustid => extract_acoustid($_->{"external-identifier"}{text})
+                              acoustid => extract_acoustid($_->{"external-identifier"})
                             }, grep {$_->{"_source"} eq "original" && $_->{format}{text} eq "Flac"} @{ $input_json->{"_source"}{"files.xml"}{files}{file} } ];
         return {
-                 release_title => $input_json->{"_source"}{"meta.xml"}{metadata}{album}{text},
+                 release_title => $input_json->{"_source"}{"meta.xml"}{metadata}{album}{text} // $input_json->{"_source"}{"meta.xml"}{metadata}{title}{text} =~ s, / .*$,,r,
                  release_date => $input_json->{"_source"}{"meta.xml"}{metadata}{year}{text},
                  release_artist => $input_json->{"_source"}{"meta.xml"}{metadata}{artist}{text},
                  track_count => $track_count,
