@@ -71,6 +71,9 @@
               <: row('Label', $result._source.product.prd_label_name.text, $result._source.product) :>
               <: row('UPC', $result._source.product._upc, $result._source.product) :>
               <: row('Release Date', $result._ingestr.release_date, $result._ingestr.release_date) :>
+              <: row('Matched Discogs ID', '<a href="https://www.discogs.com/release/' ~ $result._ingestr.discogsid ~ '">' ~ $result._ingestr.discogsid ~ '</a>' | mark_raw, $result._ingestr.discogsid) :>
+              <: row('Matched Release ID', '<a href="https://musicbrainz.org/release/' ~ $result._ingestr.releaseid ~ '">' ~ $result._ingestr.releaseid ~ '</a>' | mark_raw, $result._ingestr.releaseid) :>
+              <: row('Matched Release Group ID', '<a href="https://musicbrainz.org/release-group/' ~ $result._ingestr.releasegroupid ~ '">' ~ $result._ingestr.releasegroupid ~ '</a>' | mark_raw, $result._ingestr.releasegroupid) :>
             </tbody>
           </table>
 
@@ -84,6 +87,7 @@
                 <th>Length</th>
                 <: if $result._ingestr.print_isrc { :><th>ISRC</th><: } :>
                 <: if $result._ingestr.print_acoustid { :><th>AcoustID</th><: } :>
+                <: if $result._ingestr.print_recordingids { :><th>Matched Recording</th><: } :>
               </tr>
             </thead>
             <tbody>
@@ -96,6 +100,9 @@
                 <: if $result._ingestr.print_isrc { :><td><: $track.isrc :></td><: } :>
                 <: if $result._ingestr.print_acoustid { :><td>
                     <: if $track.acoustid { :><a href="https://acoustid.org/track/<: $track.acoustid :>"><: $track.acoustid :></a><: } :>
+                </td><: } :>
+                <: if $result._ingestr.print_recordingids { :><td>
+                    <: if $track.recordingid { :><a href="https://musicbrainz.org/recording/<: $track.recordingid :>"><: $track.recordingid :></a><: } :>
                 </td><: } :>
               </tr>
               : }

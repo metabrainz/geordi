@@ -8,14 +8,16 @@ use Plack::Request;
 use Plack::Response;
 use Text::Xslate;
 use List::UtilsBy qw( sort_by );
+use List::AllUtils qw( any );
 use Sort::Naturally qw( ncmp );
 
-sub extract_acoustid
+sub extract_identifier
 {
-   my $block = shift;
-   my $acoustid = use_first_text($block, qr{acoustid});
-   $acoustid =~ s/urn:acoustid://;
-   return $acoustid unless $acoustid eq 'unknown';
+    my ($block, $search_regex, $strip_regex) = @_;
+    $strip_regex //= $search_regex;
+    my $identifier = use_first_text($block, $search_regex);
+    $identifier =~ s/$strip_regex//;
+    return $identifier;
 }
 
 sub use_first_text
@@ -25,7 +27,7 @@ sub use_first_text
    if (ref($block) eq 'ARRAY') {
        my @items = grep { $_->{text} =~ $regex } @{ $block };
        return $items[0]->{text};
-   } else {
+   } elsif (defined $block && $block->{text} =~ $regex) {
        return defined $block ? $block->{text} : $block;
    }
 }
@@ -46,22 +48,29 @@ my $processors = {
     wcd => sub {
         my $input_json = shift;
         my @acceptable_formats = ('flac', 'vbr mp3', 'apple lossless audio', 'ogg vorbis');
-        my $track_count = scalar grep { my $form = $_->{format}{text}; $_->{"_source"} eq "original" && grep { lc($form) eq $_ } @acceptable_formats } @{ $input_json->{"_source"}{"files.xml"}{files}{file} };
+        my $track_count = scalar grep { my $form = $_->{format}{text}; $_->{"_source"} eq "original" && any { lc($form) eq $_ } @acceptable_formats } @{ $input_json->{"_source"}{"files.xml"}{files}{file} };
         my $tracks = [ sort { ncmp($a->{number}, $b->{number}) }
                        map +{ number => $_->{track}{text},
                               length => $_->{length}{text},
                               artist => $_->{artist}{text},
                               title => $_->{title}{text},
-                              acoustid => extract_acoustid($_->{"external-identifier"})
-                            }, grep { my $form = $_->{format}{text}; $_->{"_source"} eq "original" && grep { lc($form) eq $_ } @acceptable_formats } @{ $input_json->{"_source"}{"files.xml"}{files}{file} } ];
+                              acoustid => extract_identifier($_->{"external-identifier"}, qr{urn:acoustid:}),
+                              recordingid => extract_identifier($_->{"external-identifier"}, qr{urn:mb_recording_id:}),
+                            }, grep { my $form = $_->{format}{text}; $_->{"_source"} eq "original" && any { lc($form) eq $_ } @acceptable_formats } @{ $input_json->{"_source"}{"files.xml"}{files}{file} } ];
+        my $has_acoustids = any { $_->{acoustid} } @$tracks;
+        my $has_recordingids = any { $_->{recordingid} } @$tracks;
         return {
-                 release_title => use_first_text($input_json->{"_source"}{"meta.xml"}{metadata}{album}) // $input_json->{"_source"}{"meta.xml"}{metadata}{title}{text} =~ s, / .*$,,r,
+                 release_title => use_first_text($input_json->{"_source"}{"meta.xml"}{metadata}{album}) || $input_json->{"_source"}{"meta.xml"}{metadata}{title}{text} =~ s, / .*$,,r,
                  alternate_release_titles => all_but_first_text($input_json->{"_source"}{"meta.xml"}{metadata}{album}),
                  release_date => $input_json->{"_source"}{"meta.xml"}{metadata}{year}{text},
                  release_artist => $input_json->{"_source"}{"meta.xml"}{metadata}{artist}{text} // $input_json->{"_source"}{"meta.xml"}{metadata}{creator}{text},
+                 releaseid => extract_identifier($input_json->{"_source"}{"meta.xml"}{metadata}{"external-identifier"}, qr{urn:mb_release_id:}),
+                 releasegroupid => extract_identifier($input_json->{"_source"}{"meta.xml"}{metadata}{"external-identifier"}, qr{urn:mb_releasegroup_id:}),
+                 discogsid => extract_identifier($input_json->{"_source"}{"meta.xml"}{metadata}{"external-identifier"}, qr{urn:discogs:release:}),
                  track_count => $track_count,
-                 print_acoustid => 1,
-                 tracks => $tracks
+                 tracks => $tracks,
+                 print_acoustid => $has_acoustids,
+                 print_recordingids => $has_recordingids
                }
     }
 };
