@@ -8,36 +8,57 @@ use Plack::Request;
 use Plack::Response;
 use Text::Xslate;
 use List::UtilsBy qw( sort_by );
+use Sort::Naturally qw( ncmp );
 
 sub extract_acoustid
 {
    my $block = shift;
-   my $acoustid;
-   if (ref($block) eq 'ARRAY') {
-       my @acoustids = grep { $_->{text} =~ /acoustid/ } @{ $block };
-       $acoustid = $acoustids[0]->{text};
-   } else {
-       $acoustid = $block->{text};
-   }
+   my $acoustid = use_first_text($block, qr{acoustid});
    $acoustid =~ s/urn:acoustid://;
    return $acoustid unless $acoustid eq 'unknown';
+}
+
+sub use_first_text
+{
+   my ($block, $regex) = @_;
+   $regex //= qr{.*};
+   if (ref($block) eq 'ARRAY') {
+       my @items = grep { $_->{text} =~ $regex } @{ $block };
+       return $items[0]->{text};
+   } else {
+       return defined $block ? $block->{text} : $block;
+   }
+}
+
+sub all_but_first_text
+{
+   my ($block, $regex) = @_;
+   $regex //= qr{.*};
+   if (ref($block) eq 'ARRAY') {
+       my @items = grep { $_->{text} =~ $regex } @{ $block };
+       return [map { $_->{text} } @items[1..scalar @items - 1]];
+   } else {
+       return undef;
+   }
 }
 
 my $processors = {
     wcd => sub {
         my $input_json = shift;
-        my $track_count = scalar grep {$_->{"_source"} eq "original" && $_->{format}{text} eq "Flac"} @{ $input_json->{"_source"}{"files.xml"}{files}{file} };
-        my $tracks = [ sort_by { $_->{number} }
+        my @acceptable_formats = ('flac', 'vbr mp3', 'apple lossless audio', 'ogg vorbis');
+        my $track_count = scalar grep { my $form = $_->{format}{text}; $_->{"_source"} eq "original" && grep { lc($form) eq $_ } @acceptable_formats } @{ $input_json->{"_source"}{"files.xml"}{files}{file} };
+        my $tracks = [ sort { ncmp($a->{number}, $b->{number}) }
                        map +{ number => $_->{track}{text},
                               length => $_->{length}{text},
                               artist => $_->{artist}{text},
                               title => $_->{title}{text},
                               acoustid => extract_acoustid($_->{"external-identifier"})
-                            }, grep {$_->{"_source"} eq "original" && $_->{format}{text} eq "Flac"} @{ $input_json->{"_source"}{"files.xml"}{files}{file} } ];
+                            }, grep { my $form = $_->{format}{text}; $_->{"_source"} eq "original" && grep { lc($form) eq $_ } @acceptable_formats } @{ $input_json->{"_source"}{"files.xml"}{files}{file} } ];
         return {
-                 release_title => $input_json->{"_source"}{"meta.xml"}{metadata}{album}{text} // $input_json->{"_source"}{"meta.xml"}{metadata}{title}{text} =~ s, / .*$,,r,
+                 release_title => use_first_text($input_json->{"_source"}{"meta.xml"}{metadata}{album}) // $input_json->{"_source"}{"meta.xml"}{metadata}{title}{text} =~ s, / .*$,,r,
+                 alternate_release_titles => all_but_first_text($input_json->{"_source"}{"meta.xml"}{metadata}{album}),
                  release_date => $input_json->{"_source"}{"meta.xml"}{metadata}{year}{text},
-                 release_artist => $input_json->{"_source"}{"meta.xml"}{metadata}{artist}{text},
+                 release_artist => $input_json->{"_source"}{"meta.xml"}{metadata}{artist}{text} // $input_json->{"_source"}{"meta.xml"}{metadata}{creator}{text},
                  track_count => $track_count,
                  print_acoustid => 1,
                  tracks => $tracks
