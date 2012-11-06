@@ -21,8 +21,8 @@ my $app = sub {
     my $req = Plack::Request->new($env);
 
     my $res;
-    if (my ($file) = $req->path =~ /^\/(.+)$/) {
-        my $search_res = $ua->get('http://0.0.0.0:9200/umg/product/' . $file);
+    if (my ($index, $identifier) = $req->path =~ /^\/([^\/]+)\/([^\/]+)$/) {
+        my $search_res = $ua->get('http://0.0.0.0:9200/' . $index . '/item/' . $identifier);
         my $doc = $json->jsonToObj($search_res->decoded_content);
         use Devel::Dwarn; Dwarn $search_res;
         $res = Plack::Response->new(

@@ -2,6 +2,6 @@
 
 : around content -> {
 <pre>
-<: json($document._source.product) :>
+<: json($document._source) :>
 </pre>
 : }
