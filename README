@@ -1,8 +1,10 @@
 This project allows the consumption of label feed XML files.
 
-
+ingestr-server subdir:
+   new python codebase
 tools subdir:
-
-submit.pl 
-   Submits files to the local elastic search server
-   Requires: XML::XML2JSON LWP::UserAgent HTTP::Request URI::Escape Encode
+   submit-dir.pl
+      Submits files to the local elastic search server
+      Requires: XML::XML2JSON LWP::UserAgent HTTP::Request URI::Escape Encode JSON Try::Tiny File::Slurp
+ingestr-server-perl subdir:
+   old perl codebase
