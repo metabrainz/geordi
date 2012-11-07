@@ -13,15 +13,14 @@ app.config.from_object(__name__)
 
 @app.route('/')
 def search():
-    args = {'url': None, 'data': None}
+    data = None
     if request.args.get('query', False):
-        args['url'] = app.config['SEARCH_URL_PATTERN'].format(query = request.args.get('query'))
-        req = urllib2.Request(args['url'])
+        url = app.config['SEARCH_URL_PATTERN'].format(query = request.args.get('query'))
+        req = urllib2.Request(url)
         opener = urllib2.build_opener()
         f = opener.open(req)
-        args['data'] = json.load(f)
-    print repr(args)
-    return render_template('search.html', query = args['url'], data = args['data'])
+        data = json.load(f)
+    return render_template('search.html', query = request.args.get('query'), data = data, json = json)
 
 @app.route('/<index>/<item>')
 def document(index, item):

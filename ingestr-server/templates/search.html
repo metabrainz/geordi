@@ -7,7 +7,7 @@
 This is a search for <code>{{ query }}</code>.
 </p>
 <pre>
-{{ data }}
+{{ json.dumps(data, indent=1) }}
 </pre>
 {% endif %}
 {% endblock %}
