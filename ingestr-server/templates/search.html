@@ -1,8 +1,10 @@
 {% extends "layout.html" %}
-{% block title %}{{ query }} - Search{% endblock %}
+{% block title %}{% if query %}{{ query }} - Search{% else %}Search{% endif %}{% endblock %}
 
 {% block content %}
+{% if query %}
 <p>
-This is a search for {% if query %}<code>{{ query }}</code>{% else %}nothing, apparently{% endif %}.
+This is a search for <code>{{ query }}</code>.
 </p>
+{% endif %}
 {% endblock %}
