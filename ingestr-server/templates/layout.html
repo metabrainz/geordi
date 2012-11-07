@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+    <head>
+       {% block head %}
+           <title>{% block title %}{% endblock %} - ingestr</title>
+           <link rel="stylesheet" href="http://twitter.github.com/bootstrap/1.4.0/bootstrap.min.css">
+       {% endblock %}
+    </head>
+    <body>
+        <div class="container">
+          <div class="content">
+            <h1>Ingestr</h1>
+            <form action="/search" method="get">
+              <div class="clearfix">
+                <label for="id-query">Query:</label>
+                <div class="input">
+                  <input type="text" name="query" id="id-query" />
+                </div>
+              </div>
+              <div class="actions">
+                <input type="submit" class="btn primary" value="Search" />
+              </div>
+            </form>
+            {% block content %}{% endblock %}
+          </div>
+    </div>
+    </body>
+</html>
