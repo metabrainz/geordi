@@ -6,8 +6,11 @@
 <p>
 This is a search for <code>{{ query }}</code>.
 </p>
+{% for result in data.hits.hits %}
+<h2><a href="/{{ result._index}}/{{ result._id }}">{{ result._index }} - {{ result._id }}</a></h2>
 <pre>
-{{ json.dumps(data, indent=1) }}
+{{ json.dumps(result, indent=1) }}
 </pre>
+{% endfor %}
 {% endif %}
 {% endblock %}

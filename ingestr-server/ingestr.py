@@ -24,7 +24,12 @@ def search():
 
 @app.route('/<index>/<item>')
 def document(index, item):
-    return render_template('document.html', item=item, index=index)
+    url = app.config['DOCUMENT_URL_PATTERN'].format(index = index, item = item)
+    req = urllib2.Request(url)
+    opener = urllib2.build_opener()
+    f = opener.open(req)
+    data = json.load(f)
+    return render_template('document.html', item=item, index=index, data = data, json = json)
 
 if __name__ == '__main__':
     app.run(debug = True)
