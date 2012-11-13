@@ -5,6 +5,16 @@
 <i class="icon-resize-full"></i>
 {% endmacro %}
 
+{% macro json_looper(item, loop) %}
+    {%- if item is mapping -%}
+        <dl class="dict">{{ loop(item.iteritems()) }} </dl>
+    {%- elif item is iterable and item is not string -%}
+        <ul class="list">{{ loop(item) }}</ul>
+    {%- else -%} 
+        {{ item }}
+    {%- endif -%}
+{% endmacro %}
+
 {% block content %}
 {% if query %}
 <p>
@@ -22,23 +32,11 @@ This is a search for <code>{{ query }}</code>.
             <dt><button class="btn block-expander">{{ expand_icon() }} {{ item[0] }}</button></dt>
             
             <dd class="collapse">
-            {%- if item[1] is mapping -%}
-                <dl class="dict">{{ loop(item[1].iteritems()) }} </dl>
-            {%- elif item[1] is iterable and item[1] is not string -%}
-                <ul class="list">{{ loop(item[1]) }}</ul>
-            {%- else -%} 
-                {{ item[1] }}
-            {%- endif -%}
+            {{ json_looper(item[1], loop) }}
             </dd>
         {% else %}
             <li><button class="btn block-expander">{{ expand_icon() }}</button><div class="collapse list-item">
-            {%- if item is mapping -%}
-                <dl class="dict">{{ loop(item.iteritems()) }} </dl>
-            {%- elif item is iterable and item is not string -%}
-                <ul class="list">{{ loop(item) }}</ul>
-            {%- else -%} 
-                {{ item }}
-            {%- endif -%}
+            {{ json_looper(item, loop) }}
             </div></li>
         {% endif %}
     {% endfor %}
