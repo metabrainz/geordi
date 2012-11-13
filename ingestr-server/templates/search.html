@@ -1,49 +1,65 @@
 {% extends "layout.html" %}
 {% block title %}{% if query %}{{ query }} - Search{% else %}Search{% endif %}{% endblock %}
 
+{% macro expand_icon() %}
+<i class="icon-resize-full"></i>
+{% endmacro %}
+
 {% block content %}
 {% if query %}
 <p>
 This is a search for <code>{{ query }}</code>.
 </p>
+<ul>
 {% for result in data.hits.hits %}
-<div class="result">
-  <h3><a href="/{{ result._index}}/{{ result._id }}">{{ result._index }} - {{ result._id }}</a></h3>
-  <h4>Raw JSON <i class="icon-resize-full"></i></h4>
+<li class="result">
+  <h4><a href="/{{ result._index}}/{{ result._id }}">{{ result._index }} - {{ result._id }}</a></h4>
+  <button class="btn json-expander">{{ expand_icon() }} Raw JSON</button>
   <div class="raw collapse">
     <dl class="dict">
     {% for item in result.iteritems() recursive %}
         {% if item[1] is defined and item[0] is defined %}
-        <dt>{{ item[0] }}</dt>
-        <dd>
-        {%- if item[1] is mapping -%}
-            <dl class="dict">{{ loop(item[1].iteritems()) }} </dl>
-        {%- elif item[1] is iterable and item[1] is not string -%}
-            <ul class="list">{{ loop(item[1]) }}</ul>
-        {%- else -%} 
-            {{ item[1] }}
-        {%- endif -%}
-        </dd>
-        {% else %}<li>
-        {%- if item is mapping -%}
-            <dl class="dict">{{ loop(item.iteritems()) }} </dl>
-        {%- elif item is iterable and item is not string -%}
-            <ul class="list">{{ loop(item) }}</ul>
-        {%- else -%} 
-            {{ item }}
-        </li>{%- endif -%}
+            <dt><button class="btn block-expander">{{ expand_icon() }} {{ item[0] }}</button></dt>
+            
+            <dd class="collapse">
+            {%- if item[1] is mapping -%}
+                <dl class="dict">{{ loop(item[1].iteritems()) }} </dl>
+            {%- elif item[1] is iterable and item[1] is not string -%}
+                <ul class="list">{{ loop(item[1]) }}</ul>
+            {%- else -%} 
+                {{ item[1] }}
+            {%- endif -%}
+            </dd>
+        {% else %}
+            <li><button class="btn block-expander">{{ expand_icon() }}</button><div class="collapse list-item">
+            {%- if item is mapping -%}
+                <dl class="dict">{{ loop(item.iteritems()) }} </dl>
+            {%- elif item is iterable and item is not string -%}
+                <ul class="list">{{ loop(item) }}</ul>
+            {%- else -%} 
+                {{ item }}
+            {%- endif -%}
+            </div></li>
         {% endif %}
     {% endfor %}
     </dl>
   </div>
-</div>
+</li>
 {% endfor %}
+</ul>
 {% endif %}
 {% endblock %}
 
 {% block js %}
-  <script>$('i').click(function() {
-      $(this).toggleClass('icon-resize-full icon-resize-small') 
-      $(this).closest('div.result').find('div.raw').toggleClass('collapse')
-  });</script>
+<script>
+  $('button.json-expander').click(function() {
+    $(this).find('i').toggleClass('icon-resize-full icon-resize-small'); 
+    $(this).closest('li.result').find('div.raw').toggleClass('collapse');
+  });
+  $('.block-expander').click(function() {
+    $(this).find('i').toggleClass('icon-resize-full icon-resize-small');
+    $(this).next('div.list-item').toggleClass('collapse');
+    $(this).parents('dt').next('dd').toggleClass('collapse');
+  });
+</script>
 {% endblock %}
