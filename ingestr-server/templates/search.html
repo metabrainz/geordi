@@ -29,12 +29,10 @@ This is a search for <code>{{ query }}</code>. In the JSON Source view, alt-clic
     {% for item in result._source.iteritems() recursive %}
         {% if item[1] is defined and item[0] is defined %}
             <dt><button class="btn block-expander closed">{{ expand_icon() }} {{ item[0] }}</button></dt>
-            
             <dd class="collapse">{{ json_looper(item[1], loop) }}</dd>
         {% else %}
             <li><button class="btn block-expander closed">{{ expand_icon() }}</button>
-
-            <div class="collapse li">{{ json_looper(item, loop) }}</div>
+                <div class="collapse li">{{ json_looper(item, loop) }}</div>
             </li>
         {% endif %}
     {% endfor %}
@@ -76,14 +74,16 @@ This is a search for <code>{{ query }}</code>. In the JSON Source view, alt-clic
     if ($this.hasClass('closed')) {
         openRegion($this);
         if (event.altKey) {
-            $this.next('div.li').find('.block-expander.closed').each(function() { openRegion($(this)) });
-            $this.parents('dt').next('dd').find('.block-expander.closed').each(function () { openRegion($(this)) });
+            $this.next('div.li')
+              .add($this.parents('dt').next('dd'))
+              .find('.block-expander.closed').each(function() { openRegion($(this)) });
         }
     } else {
         closeRegion($this);
         if (event.altKey) {
-            $this.next('div.li').find('.block-expander.open').each(function() { closeRegion($(this)) });
-            $this.parents('dt').next('dd').find('.block-expander.open').each(function () { closeRegion($(this)) });
+            $this.next('div.li')
+              .add($this.parents('dt').next('dd'))
+              .find('.block-expander.open').each(function() { closeRegion($(this)) });
         }
     }
   });
