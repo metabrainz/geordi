@@ -9,11 +9,32 @@ This is a search for <code>{{ query }}</code>.
 {% for result in data.hits.hits %}
 <div class="result">
   <h3><a href="/{{ result._index}}/{{ result._id }}">{{ result._index }} - {{ result._id }}</a></h3>
-  <h4>Raw JSON <i class="icon-resize-full" data-toggle="collapse" data-target="#pre-{{ result._index }}-{{ result._id }}"></i></h4>
+  <h4>Raw JSON <i class="icon-resize-full"></i></h4>
   <div class="raw collapse">
-    <pre id="pre-{{ result._index }}-{{ result._id }}">
-    {{ json.dumps(result, indent=1) }}
-    </pre>
+    <dl class="dict">
+    {% for item in result.iteritems() recursive %}
+        {% if item[1] is defined and item[0] is defined %}
+        <dt>{{ item[0] }}</dt>
+        <dd>
+        {%- if item[1] is mapping -%}
+            <dl class="dict">{{ loop(item[1].iteritems()) }} </dl>
+        {%- elif item[1] is iterable and item[1] is not string -%}
+            <ul class="list">{{ loop(item[1]) }}</ul>
+        {%- else -%} 
+            {{ item[1] }}
+        {%- endif -%}
+        </dd>
+        {% else %}<li>
+        {%- if item is mapping -%}
+            <dl class="dict">{{ loop(item.iteritems()) }} </dl>
+        {%- elif item is iterable and item is not string -%}
+            <ul class="list">{{ loop(item) }}</ul>
+        {%- else -%} 
+            {{ item }}
+        </li>{%- endif -%}
+        {% endif %}
+    {% endfor %}
+    </dl>
   </div>
 </div>
 {% endfor %}
