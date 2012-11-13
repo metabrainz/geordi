@@ -7,9 +7,9 @@
 
 {% macro json_looper(item, loop) %}
     {%- if item is mapping -%}
-        <dl class="dict">{{ loop(item.iteritems()) }} </dl>
+        <dl>{{ loop(item.iteritems()) }}</dl>
     {%- elif item is iterable and item is not string -%}
-        <ul class="list">{{ loop(item) }}</ul>
+        <ul>{{ loop(item) }}</ul>
     {%- else -%} 
         {{ item }}
     {%- endif -%}
@@ -18,26 +18,24 @@
 {% block content %}
 {% if query %}
 <p>
-This is a search for <code>{{ query }}</code>.
+This is a search for <code>{{ query }}</code>. In the JSON Source view, alt-click will open and close full subtrees.
 </p>
 <ul>
 {% for result in data.hits.hits %}
 <li class="result">
-  <h4><a href="/{{ result._index}}/{{ result._id }}">{{ result._index }} - {{ result._id }}</a></h4>
-  <button class="btn json-expander closed">{{ expand_icon() }} JSON Source</button>
+  <h4><a href="/{{ result._index}}/{{ result._id }}">{{ result._index }} / {{ result._id }}</a> <button class="btn json-expander closed">{{ expand_icon() }} JSON Source</button></h4>
   <div class="raw collapse">
     <dl class="dict">
     {% for item in result._source.iteritems() recursive %}
         {% if item[1] is defined and item[0] is defined %}
             <dt><button class="btn block-expander closed">{{ expand_icon() }} {{ item[0] }}</button></dt>
             
-            <dd class="collapse">
-            {{ json_looper(item[1], loop) }}
-            </dd>
+            <dd class="collapse">{{ json_looper(item[1], loop) }}</dd>
         {% else %}
-            <li><button class="btn block-expander closed">{{ expand_icon() }}</button><div class="collapse list-item">
-            {{ json_looper(item, loop) }}
-            </div></li>
+            <li><button class="btn block-expander closed">{{ expand_icon() }}</button>
+
+            <div class="collapse li">{{ json_looper(item, loop) }}</div>
+            </li>
         {% endif %}
     {% endfor %}
     </dl>
@@ -50,28 +48,44 @@ This is a search for <code>{{ query }}</code>.
 
 {% block js %}
 <script>
+  function closeRegion($blockExpander) {
+      $blockExpander
+        .next('div.li').addClass('collapse').end()
+        .parents('dt').next('dd').addClass('collapse'); 
+      toggleBits($blockExpander);
+  }
+
+  function openRegion($blockExpander) {
+      $blockExpander
+        .next('div.li').removeClass('collapse').end()
+        .parents('dt').next('dd').removeClass('collapse'); 
+      toggleBits($blockExpander);
+  }
+
+  function toggleBits($base) {
+      $base.toggleClass('closed open').find('i').toggleClass('icon-plus icon-minus');
+  }
+
   $('button.json-expander').click(function() {
     $(this).find('i').toggleClass('icon-plus icon-minus'); 
     $(this).closest('li.result').find('div.raw').toggleClass('collapse');
   });
+
   $('.block-expander').click(function(event) {
-    if ($(this).hasClass('closed')) {
-        $(this).next('div.list-item').removeClass('collapse');
-        $(this).parents('dt').next('dd').removeClass('collapse');
+    $this = $(this);
+    if ($this.hasClass('closed')) {
+        openRegion($this);
         if (event.altKey) {
-            $(this).next('div.list-item').find('.block-expander.closed').click();
-            $(this).parents('dt').next('dd').find('.block-expander.closed').click();
+            $this.next('div.li').find('.block-expander.closed').each(function() { openRegion($(this)) });
+            $this.parents('dt').next('dd').find('.block-expander.closed').each(function () { openRegion($(this)) });
         }
     } else {
-        $(this).next('div.list-item').addClass('collapse');
-        $(this).parents('dt').next('dd').addClass('collapse');
+        closeRegion($this);
         if (event.altKey) {
-            $(this).next('div.list-item').find('.block-expander.open').click();
-            $(this).parents('dt').next('dd').find('.block-expander.open').click();
+            $this.next('div.li').find('.block-expander.open').each(function() { closeRegion($(this)) });
+            $this.parents('dt').next('dd').find('.block-expander.open').each(function () { closeRegion($(this)) });
         }
     }
-    $(this).find('i').toggleClass('icon-plus icon-minus');
-    $(this).toggleClass('closed open');
   });
 </script>
 {% endblock %}
