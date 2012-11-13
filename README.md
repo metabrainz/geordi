@@ -1,8 +1,10 @@
-== ingestr ==
+ingestr
+-------
 
 This project allows the consumption of arbitrary data, for use as a data source and matching tool.
 
-=== Setup ===
+Setup
+=====
 
 Shared dependencies: elasticsearch -- install and make available, presumably on localhost:9200 (the default)
 
@@ -30,11 +32,13 @@ To import data, from tools directory:
 
 Where \* should be a bunch of directories named by identifier, containing XML and JSON files.
 
-=== Usage ===
+Usage
+=====
 
 Thus far, only displays data, updates when that's fixed!
 
-=== Code Layout ===
+Code Layout
+===========
 
 ingestr-server subdir:
    new python codebase
