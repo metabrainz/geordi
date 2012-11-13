@@ -2,7 +2,7 @@
 {% block title %}{% if query %}{{ query }} - Search{% else %}Search{% endif %}{% endblock %}
 
 {% macro expand_icon() %}
-<i class="icon-resize-full"></i>
+<i class="icon-plus"></i>
 {% endmacro %}
 
 {% macro json_looper(item, loop) %}
@@ -24,18 +24,18 @@ This is a search for <code>{{ query }}</code>.
 {% for result in data.hits.hits %}
 <li class="result">
   <h4><a href="/{{ result._index}}/{{ result._id }}">{{ result._index }} - {{ result._id }}</a></h4>
-  <button class="btn json-expander">{{ expand_icon() }} JSON Source</button>
+  <button class="btn json-expander closed">{{ expand_icon() }} JSON Source</button>
   <div class="raw collapse">
     <dl class="dict">
     {% for item in result._source.iteritems() recursive %}
         {% if item[1] is defined and item[0] is defined %}
-            <dt><button class="btn block-expander">{{ expand_icon() }} {{ item[0] }}</button></dt>
+            <dt><button class="btn block-expander closed">{{ expand_icon() }} {{ item[0] }}</button></dt>
             
             <dd class="collapse">
             {{ json_looper(item[1], loop) }}
             </dd>
         {% else %}
-            <li><button class="btn block-expander">{{ expand_icon() }}</button><div class="collapse list-item">
+            <li><button class="btn block-expander closed">{{ expand_icon() }}</button><div class="collapse list-item">
             {{ json_looper(item, loop) }}
             </div></li>
         {% endif %}
@@ -51,13 +51,27 @@ This is a search for <code>{{ query }}</code>.
 {% block js %}
 <script>
   $('button.json-expander').click(function() {
-    $(this).find('i').toggleClass('icon-resize-full icon-resize-small'); 
+    $(this).find('i').toggleClass('icon-plus icon-minus'); 
     $(this).closest('li.result').find('div.raw').toggleClass('collapse');
   });
-  $('.block-expander').click(function() {
-    $(this).find('i').toggleClass('icon-resize-full icon-resize-small');
-    $(this).next('div.list-item').toggleClass('collapse');
-    $(this).parents('dt').next('dd').toggleClass('collapse');
+  $('.block-expander').click(function(event) {
+    if ($(this).hasClass('closed')) {
+        $(this).next('div.list-item').removeClass('collapse');
+        $(this).parents('dt').next('dd').removeClass('collapse');
+        if (event.altKey) {
+            $(this).next('div.list-item').find('.block-expander.closed').click();
+            $(this).parents('dt').next('dd').find('.block-expander.closed').click();
+        }
+    } else {
+        $(this).next('div.list-item').addClass('collapse');
+        $(this).parents('dt').next('dd').addClass('collapse');
+        if (event.altKey) {
+            $(this).next('div.list-item').find('.block-expander.open').click();
+            $(this).parents('dt').next('dd').find('.block-expander.open').click();
+        }
+    }
+    $(this).find('i').toggleClass('icon-plus icon-minus');
+    $(this).toggleClass('closed open');
   });
 </script>
 {% endblock %}
