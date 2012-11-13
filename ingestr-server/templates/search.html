@@ -7,15 +7,22 @@
 This is a search for <code>{{ query }}</code>.
 </p>
 {% for result in data.hits.hits %}
-<h3><a href="/{{ result._index}}/{{ result._id }}">{{ result._index }} - {{ result._id }}</a></h3>
-<i style="float: right" class="icon-resize-full" data-toggle="collapse" data-target="#pre-{{ result._index }}-{{ result._id }}"></i>
-<pre class="collapse" id="pre-{{ result._index }}-{{ result._id }}">
-{{ json.dumps(result, indent=1) }}
-</pre>
+<div class="result">
+  <h3><a href="/{{ result._index}}/{{ result._id }}">{{ result._index }} - {{ result._id }}</a></h3>
+  <h4>Raw JSON <i class="icon-resize-full" data-toggle="collapse" data-target="#pre-{{ result._index }}-{{ result._id }}"></i></h4>
+  <div class="raw collapse">
+    <pre id="pre-{{ result._index }}-{{ result._id }}">
+    {{ json.dumps(result, indent=1) }}
+    </pre>
+  </div>
+</div>
 {% endfor %}
 {% endif %}
 {% endblock %}
 
 {% block js %}
-  <script>$('i').click(function(){ $(this).toggleClass('icon-resize-full icon-resize-small') });</script>
+  <script>$('i').click(function() {
+      $(this).toggleClass('icon-resize-full icon-resize-small') 
+      $(this).closest('div.result').find('div.raw').toggleClass('collapse')
+  });</script>
 {% endblock %}
