@@ -2,7 +2,7 @@
 
 This project allows the consumption of arbitrary data, for use as a data source and matching tool.
 
-=== Setup ==
+=== Setup ===
 
 Shared dependencies: elasticsearch -- install and make available, presumably on localhost:9200 (the default)
 
