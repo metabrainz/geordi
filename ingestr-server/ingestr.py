@@ -2,6 +2,7 @@ from __future__ import division, absolute_import
 from flask import Flask, render_template, request
 import json
 import urllib2
+import urllib
 
 # CONFIG
 SECRET_KEY = 'super seekrit'
@@ -15,7 +16,7 @@ app.config.from_object(__name__)
 def search():
     data = None
     if request.args.get('query', False):
-        url = app.config['SEARCH_URL_PATTERN'].format(query = request.args.get('query'))
+        url = app.config['SEARCH_URL_PATTERN'].format(query = urllib.quote_plus(request.args.get('query')))
         req = urllib2.Request(url)
         opener = urllib2.build_opener()
         f = opener.open(req)
