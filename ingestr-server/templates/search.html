@@ -5,6 +5,21 @@
 <i class="icon-plus"></i>
 {% endmacro %}
 
+{% macro json_pp(json_data) %}
+    <dl>
+    {% for item in json_data.iteritems() recursive %}
+        {% if item[1] is defined and item[0] is defined %}
+            <dt><button class="btn block-expander closed">{{ expand_icon() }} {{ item[0] }}</button></dt>
+            <dd class="collapse">{{ json_looper(item[1], loop) }}</dd>
+        {% else %}
+            <li><button class="btn block-expander closed">{{ expand_icon() }}</button>
+                <div class="collapse li">{{ json_looper(item, loop) }}</div>
+            </li>
+        {% endif %}
+    {% endfor %}
+    </dl>
+{% endmacro %}
+
 {% macro json_looper(item, loop) %}
     {%- if item is mapping -%}
         <dl>{{ loop(item.iteritems()) }}</dl>
@@ -24,20 +39,7 @@ This is a search for <code>{{ query }}</code>. In the JSON Source view, alt-clic
 {% for result in data.hits.hits %}
 <li class="result">
   <h4><a href="/{{ result._index}}/{{ result._id }}">{{ result._index }} / {{ result._id }}</a> <button class="btn json-expander closed">{{ expand_icon() }} JSON Source</button></h4>
-  <div class="raw collapse">
-    <dl class="dict">
-    {% for item in result._source.iteritems() recursive %}
-        {% if item[1] is defined and item[0] is defined %}
-            <dt><button class="btn block-expander closed">{{ expand_icon() }} {{ item[0] }}</button></dt>
-            <dd class="collapse">{{ json_looper(item[1], loop) }}</dd>
-        {% else %}
-            <li><button class="btn block-expander closed">{{ expand_icon() }}</button>
-                <div class="collapse li">{{ json_looper(item, loop) }}</div>
-            </li>
-        {% endif %}
-    {% endfor %}
-    </dl>
-  </div>
+  <div class="raw collapse">{{ json_pp(result._source) }}</div>
 </li>
 {% endfor %}
 </ul>
