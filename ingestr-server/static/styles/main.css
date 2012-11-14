@@ -1,0 +1,23 @@
+dl { margin: 0px; }
+ul { margin-bottom: 0px; }
+dt::after { content: ': ' }
+dt, dd { float: left; }
+dt { clear: left }
+dd { line-height: 20px; }
+li.closed { list-style-image: url('/static/images/closed.png') }
+li.open { list-style-image: url('/static/images/open.png') }
+div.li { margin-left: 10px }
+i.icon-closed, i.icon-open {
+    width: 7px;
+    height: 7px;
+    line-height: 20px;
+    display: inline-block;
+    background-position: 0px 0px;
+    vertical-align: baseline;
+}
+i.icon-closed { background-image: url('/static/images/closed.png'); }
+i.icon-open { background-image: url('/static/images/open.png'); }
+.block-expander > span, .json-expander > span, span.block-expander { border: 1px solid transparent; }
+.block-expander > span:hover, .json-expander > span:hover, span.block-expander:hover { border: 1px dotted red; }
+.block-expander, .json-expander { cursor: pointer; }
+.plain-text { cursor: text; }
