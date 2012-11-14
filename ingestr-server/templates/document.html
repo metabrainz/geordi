@@ -1,12 +1,21 @@
 {% extends "layout.html" %}
-{% block title %}{{ index }} - {{ item }}{% endblock %}
+{% block title %}{{ data._index }} - {{ data._id }}{% endblock %}
 
 {% block content %}
 <p>
-This will display <code>{{ item }}</code> from the index <code>{{ index }}</code>.
+This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code>.
 </p>
-<pre>
-{{ json.dumps(data, indent=1) }}
-</pre>
+<dl>
+  <dt>Type</dt><dd>{{ data._type }}</dd>
+  <dt>Exists</dt><dd>{{ data.exists }}</dd>
+  <dt>Version</dt><dd>{{ data._version }}</dd>
+</dl>
 
+<h2 style="clear: left">JSON Source</h2>
+<div>{{ json_pp(data._source) }}</div>
+
+{% endblock %}
+
+{% block js %}
+{{ expander_js() }}
 {% endblock %}

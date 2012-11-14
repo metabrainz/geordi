@@ -1,3 +1,73 @@
+{%- macro expand_icon() -%}
+<i class="icon-plus"></i>
+{%- endmacro -%}
+
+{%- macro json_pp(json_data) -%}
+    <dl>
+    {% for item in json_data.iteritems() recursive -%}
+        {% if item[1] is defined and item[0] is defined %}
+            <dt><button class="btn block-expander closed">{{ expand_icon() }} {{ item[0] }}</button></dt>
+            <dd class="collapse">{{ json_looper(item[1], loop) }}</dd>
+        {% else %}
+            <li style="clear: left"><button class="btn block-expander closed">{{ expand_icon() }}</button>
+                <div class="collapse li">{{ json_looper(item, loop) }}</div>
+            </li>
+        {% endif %}
+    {% endfor %}
+    </dl>
+{%- endmacro -%}
+
+{%- macro json_looper(item, loop) -%}
+    {%- if item is mapping -%}
+        <dl>{{ loop(item.iteritems()) }}</dl>
+    {%- elif item is iterable and item is not string -%}
+        <ul>{{ loop(item) }}</ul>
+    {%- else -%} 
+        {{ item }}
+    {%- endif -%}
+{%- endmacro -%}
+
+{%- macro expander_js() -%}
+<script>
+  function closeRegion($blockExpander) {
+      $blockExpander
+        .next('div.li').addClass('collapse').end()
+        .parents('dt').next('dd').addClass('collapse'); 
+      toggleBits($blockExpander);
+  }
+
+  function openRegion($blockExpander) {
+      $blockExpander
+        .next('div.li').removeClass('collapse').end()
+        .parents('dt').next('dd').removeClass('collapse'); 
+      toggleBits($blockExpander);
+  }
+
+  function toggleBits($base) {
+      $base.toggleClass('closed open').find('i').toggleClass('icon-plus icon-minus');
+  }
+
+  $('.block-expander').click(function(event) {
+    $this = $(this);
+    if ($this.hasClass('closed')) {
+        openRegion($this);
+        if (event.altKey) {
+            $this.next('div.li')
+              .add($this.parents('dt').next('dd'))
+              .find('.block-expander.closed').each(function() { openRegion($(this)) });
+        }
+    } else {
+        closeRegion($this);
+        if (event.altKey) {
+            $this.next('div.li')
+              .add($this.parents('dt').next('dd'))
+              .find('.block-expander.open').each(function() { closeRegion($(this)) });
+        }
+    }
+  });
+</script>
+{%- endmacro -%}
+
 <!doctype html>
 <html>
     <head>
@@ -7,6 +77,10 @@
            <style type="text/css">
                dl { margin: 0px; }
                dt::after { content: ': ' }
+               dt, dd { float: left; }
+               dt { clear: left }
+               dd { line-height: 30px; }
+               div.li { margin-left: 10px }
            </style>
        {% endblock %}
     </head>
