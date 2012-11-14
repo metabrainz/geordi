@@ -18,9 +18,9 @@ i.icon {
 }
 .closed > i.icon { background-image: url('/static/images/closed.png'); }
 .open > i.icon { background-image: url('/static/images/open.png'); }
-.block-expander > span, .json-expander > span, span.block-expander { border: 1px solid transparent; }
-.block-expander > span:hover, .json-expander > span:hover, span.block-expander:hover { border: 1px dotted red; }
-.block-expander, .json-expander { cursor: pointer; }
+.expander > span { border: 1px solid transparent; }
+.expander > span:hover { border: 1px dotted red; }
+.expander { cursor: pointer; }
 .plain-text { cursor: text; }
 .collapse {
   position: relative;

@@ -2,10 +2,10 @@
     <dl>
     {% for item in json_data.iteritems() recursive -%}
         {% if item[1] is defined and item[0] is defined %}
-            <dt><span class="block-expander closed"><i class="icon"></i> {{ item[0] }}</span></dt>
+            <dt class="expander block-expander closed"><i class="icon"></i> <span>{{ item[0] }}</span></dt>
             <dd class="collapse">{{ json_looper(item[1], loop) }}</dd>
         {% else %}
-            <li class="block-expander closed" style="clear: left"><span>[{{ loop.index0 }}]</span>
+            <li class="expander block-expander closed" style="clear: left"><span>[{{ loop.index0 }}]</span>
                 <div class="collapse li">{{ json_looper(item, loop) }}</div>
             </li>
         {% endif %}
@@ -29,14 +29,14 @@
       $blockExpander
         .toggleClass('closed open')
         .children('div.li').addClass('collapse').end()
-        .parents('dt').next('dd').addClass('collapse'); 
+        .next('dd').addClass('collapse'); 
   }
 
   function openRegion($blockExpander) {
       $blockExpander
         .toggleClass('closed open')
         .children('div.li').removeClass('collapse').end()
-        .parents('dt').next('dd').removeClass('collapse'); 
+        .next('dd').removeClass('collapse'); 
   }
 
   $('li').click(function() {
@@ -52,14 +52,14 @@
         openRegion($this);
         if (event.altKey) {
             $this.children('div.li')
-              .add($this.parents('dt').next('dd'))
+              .add($this.next('dd'))
               .find('.block-expander.closed').each(function() { openRegion($(this)) });
         }
     } else {
         closeRegion($this);
         if (event.altKey) {
             $this.children('div.li')
-              .add($this.parents('dt').next('dd'))
+              .add($this.next('dd'))
               .find('.block-expander.open').each(function() { closeRegion($(this)) });
         }
     }

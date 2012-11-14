@@ -4,9 +4,11 @@
 
 {% block content %}
 {% if query %}
+
 <p>
 This is a search for <code>{{ query }}</code>. We found {{ data.hits.total }} results; starting at {{ start_from }}. 
 </p>
+
 {%- if start_from | int > 9 -%}
   <a href="/?query={{ query }}&from=0">[&laquo;]</a>
   <a href="/?query={{ query }}&from={{start_from | int - 10 }}">[&lsaquo;]</a>
@@ -20,17 +22,20 @@ This is a search for <code>{{ query }}</code>. We found {{ data.hits.total }} re
   <a href="/?query={{ query }}&from={{ start_from | int + 10}}">[&rsaquo;]</a>
   <a href="/?query={{ query }}&from={{ data.hits.total // 10 }}">[&raquo;]</a>
 {%- endif -%}
+
 <p>
 In the JSON Source view, alt-click will open and close full subtrees.
 </p>
+
 <ul>
 {% for result in data.hits.hits %}
-<li style="clear: left" class="result json-expander closed">
+<li style="clear: left" class="result expander json-expander closed">
   <span><big>{{ result._id }} ({{ result._index }}) <a href="/{{ result._index}}/{{ result._id }}">[info]</a></big> <small>({{ result._score }})</small></span>
   <div class="raw collapse">{{ json_pp(result._source) }}</div>
 </li>
 {% endfor %}
 </ul>
+
 {% endif %}
 {% endblock %}
 
