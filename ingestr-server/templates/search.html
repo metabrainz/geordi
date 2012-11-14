@@ -8,8 +8,8 @@ This is a search for <code>{{ query }}</code>. In the JSON Source view, alt-clic
 </p>
 <ul>
 {% for result in data.hits.hits %}
-<li style="clear: left" class="result">
-  <h4><a href="/{{ result._index}}/{{ result._id }}">{{ result._index }} / {{ result._id }}</a> <button class="btn json-expander closed">{{ expand_icon() }} JSON Source</button></h4>
+<li style="clear: left" class="result json-expander closed">
+  <h4>{{ result._index }} / {{ result._id }} <a href="/{{ result._index}}/{{ result._id }}">[info]</a></h4>
   <div class="raw collapse">{{ json_pp(result._source) }}</div>
 </li>
 {% endfor %}
@@ -20,9 +20,11 @@ This is a search for <code>{{ query }}</code>. In the JSON Source view, alt-clic
 {% block js %}
 {{ expander_js() }}
 <script>
-  $('button.json-expander').click(function() {
-    $(this).find('i').toggleClass('icon-plus icon-minus'); 
-    $(this).closest('li.result').find('div.raw').toggleClass('collapse');
+  $('li.json-expander').click(function(event) {
+    $this = $(this);
+    $this.toggleClass('closed open')
+         // .find('i').toggleClass('icon-open icon-closed').end()
+         .find('div.raw').toggleClass('collapse');
   });
 </script>
 {% endblock %}
