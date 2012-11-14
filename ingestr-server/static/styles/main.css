@@ -18,10 +18,8 @@ i.icon {
 }
 .closed > i.icon { background-image: url('/static/images/closed.png'); }
 .open > i.icon { background-image: url('/static/images/open.png'); }
-.expander > span { border: 1px solid transparent; }
-.expander > span:hover { border: 1px dotted red; }
-.expander { cursor: pointer; }
-.plain-text { cursor: text; }
+.expander > span.clicker { border: 1px solid transparent; cursor: pointer; }
+.expander > span.clicker:hover { border: 1px dotted red; }
 .collapse {
   position: relative;
   height: 0;
