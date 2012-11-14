@@ -9,7 +9,7 @@
             <dt><span class="block-expander closed">{{ expand_icon() }} {{ item[0] }}</span></dt>
             <dd class="collapse">{{ json_looper(item[1], loop) }}</dd>
         {% else %}
-            <li class="block-expander closed" style="clear: left">[{{ loop.index0 }}]
+            <li class="block-expander closed" style="clear: left"><span>[{{ loop.index0 }}]</span>
                 <div class="collapse li">{{ json_looper(item, loop) }}</div>
             </li>
         {% endif %}
@@ -23,7 +23,7 @@
     {%- elif item is iterable and item is not string -%}
         <ul>{{ loop(item) }}</ul>
     {%- else -%} 
-        {{ item }}
+        <span class="plain-text">{{ item }}</span>
     {%- endif -%}
 {%- endmacro -%}
 
@@ -50,6 +50,8 @@
   $('li').click(function() {
     $(this).children('.block-expander').click();
   });
+
+  $('.plain-text').click(function(event) { event.stopPropagation(); });
 
   $('.block-expander').click(function(event) {
     event.stopPropagation();

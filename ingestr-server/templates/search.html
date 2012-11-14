@@ -5,12 +5,28 @@
 {% block content %}
 {% if query %}
 <p>
-This is a search for <code>{{ query }}</code>. In the JSON Source view, alt-click will open and close full subtrees.
+This is a search for <code>{{ query }}</code>. We found {{ data.hits.total }} results; starting at {{ start_from }}. 
+</p>
+{%- if start_from | int > 9 -%}
+  <a href="/?query={{ query }}&from=0">[&laquo;]</a>
+  <a href="/?query={{ query }}&from={{start_from | int - 10 }}">[&lsaquo;]</a>
+{%- endif -%}
+{%- for page_start in range(0, data.hits.total, 10) -%}
+  {%- if start_from | int == page_start -%}<b>{%- else -%}<a href="/?query={{ query }}&from={{ page_start }}">{%- endif -%}
+  [{{ loop.index }}]
+  {%- if start_from | int == page_start -%}</b>{%- else -%}</a>{%- endif -%}
+{%- endfor -%}
+{%- if data.hits.total > start_from | int + 10 -%}
+  <a href="/?query={{ query }}&from={{ start_from | int + 10}}">[&rsaquo;]</a>
+  <a href="/?query={{ query }}&from={{ data.hits.total // 10 }}">[&raquo;]</a>
+{%- endif -%}
+<p>
+In the JSON Source view, alt-click will open and close full subtrees.
 </p>
 <ul>
 {% for result in data.hits.hits %}
 <li style="clear: left" class="result json-expander closed">
-  <h4>{{ result._index }} / {{ result._id }} <a href="/{{ result._index}}/{{ result._id }}">[info]</a></h4>
+  <span><big>{{ result._id }} ({{ result._index }}) <a href="/{{ result._index}}/{{ result._id }}">[info]</a></big> <small>({{ result._score }})</small></span>
   <div class="raw collapse">{{ json_pp(result._source) }}</div>
 </li>
 {% endfor %}
@@ -22,10 +38,11 @@ This is a search for <code>{{ query }}</code>. In the JSON Source view, alt-clic
 {{ expander_js() }}
 <script>
   $('li.json-expander').click(function(event) {
-    $this = $(this);
-    $this.toggleClass('closed open')
-         // .find('i').toggleClass('icon-open icon-closed').end()
+    if (event.target.nodeName != 'A') {
+      $this = $(this);
+      $this.toggleClass('closed open')
          .find('div.raw').toggleClass('collapse');
+    }
   });
 </script>
 {% endblock %}
