@@ -1,12 +1,8 @@
-{%- macro expand_icon() -%}
-<i class="icon-closed"></i>
-{%- endmacro -%}
-
 {%- macro json_pp(json_data) -%}
     <dl>
     {% for item in json_data.iteritems() recursive -%}
         {% if item[1] is defined and item[0] is defined %}
-            <dt><span class="block-expander closed">{{ expand_icon() }} {{ item[0] }}</span></dt>
+            <dt><span class="block-expander closed"><i class="icon"></i> {{ item[0] }}</span></dt>
             <dd class="collapse">{{ json_looper(item[1], loop) }}</dd>
         {% else %}
             <li class="block-expander closed" style="clear: left"><span>[{{ loop.index0 }}]</span>
@@ -31,20 +27,16 @@
 <script>
   function closeRegion($blockExpander) {
       $blockExpander
+        .toggleClass('closed open')
         .children('div.li').addClass('collapse').end()
         .parents('dt').next('dd').addClass('collapse'); 
-      toggleBits($blockExpander);
   }
 
   function openRegion($blockExpander) {
       $blockExpander
+        .toggleClass('closed open')
         .children('div.li').removeClass('collapse').end()
         .parents('dt').next('dd').removeClass('collapse'); 
-      toggleBits($blockExpander);
-  }
-
-  function toggleBits($base) {
-      $base.toggleClass('closed open').children('i').toggleClass('icon-closed icon-open');
   }
 
   $('li').click(function() {
