@@ -1,5 +1,5 @@
 dl { margin: 0px; }
-ul { margin-bottom: 0px; }
+ul { margin-bottom: 0px; margin-top: 0px; }
 dt::after { content: ': ' }
 dt, dd { float: left; }
 dt { clear: left }
@@ -18,8 +18,20 @@ i.icon {
 }
 .closed > i.icon { background-image: url('/static/images/closed.png'); }
 .open > i.icon { background-image: url('/static/images/open.png'); }
-.expander > span.clicker { border: 1px solid transparent; cursor: pointer; }
+
+div.li:after, .expander:after { content: '.'; display: block; visibility: hidden; height: 0; clear: both; }
+
+/* Placeholder border to prevent page moving */
+li.expander, .plain-text, .expander > span.clicker { border: 1px solid transparent; }
+
+/* Make clickable expanders respond */
+.expander > span.clicker { cursor: pointer; }
 .expander > span.clicker:hover { border: 1px dotted red; }
+
+/* Make groups/values respond on hover */
+li.expander:hover { border: 1px dotted blue; }
+.plain-text:hover { border: 1px dotted green; }
+
 .collapse {
   position: relative;
   height: 0;
