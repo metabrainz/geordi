@@ -21,15 +21,13 @@ i.icon {
 
 div.li:after, .expander:after { content: '.'; display: block; visibility: hidden; height: 0; clear: both; }
 
-/* Placeholder border to prevent page moving */
-li.expander, .plain-text, .expander > span.clicker { border: 1px solid transparent; }
+/* Placeholder border to prevent page moving, show proper cursor */
+li.block-expander, .plain-text, .expander > span.clicker { border: 1px solid transparent; }
+li.block-expander, .plain-text, .expander > span.clicker { cursor: pointer; }
 
-/* Make clickable expanders respond */
-.expander > span.clicker { cursor: pointer; }
+/* Make things respond on hover*/
 .expander > span.clicker:hover { border: 1px dotted red; }
-
-/* Make groups/values respond on hover */
-li.expander:hover { border: 1px dotted blue; }
+li.block-expander:hover { border: 1px dotted blue; }
 .plain-text:hover { border: 1px dotted green; }
 
 .collapse {
