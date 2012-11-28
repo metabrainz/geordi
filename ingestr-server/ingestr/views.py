@@ -1,12 +1,11 @@
 from __future__ import division, absolute_import
 from flask import render_template, request
 from ingestr import app
+from ingestr.db import get_conn
 
 import json
 import urllib2
 import urllib
-import psycopg2
-
 
 @app.route('/')
 def search():
@@ -33,11 +32,11 @@ def document(index, item):
 @app.route('/dbinfo')
 def dbinfo():
     ret = ""
-    try:
-        conn = psycopg2.connect("dbname='{dbname}' user='{dbuser}' host='{dbhost}'".format(dbname = app.config['DB_NAME'], dbuser = app.config['DB_USER'], dbhost = app.config['DB_HOST']))
+    conn = get_conn()
+    if conn is None:
+        return "failed to connect"
+    else:
         ret = ret + "connected to postgres\n"
-    except Exception as e:
-        return "failed to connect: {err}".format(err = repr(e))
 
     cur = conn.cursor()
     cur.execute("SELECT table_name, column_name, column_default, data_type from information_schema.columns where table_schema = 'public'")
