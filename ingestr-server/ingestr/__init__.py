@@ -1,9 +1,5 @@
 from __future__ import division, absolute_import
-from flask import Flask, render_template, request
-import json
-import urllib2
-import urllib
-import psycopg2
+from flask import Flask
 
 # CONFIG
 SECRET_KEY = 'super seekrit'
