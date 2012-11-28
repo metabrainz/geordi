@@ -1,16 +1,12 @@
 from __future__ import division, absolute_import
-from flask import Flask, render_template, request
+from flask import render_template, request
+from ingestr import app
+
 import json
 import urllib2
 import urllib
+import psycopg2
 
-# CONFIG
-SECRET_KEY = 'super seekrit'
-DOCUMENT_URL_PATTERN = 'http://localhost:9200/{index}/item/{item}'
-SEARCH_URL_PATTERN = 'http://localhost:9200/_search?q={query}&size=10&from={start_from}'
-
-app = Flask(__name__)
-app.config.from_object(__name__)
 
 @app.route('/')
 def search():
@@ -34,5 +30,18 @@ def document(index, item):
     data = json.load(f)
     return render_template('document.html', item=item, index=index, data = data, json = json)
 
-if __name__ == '__main__':
-    app.run(debug = True)
+@app.route('/dbinfo')
+def dbinfo():
+    ret = ""
+    try:
+        conn = psycopg2.connect("dbname='{dbname}' user='{dbuser}' host='{dbhost}'".format(dbname = app.config['DB_NAME'], dbuser = app.config['DB_USER'], dbhost = app.config['DB_HOST']))
+        ret = ret + "connected to postgres\n"
+    except Exception as e:
+        return "failed to connect: {err}".format(err = repr(e))
+
+    cur = conn.cursor()
+    cur.execute("SELECT table_name, column_name, column_default, data_type from information_schema.columns where table_schema = 'public'")
+    rows = cur.fetchall()
+    ret = ret + repr(rows)
+
+    return ret
