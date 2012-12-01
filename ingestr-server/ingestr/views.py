@@ -19,7 +19,7 @@ from flask import render_template, request
 from ingestr import app
 
 import json
-from pyelasticsearch import ElasticSearch
+from pyelasticsearch import ElasticSearch, ElasticHttpNotFoundError
 
 @app.route('/')
 def search():
@@ -33,5 +33,8 @@ def search():
 @app.route('/<index>/<item>')
 def document(index, item):
     es = ElasticSearch('http://localhost:9200/')
-    data = es.get(index, 'item', item)
-    return render_template('document.html', item=item, index=index, data = data, json = json)
+    try:
+        data = es.get(index, 'item', item)
+        return render_template('document.html', item=item, index=index, data = data, json = json)
+    except ElasticHttpNotFoundError:
+        return render_template('notfound.html')
