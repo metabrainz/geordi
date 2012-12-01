@@ -1,7 +1,6 @@
 from __future__ import division, absolute_import
 from flask import render_template, request
 from ingestr import app
-from ingestr.db import get_conn
 
 import json
 import urllib2
@@ -28,19 +27,3 @@ def document(index, item):
     f = opener.open(req)
     data = json.load(f)
     return render_template('document.html', item=item, index=index, data = data, json = json)
-
-@app.route('/dbinfo')
-def dbinfo():
-    ret = ""
-    conn = get_conn()
-    if conn is None:
-        return "failed to connect"
-    else:
-        ret = ret + "connected to postgres\n"
-
-    cur = conn.cursor()
-    cur.execute("SELECT table_name, column_name, column_default, data_type from information_schema.columns where table_schema = 'public'")
-    rows = cur.fetchall()
-    ret = ret + repr(rows)
-
-    return ret
