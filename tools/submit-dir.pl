@@ -62,6 +62,8 @@ foreach my $dir (@ARGV) {
         $filebase =~ s/$base//;
         # Trim leading/trailing separators
         $filebase =~ s/^[\s_-]+|[\s_-]+$//;
+        # Replace periods with underscores
+        $filebase =~ s/\./_/g;
 
         my $filecontent = read_file("$dir/$file");
         if ($file =~ /\.xml$/) {
