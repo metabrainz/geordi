@@ -40,12 +40,12 @@ Thus far, only displays data, updates when that's fixed!
 Code Layout
 ===========
 
-ingestr-server subdir:
-   new python codebase
+ingestr-server subdir: new python codebase (GPLv3+)
+
 tools subdir:
-   submit-dir.pl
-      Submits files to the local elastic search server
-      Requires: XML::XML2JSON LWP::UserAgent HTTP::Request URI::Escape Encode JSON Try::Tiny File::Slurp
-   other largely outdated files for historical understanding
-ingestr-server-perl subdir:
-   old perl codebase
+ * submit-dir.pl
+      Submits files to the local elastic search server;
+      requires: XML::XML2JSON LWP::UserAgent HTTP::Request URI::Escape Encode JSON Try::Tiny File::Slurp
+ * other largely outdated files for historical understanding
+
+ingestr-server-perl subdir: old perl codebase
