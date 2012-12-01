@@ -19,8 +19,7 @@ from flask import Flask
 
 # CONFIG
 SECRET_KEY = 'super seekrit'
-DOCUMENT_URL_PATTERN = 'http://localhost:9200/{index}/item/{item}'
-SEARCH_URL_PATTERN = 'http://localhost:9200/_search?q={query}&size=10&from={start_from}'
+ELASTICSEARCH_ENDPOINT = 'http://localhost:9200/'
 
 app = Flask(__name__)
 app.config.from_object(__name__)
