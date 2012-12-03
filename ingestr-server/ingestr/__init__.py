@@ -20,6 +20,7 @@ from flask import Flask
 # CONFIG
 SECRET_KEY = 'super seekrit'
 ELASTICSEARCH_ENDPOINT = 'http://localhost:9200/'
+AVAILABLE_INDICES = ['wcd']
 
 app = Flask(__name__)
 app.config.from_object(__name__)

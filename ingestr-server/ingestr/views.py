@@ -27,7 +27,7 @@ def search():
     start_from = request.args.get('from', '0')
     if request.args.get('query', False):
         es = ElasticSearch(app.config['ELASTICSEARCH_ENDPOINT'])
-        data = es.search({'query': {'bool': {'must': [{"query_string":{"query":request.args.get('query')}}]}}})
+        data = es.search({'query': {'bool': {'must': [{"query_string":{"query":request.args.get('query')}}]}}}, index = app.config['AVAILABLE_INDICES'], doc_type = "item")
     return render_template('search.html', query = request.args.get('query'), data = data, json = json, start_from = start_from)
 
 @app.route('/<index>/<item>')
