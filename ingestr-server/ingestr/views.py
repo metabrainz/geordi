@@ -28,13 +28,13 @@ def search():
     if request.args.get('query', False):
         es = ElasticSearch(app.config['ELASTICSEARCH_ENDPOINT'])
         data = es.search({'query': {'bool': {'must': [{"query_string":{"query":request.args.get('query')}}]}}}, index = app.config['AVAILABLE_INDICES'], doc_type = "item")
-    return render_template('search.html', query = request.args.get('query'), data = data, json = json, start_from = start_from)
+    return render_template('search.html', query = request.args.get('query'), data = data, json = json, start_from = start_from, indices = app.config['AVAILABLE_INDICES'])
 
 @app.route('/<index>/<item>')
 def document(index, item):
     es = ElasticSearch(app.config['ELASTICSEARCH_ENDPOINT'])
     try:
         data = es.get(index, 'item', item)
-        return render_template('document.html', item=item, index=index, data = data, json = json)
+        return render_template('document.html', item=item, index=index, data = data, json = json, indices = app.config['AVAILABLE_INDICES'])
     except ElasticHttpNotFoundError:
         return render_template('notfound.html')
