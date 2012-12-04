@@ -16,19 +16,17 @@ i.icon {
     background-repeat: no-repeat;
     vertical-align: baseline;
 }
-img.edit-icon { display: none; position: absolute; top: 0px; right: 0px; }
 .closed > i.icon { background-image: url('/static/images/closed.png'); }
 .open > i.icon { background-image: url('/static/images/open.png'); }
 
 div.li:after, .expander:after { content: '.'; display: block; visibility: hidden; height: 0; clear: both; }
 
 /* Placeholder border to prevent page moving, show proper cursor */
-.plain-text { display: block; padding-right: 16px; }
+.plain-text { display: block; }
 li.block-expander, .plain-text, .expander > span.clicker { border: 1px solid transparent; border-radius: 2px; position: relative; }
 li.block-expander, .plain-text, .expander > span.clicker { cursor: pointer; }
 
 /* Make things respond on hover*/
-li.block-expander:hover > img.edit-icon, .plain-text:hover > img.edit-icon { display: block; }
 .expander > span.clicker:hover { background-color: #FF6EB4; border: 1px solid #CD6090; }
 li.block-expander:hover { background-color: #D1EEEE; border: 1px solid #7A8B8B; }
 .plain-text:hover { background-color: #90EE90; border: 1px solid #7CCD7C; }

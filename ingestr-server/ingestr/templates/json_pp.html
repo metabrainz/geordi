@@ -6,7 +6,6 @@
             <dd class="collapse">{{ json_looper(item[1], loop) }}</dd>
         {% else %}
             <li class="expander block-expander closed" style="clear: left"><span class="clicker">[{{ loop.index0 }}]</span>
-                <img class="edit-icon" src="/static/images/pencil.png" />
                 <div class="collapse li">{{ json_looper(item, loop) }}</div>
             </li>
         {% endif %}
@@ -20,8 +19,7 @@
     {%- elif item is iterable and item is not string -%}
         <ul>{{ loop(item) }}</ul>
     {%- else -%} 
-        <span class="plain-text"><img class="edit-icon" src="/static/images/pencil.png" />
-{{ item }}</span>
+        <span class="plain-text">{{ item }}</span>
     {%- endif -%}
 {%- endmacro -%}
 
