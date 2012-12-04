@@ -6,7 +6,7 @@
 {% if query %}
 
 <p>
-This is a search for <code>{{ query }}</code>. We found {{ data.hits.total }} results; starting at {{ start_from }}. 
+This is a search for <code>{{ query }}</code> in the indices <code>{% for index in indices %}{{ index }}{% if not loop.last %},{% endif %}{% endfor %}</code>. We found {{ data.hits.total }} results; starting at {{ start_from }}. 
 </p>
 
 {%- if start_from | int > 9 -%}
