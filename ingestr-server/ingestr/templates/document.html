@@ -6,13 +6,10 @@
 <p>
 This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code>.
 </p>
-<dl>
-  <dt>Type</dt><dd>{{ data._type }}</dd>
-  <dt>Exists</dt><dd>{{ data.exists }}</dd>
-  <dt>Version</dt><dd>{{ data._version }}</dd>
-</dl>
 
-<h2 style="clear: left">JSON Source</h2>
+<h2>Extracted Information</h2>
+<h2>Link to MusicBrainz</h2>
+<h2>JSON Source</h2> <a href="#">show all</a>
 <div>{{ json_pp(data._source) }}</div>
 
 {% endblock %}
