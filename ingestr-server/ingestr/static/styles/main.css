@@ -23,13 +23,13 @@ div.li:after, .expander:after { content: '.'; display: block; visibility: hidden
 
 /* Placeholder border to prevent page moving, show proper cursor */
 .plain-text { display: block; }
-li.block-expander, .plain-text, .expander > span.clicker { border: 1px solid transparent; border-radius: 2px; position: relative; }
-li.block-expander, .plain-text, .expander > span.clicker { cursor: pointer; }
+.expander > span.clicker { cursor: pointer; position: relative; }
+.expander > span.clicker, li.block-expander, .plain-text { padding-top: 5px }
 
 /* Make things respond on hover*/
-.expander > span.clicker:hover { background-color: #FF6EB4; border: 1px solid #CD6090; }
-li.block-expander:hover { background-color: #D1EEEE; border: 1px solid #7A8B8B; }
-.plain-text:hover { background-color: #90EE90; border: 1px solid #7CCD7C; }
+.expander > span.clicker:hover { background-color: #FF6EB4; }
+li.block-expander:hover { background-color: #D1EEEE; }
+.plain-text:hover { background-color: #90EE90; }
 
 .collapse {
   position: relative;
@@ -40,3 +40,5 @@ li.block-expander:hover { background-color: #D1EEEE; border: 1px solid #7A8B8B; 
        -o-transition: height 0.35s ease;
           transition: height 0.35s ease;
 }
+
+select#id-index { width: 200px }
