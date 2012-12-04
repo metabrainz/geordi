@@ -15,26 +15,17 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division, absolute_import
-from flask import render_template, request
 from ingestr import app
-from ingestr.search import do_search
 
-import json
 from pyelasticsearch import ElasticSearch, ElasticHttpNotFoundError
 
-@app.route('/')
-def search():
-    data = None
-    start_from = request.args.get('from', '0')
-    if request.args.get('query', False):
-        data = do_search(request.args.get('query'), request.args.getlist('index'))
-    return render_template('search.html', query = request.args.get('query'), data = data, json = json, start_from = start_from, all_indices = app.config['AVAILABLE_INDICES'], indices = request.args.getlist('index'))
-
-@app.route('/<index>/<item>')
-def document(index, item):
+def do_search(query, indices):
     es = ElasticSearch(app.config['ELASTICSEARCH_ENDPOINT'])
-    try:
-        data = es.get(index, 'item', item)
-        return render_template('document.html', item=item, index=index, data = data, json = json, indices = app.config['AVAILABLE_INDICES'])
-    except ElasticHttpNotFoundError:
-        return render_template('notfound.html')
+    if indices in [[], ['']]:
+        indices = app.config['AVAILABLE_INDICES']
+    query = {'query':
+              {'bool': {'must': [
+                {"query_string": {"query": query}}
+              ]}}
+            }
+    return es.search(query, index = indices, doc_type = "item")

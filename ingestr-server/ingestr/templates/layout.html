@@ -19,20 +19,17 @@
                 <input type="checkbox" name="human" id="id-human" /> <label for="id-human">Show human-matched items</label>
                 <input type="checkbox" name="auto" id="id-auto" checked /> <label for="id-auto">Show auto-matched items</label>
                 <input type="checkbox" name="un" id="id-un" checked /> <label for="id-un">Show unmatched items</label>
+                <input type="checkbox" name="all" id="id-all" /> <label for="id-all">Consider all matches (not just the most recent)</label>
                 <input type="checkbox" name="direct" id="id-direct" /> <label for="id-direct">Show only direct links</label>
               </div>
               <div class="filters">
-                <label for="id-index.0">Index</label>: <select name="index.0" id="id-index.0">
-                    <option></option>
+                <label for="id-index">Index</label>: <select multiple name="index" id="id-index">
                 {% for index in all_indices %}
                     <option>{{ index }}</option>
                 {% endfor %}</select>
               </div>
               <div class="filters">
-                <label for="id-curuser.0">User (current match)</label>: <input type="text" name="curuser.0" id="id-curuser.0" />
-              </div>
-              <div class="filters">
-                <label for="id-anyuser.0">User (any match)</label>: <input type="text" name="anyuser.0" id="id-anyuser.0" /> <input type="checkbox" name="auto-anyuser.0" id="id-auto-anyuser.0" /> <label for="id-auto-anyuser.0">(automatic matches)</label>
+                User: <input type="text" name="user" />
               </div>
               <p class="filter-preview"></p>
             </form>
