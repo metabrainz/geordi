@@ -34,10 +34,9 @@ def before_request():
 @app.route('/')
 def search():
     data = None
-    start_from = request.args.get('from', '0')
     if request.args.get('query', False):
-        data = do_search(request.args.get('query'), request.args.getlist('index'), start_from=start_from)
-    return render_template('search.html', query = request.args.get('query'), data = data, start_from = start_from, indices = request.args.getlist('index'))
+        data = do_search(request.args.get('query'), request.args.getlist('index'), start_from=request.args.get('from', None))
+    return render_template('search.html', query=request.args.get('query'), data = data, start_from=request.args.get('from', '0'))
 
 @app.route('/<index>/<item>')
 def document(index, item):

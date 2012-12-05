@@ -7,13 +7,13 @@
 
 <p>
 This is a search for <code>{{ query }}</code>
-{% if indices not in [[], ['']] %}
-  in the indices
-  <code>{% for index in indices %}
-          {{ index }}{% if not loop.last %},{% endif %}
-        {% endfor %}
+{%- if request.args.getlist('index') not in [[], ['']] %}
+  in
+  <code>{%- for index in request.args.getlist('index') -%}
+          {{ index }}{%- if not loop.last -%}, {% endif -%}
+        {%- endfor -%}
   </code>
-{% endif %}.
+{%- endif -%}.
 We found {{ data.hits.total }} results; starting at {{ start_from }}.
 </p>
 
