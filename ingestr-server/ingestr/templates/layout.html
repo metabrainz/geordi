@@ -1,7 +1,7 @@
 {% extends "layout-basic.html" %}
 
 {% block furtherlayout %}
-  {% if current_user.id %}
+  {% if current_user.is_authenticated() %}
     <p>Currently logged in as <code>{{ current_user.id }}</code> <a href="/logout">(log out)</a></p>
   {% else %}
     <p>Not logged in. <a href="/login">(log in)</a></p>
