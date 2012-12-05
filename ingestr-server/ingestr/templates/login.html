@@ -2,12 +2,14 @@
 {% block title %}Login{% endblock %}
 
 {% block content %}
-<p>
-Please log in.
-</p>
+{% if current_user.id %}
+<p>You're already logged in as <code>{{ current_user.id }}</code>! Perhaps you meant to <a href="/logout">log out</a> instead?</p>
+{% else %}
+<p>Please log in.</p>
 
 <form action="" method="post">
-	<input type="text" name="username" placeholder="Username (don't lie!)" />
-	<input type="submit" value="Go!" />
+  <input type="text" name="username" placeholder="Username (don't lie!)" />
+  <input type="submit" value="Go!" />
 </form>
+{% endif %}
 {% endblock %}
