@@ -1,4 +1,7 @@
 {%- from "json_pp.html" import json_pp, expander_js -%}
+{%- macro build_search_url(from_value) -%}
+{{ url_for('search', from=from_value, query=query, s=1, index=request.args.getlist('index'), auto=request.args.get('auto'), un=request.args.get('un'), human=request.args.get('human'), all=request.args.get('all'), direct=request.args.get('direct'), user=request.args.getlist('user')) }}
+{%- endmacro -%}
 {% extends "layout.html" %}
 {% block title %}{% if query %}{{ query }} - Search{% else %}Search{% endif %}{% endblock %}
 
@@ -18,17 +21,17 @@ We found {{ data.hits.total }} results; starting at {{ start_from }}.
 </p>
 
 {%- if start_from | int > 9 -%}
-  <a href="{{ url_for('search', query=query, from=0) }}">[&laquo;]</a>
-  <a href="{{ url_for('search', query=query, from= start_from | int - 10) }}">[&lsaquo;]</a>
+  <a href="{{ build_search_url(0) }}">[&laquo;]</a>
+  <a href="{{ build_search_url(start_from | int - 10) }}">[&lsaquo;]</a>
 {%- endif -%}
 {%- for page_start in range(0, data.hits.total, 10) -%}
-  {%- if start_from | int == page_start -%}<b>{%- else -%}<a href="{{ url_for('search', query=query, from=page_start) }}">{%- endif -%}
+  {%- if start_from | int == page_start -%}<b>{%- else -%}<a href="{{ build_search_url(page_start) }}">{%- endif -%}
   [{{ loop.index }}]
   {%- if start_from | int == page_start -%}</b>{%- else -%}</a>{%- endif -%}
 {%- endfor -%}
 {%- if data.hits.total > start_from | int + 10 -%}
-  <a href="{{ url_for('search', query=query, from= start_from | int + 10) }}">[&rsaquo;]</a>
-  <a href="{{ url_for('search', query=query, from= (data.hits.total // 10) * 10) }}">[&raquo;]</a>
+  <a href="{{ build_search_url(start_from | int + 10) }}">[&rsaquo;]</a>
+  <a href="{{ build_search_url((data.hits.total // 10) * 10) }}">[&raquo;]</a>
 {%- endif -%}
 
 <p>In the JSON Source view, alt-click will open and close full subtrees.</p>
