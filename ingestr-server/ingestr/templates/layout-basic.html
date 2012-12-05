@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+    <head>
+       {% block head %}
+           <title>{% block title %}{% endblock %} - ingestr</title>
+           <link rel="stylesheet" href="/static/styles/main.css">
+       {% endblock %}
+    </head>
+    <body>
+        <div class="container">
+          <div class="content">
+            <h1>Ingestr</h1>
+            {% block furtherlayout %}{% endblock %}
+            {% block content %}{% endblock %}
+          </div>
+    </div>
+    <script src="/static/jquery/jquery-1.8.2.min.js"></script>
+    {% block js %}{% endblock %}
+    </body>
+</html>

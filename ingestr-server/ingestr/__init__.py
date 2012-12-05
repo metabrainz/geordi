@@ -16,6 +16,7 @@
 
 from __future__ import division, absolute_import
 from flask import Flask
+from flask.ext.login import LoginManager, UserMixin
 
 # CONFIG
 SECRET_KEY = 'super seekrit'
@@ -24,5 +25,17 @@ AVAILABLE_INDICES = ['wcd']
 
 app = Flask(__name__)
 app.config.from_object(__name__)
+
+class User(UserMixin):
+    def __init__(self, id):
+        self.id = id
+
+login_manager = LoginManager()
+
+@login_manager.user_loader
+def load_user(username):
+    return User(username)
+
+login_manager.setup_app(app)
 
 import ingestr.views
