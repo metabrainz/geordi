@@ -36,6 +36,6 @@ login_manager = LoginManager()
 def load_user(username):
     return User(username)
 
-login_manager.setup_app(app)
+login_manager.setup_app(app, add_context_processor = True)
 
 import ingestr.views
