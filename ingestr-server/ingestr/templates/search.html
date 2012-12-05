@@ -18,17 +18,17 @@ We found {{ data.hits.total }} results; starting at {{ start_from }}.
 </p>
 
 {%- if start_from | int > 9 -%}
-  <a href="/?query={{ query }}&from=0">[&laquo;]</a>
-  <a href="/?query={{ query }}&from={{start_from | int - 10 }}">[&lsaquo;]</a>
+  <a href="{{ url_for('search', query=query, from=0) }}">[&laquo;]</a>
+  <a href="{{ url_for('search', query=query, from= start_from | int - 10) }}">[&lsaquo;]</a>
 {%- endif -%}
 {%- for page_start in range(0, data.hits.total, 10) -%}
-  {%- if start_from | int == page_start -%}<b>{%- else -%}<a href="/?query={{ query }}&from={{ page_start }}">{%- endif -%}
+  {%- if start_from | int == page_start -%}<b>{%- else -%}<a href="{{ url_for('search', query=query, from=page_start) }}">{%- endif -%}
   [{{ loop.index }}]
   {%- if start_from | int == page_start -%}</b>{%- else -%}</a>{%- endif -%}
 {%- endfor -%}
 {%- if data.hits.total > start_from | int + 10 -%}
-  <a href="/?query={{ query }}&from={{ start_from | int + 10}}">[&rsaquo;]</a>
-  <a href="/?query={{ query }}&from={{ data.hits.total // 10 }}">[&raquo;]</a>
+  <a href="{{ url_for('search', query=query, from= start_from | int + 10) }}">[&rsaquo;]</a>
+  <a href="{{ url_for('search', query=query, from= (data.hits.total // 10) * 10) }}">[&raquo;]</a>
 {%- endif -%}
 
 <p>In the JSON Source view, alt-click will open and close full subtrees.</p>

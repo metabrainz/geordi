@@ -20,7 +20,7 @@
     </div>
     <div class="filters">
       <label for="id-index">Index</label>: <select multiple name="index" id="id-index">
-      {% for index in all_indices %}
+      {% for index in g.all_indices %}
           <option>{{ index }}</option>
       {% endfor %}</select>
     </div>

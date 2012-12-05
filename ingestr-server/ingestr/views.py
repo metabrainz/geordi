@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division, absolute_import
-from flask import render_template, request, redirect, url_for, flash, Response
+from flask import render_template, request, redirect, url_for, flash, Response, g
 from flask.ext.login import login_required, login_user, logout_user
 from ingestr import app, login_manager, User
 from ingestr.search import do_search
@@ -26,7 +26,9 @@ import urllib2
 
 from pyelasticsearch import ElasticSearch, ElasticHttpNotFoundError
 
-standard_options = {'json': json, 'all_indices': app.config['AVAILABLE_INDICES']}
+@app.before_request
+def before_request():
+    g.all_indices = app.config['AVAILABLE_INDICES']
 
 # Main user-facing views
 @app.route('/')
@@ -34,17 +36,17 @@ def search():
     data = None
     start_from = request.args.get('from', '0')
     if request.args.get('query', False):
-        data = do_search(request.args.get('query'), request.args.getlist('index'))
-    return render_template('search.html', query = request.args.get('query'), data = data, start_from = start_from, indices = request.args.getlist('index'), **standard_options)
+        data = do_search(request.args.get('query'), request.args.getlist('index'), start_from=start_from)
+    return render_template('search.html', query = request.args.get('query'), data = data, start_from = start_from, indices = request.args.getlist('index'))
 
 @app.route('/<index>/<item>')
 def document(index, item):
     es = ElasticSearch(app.config['ELASTICSEARCH_ENDPOINT'])
     try:
         data = es.get(index, 'item', item)
-        return render_template('document.html', item=item, index=index, data = data, **standard_options)
+        return render_template('document.html', item=item, index=index, data = data)
     except ElasticHttpNotFoundError:
-        return render_template('notfound.html', **standard_options)
+        return render_template('notfound.html')
 
 # Internal API urls for matching etc.
 @app.route('/api/matchitem/<index>/<item>')

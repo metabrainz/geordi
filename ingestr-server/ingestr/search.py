@@ -19,13 +19,15 @@ from ingestr import app
 
 from pyelasticsearch import ElasticSearch, ElasticHttpNotFoundError
 
-def do_search(query, indices):
+def do_search(query_string, indices, start_from=None):
     es = ElasticSearch(app.config['ELASTICSEARCH_ENDPOINT'])
     if indices in [[], ['']]:
         indices = app.config['AVAILABLE_INDICES']
     query = {'query':
               {'bool': {'must': [
-                {"query_string": {"query": query}}
+                {"query_string": {"query": query_string}}
               ]}}
             }
+    if start_from:
+        query['from'] = start_from
     return es.search(query, index = indices, doc_type = "item")
