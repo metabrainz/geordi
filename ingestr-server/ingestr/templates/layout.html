@@ -1,6 +1,11 @@
 {% extends "layout-basic.html" %}
 
 {% block furtherlayout %}
+  {% if current_user.id %}
+    <p>Currently logged in as <code>{{ current_user.id }}</code> <a href="/logout">(log out)</a></p>
+  {% else %}
+    <p>Not logged in. <a href="/login">(log in)</a></p>
+  {% endif %}
   <form action="/" method="get">
     <div class="actions">
       <input type="text" name="query" id="id-query" placeholder="Query" />
@@ -24,9 +29,4 @@
     </div>
     <p class="filter-preview"></p>
   </form>
-  {% if current_user.id %}
-    <p>Currently logged in as <code>{{ current_user.id }}</code> <a href="/logout">(log out)</a></p>
-  {% else %}
-    <p>Not logged in. <a href="/login">(log in)</a></p>
-  {% endif %}
 {% endblock %}
