@@ -1,3 +1,4 @@
+body { font-family: sans-serif }
 dl { margin: 0px; }
 ul { margin-bottom: 0px; margin-top: 0px; }
 dt::after { content: ': ' }
@@ -43,5 +44,7 @@ li.block-expander:hover { background-color: #D1EEEE; }
 
 select#id-index { width: 200px }
 
-ul.flashes { list-style-type: none; }
-ul.flashes li { display: inline-block; }
+ul.flashes { list-style-type: none; padding: 0; float: right; }
+ul.flashes li { display: inline-block; background-color: papayawhip; border: 1px solid gray; margin: 2px; padding: 2px; border-radius: 2px;}
+
+h1 { margin: 0 }
