@@ -42,7 +42,7 @@ We found {{ data.hits.total }} results; starting at {{ start_from }}.
   <span class="clicker">
   {% if mapping[loop.index0] %}
      {% if mapping[loop.index0].release %}
-     <big>{{ mapping[loop.index0].release.title }}{% if mapping[loop.index0].release.combined_artist %} by {{ mapping[loop.index0].release.combined_artist }}{% endif %}</big>
+     <big>{{ mapping[loop.index0].release.title[0] }}{% if mapping[loop.index0].release.combined_artist %} by {{ mapping[loop.index0].release.combined_artist }}{% endif %}</big>
      {% endif %}
      <small>(<a href="/{{ result._index}}/{{ result._id }}">{{ result._index }}/{{ result._id }}</a>) ({{ result._score }})</small>
   {% else %}

@@ -22,7 +22,10 @@ import re
 
 class wcd():
     def link_types(self):
-        return [{'name':"wcd artist id", 'type': 'artist', 'key': 'wcd_artist_id'}]
+        return [
+                {'name':"wcd artist id", 'key': 'wcd_artist_id'},
+                {'name':"wcd file", 'key': 'sha1'}
+                ]
 
     def extract_linked(self, data):
         if 'what_cd_json' in data:
@@ -41,7 +44,7 @@ class wcd():
             all_artists.extend([c for c in composers if not (c in seen or seen.append(c))])
             all_artists.extend([c for c in conductors if not (c in seen or seen.append(c))])
             all_artists.extend([c for c in djs if not (c in seen or seen.append(c))])
-            return [all_artists]
+            return [all_artists, []]
 
     def sparse(self, data):
         target = base_mapping()
@@ -53,9 +56,7 @@ class wcd():
             title_candidates = []
         title_candidates.append(re.split(' / ', data['meta_xml']['metadata']['title']['text'], maxsplit=1)[0])
         seen = []
-        title_candidates = [c for c in title_candidates if not (c in seen or seen.append(c))]
-        release['title'] = title_candidates[0]
-        release['alternate_titles'] = title_candidates[1:]
+        release['title'] = [c for c in title_candidates if not (c in seen or seen.append(c))]
 
         try:
             release['date'] = data['meta_xml']['metadata']['year']['text']
