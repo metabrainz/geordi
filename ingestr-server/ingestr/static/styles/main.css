@@ -3,7 +3,7 @@ dl { margin: 0px; }
 ul { margin-bottom: 0px; margin-top: 0px; }
 dt::after { content: ': ' }
 dt, dd { float: left; }
-dt { clear: left }
+dt { clear: left; line-height: 20px; }
 dd { line-height: 20px; }
 li.closed { list-style-image: url('/static/images/closed.png') }
 li.open { list-style-image: url('/static/images/open.png') }
@@ -25,7 +25,6 @@ div.li:after, .expander:after { content: '.'; display: block; visibility: hidden
 /* Placeholder border to prevent page moving, show proper cursor */
 .plain-text { display: block; }
 .expander > span.clicker { cursor: pointer; position: relative; }
-.expander > span.clicker, li.block-expander, .plain-text { padding-top: 5px }
 
 /* Make things respond on hover*/
 .expander > span.clicker:hover { background-color: #FF6EB4; }
