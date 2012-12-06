@@ -20,6 +20,7 @@ from flask.ext.login import login_required, login_user, logout_user, current_use
 from ingestr import app, login_manager, User
 from ingestr.search import do_search
 from ingestr.matching import register_match
+from ingestr.mapping import map_search_data, map_by_index
 
 import json
 import uuid
@@ -40,13 +41,15 @@ def search():
     data = None
     if request.args.get('query', False):
         data = do_search(request.args.get('query'), request.args.getlist('index'), start_from=request.args.get('from', None))
-    return render_template('search.html', query=request.args.get('query'), data = data, start_from=request.args.get('from', '0'))
+        mapping = map_search_data(data)
+    return render_template('search.html', query=request.args.get('query'), data = data, mapping = mapping, start_from=request.args.get('from', '0'))
 
 @app.route('/<index>/<item>')
 def document(index, item):
     try:
         data = es.get(index, 'item', item)
-        return render_template('document.html', item=item, index=index, data = data)
+        mapping = map_by_index(index, data)
+        return render_template('document.html', item=item, index=index, data = data, mapping = mapping)
     except ElasticHttpNotFoundError:
         return render_template('notfound.html')
 
