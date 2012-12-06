@@ -61,9 +61,11 @@ def matchitem(index, item):
 @app.route('/api/subitem/<index>/<subitem>')
 def subitem(index, subitem):
     "Get information for a subitem's matching"
-    document = es.get(index, 'subitem', subitem)
-
-    return Response(json.dumps({'code': 500, 'error': 'Not Implemented.', 'document': document}), 500)
+    try:
+        document = es.get(index, 'subitem', subitem)
+        return Response(json.dumps({'code': 200, 'document': document}), 200);
+    except ElasticHttpNotFoundError:
+        return Response(json.dumps({'code': 404, 'error': 'The provided item could not be found.'}), 404)
 
 @app.route('/api/matchsubitem/<index>/<subitem>')
 @login_required
