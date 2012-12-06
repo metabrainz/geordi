@@ -16,13 +16,14 @@
 
 from __future__ import division, absolute_import
 from flask import render_template, request, redirect, url_for, flash, Response, g
-from flask.ext.login import login_required, login_user, logout_user
+from flask.ext.login import login_required, login_user, logout_user, current_user
 from ingestr import app, login_manager, User
 from ingestr.search import do_search
 
 import json
 import uuid
 import urllib2
+from datetime import datetime
 
 from pyelasticsearch import ElasticSearch, ElasticHttpNotFoundError
 
@@ -60,8 +61,30 @@ def matchitem(index, item):
         uuid.UUID('{{{uuid}}}'.format(uuid=mbid))
     except ValueError:
         return Response(json.dumps({'code': 400, 'error': 'The provided MBID is ill-formed'}), 400)
+    es = ElasticSearch(app.config['ELASTICSEARCH_ENDPOINT'])
+    try:
+        document = es.get(index, 'item', item)
+    except ElasticHttpNotFoundError:
+        return Response(json.dumps({'code': 404, 'error': 'The provided item could not be found.'}), 404)
+    data = document['_source']
 
-    pass
+    if '_ingestr' not in data:
+        data['_ingestr'] = {}
+    if 'matchings' not in data['_ingestr']:
+        data['_ingestr']['matchings'] = []
+
+    data['_ingestr']['matchings'].append(
+        {'user': current_user.id,
+         'timestamp': datetime.utcnow(),
+         'type': matchtype,
+         'mbid': mbid}
+    )
+
+    try:
+        es.index(index, 'item', data, id=item, es_version=document['_version'])
+        return Response(json.dumps({'code': 200}), 200)
+    except:
+        return Response(json.dumps({'code': 500, 'error': 'An unknown error happened while pushing to elasticsearch.'}), 500)
 
 @app.route('/api/subitem/<index>/<subitem>')
 def subitem(index, subitem):
@@ -81,7 +104,7 @@ def matchsubitem(index, subitem):
     except ValueError:
         return Response(json.dumps({'code': 400, 'error': 'The provided MBID is ill-formed'}), 400)
 
-    pass
+    return Response(json.dumps({'code': 500, 'error': 'Not yet implemented.'}), 500)
 
 # Login/logout-related views
 @app.route('/login', methods=["GET", "POST"])
