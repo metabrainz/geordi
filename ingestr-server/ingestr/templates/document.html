@@ -12,7 +12,13 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
 {{ mapping }}
 {% endif %}
 <h2>Link to MusicBrainz</h2>
-<h2>JSON Source</h2> <a href="#">show all</a>
+<dl>
+{% for link_type in link_types %}
+<dt>{{ link_type.name }}</dt>
+<dd><ul>{% for link in data._source._ingestr.links[loop.index0] %}<li style="clear:both">[{{ loop.index0 }}]<dl>{% for entry in link.iteritems() %}<dt>{{ entry[0] }}</dt><dd>{{ entry[1] }}</dd>{% endfor %}</dl></li>{% endfor %}</ul></dd>
+{% endfor %}
+</dl>
+<h2 style="clear: both">JSON Source</h2> <a href="#">show all</a>
 <div>{{ json_pp(data._source, g.dictarray) }}</div>
 
 {% endblock %}

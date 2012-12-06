@@ -20,7 +20,7 @@ i.icon {
 .closed > i.icon { background-image: url('/static/images/closed.png'); }
 .open > i.icon { background-image: url('/static/images/open.png'); }
 
-div.li:after, .expander:after { content: '.'; display: block; visibility: hidden; height: 0; clear: both; }
+div.li:after, .expander:after, .clearfix:after { content: '.'; display: block; visibility: hidden; height: 0; clear: both; }
 
 /* Placeholder border to prevent page moving, show proper cursor */
 .plain-text { display: block; }

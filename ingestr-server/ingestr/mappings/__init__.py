@@ -38,6 +38,10 @@ def map_by_index(index, data, sparse=False):
     else:
         return None
 
+def get_link_types_by_index (index):
+    if index in class_map:
+        return class_map[index].link_types()
+
 def update_linked_by_index(index, item, data):
     if index in class_map:
         try:
