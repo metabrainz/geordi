@@ -30,7 +30,8 @@ class wcd():
         except KeyError:
             title_candidates = []
         title_candidates.append(re.split(' / ', data['meta_xml']['metadata']['title']['text'])[0])
-        title_candidates = list(set(title_candidates))
+        seen = []
+        title_candidates = [c for c in title_candidates if not (c in seen or seen.append(c))]
         release['title'] = title_candidates[0]
         release['alternate_titles'] = title_candidates[1:]
 
@@ -40,11 +41,11 @@ class wcd():
             release['date'] = None
 
         try:
-            release['artist'] = collect_text(data['meta_xml']['metadata']['artist'])
+            release['artist'] = [{'name': name} for name in collect_text(data['meta_xml']['metadata']['artist'])]
         except KeyError:
-            release['artist'] = collect_text(data['meta_xml']['metadata']['creator'])
+            release['artist'] = [{'name': name} for name in collect_text(data['meta_xml']['metadata']['creator'])]
 
-        release['combined_artist'] = comma_list(release['artist'])
+        release['combined_artist'] = comma_list([artist['name'] for artist in release['artist']])
 
         return target
 
