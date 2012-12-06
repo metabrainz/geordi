@@ -16,7 +16,7 @@
 
 from __future__ import division, absolute_import
 
-from ingestr.mappings.util import use_first_text, alternate_text
+from ingestr.mappings.util import use_first_text, alternate_text, concatenate_text, collect_text, comma_list
 
 import re
 
@@ -26,11 +26,13 @@ class wcd():
         release = target['release']
 
         try:
-            release['title'] = use_first_text(data['meta_xml']['metadata']['album'])
-            release['alternate_titles'] = alternate_text(data['meta_xml']['metadata']['album'])
+            title_candidates = collect_text(data['meta_xml']['metadata']['album'])
         except KeyError:
-            release['title'] = re.split(' / ', data['meta_xml']['metadata']['title']['text'])[0]
-            release['alternate_titles'] = []
+            title_candidates = []
+        title_candidates.append(re.split(' / ', data['meta_xml']['metadata']['title']['text'])[0])
+        title_candidates = list(set(title_candidates))
+        release['title'] = title_candidates[0]
+        release['alternate_titles'] = title_candidates[1:]
 
         try:
             release['date'] = data['meta_xml']['metadata']['year']['text']
@@ -38,9 +40,11 @@ class wcd():
             release['date'] = None
 
         try:
-            release['artist'] = data['meta_xml']['metadata']['artist']['text']
+            release['artist'] = collect_text(data['meta_xml']['metadata']['artist'])
         except KeyError:
-            release['artist'] = data['meta_xml']['metadata']['creator']['text']
+            release['artist'] = collect_text(data['meta_xml']['metadata']['creator'])
+
+        release['combined_artist'] = comma_list(release['artist'])
 
         return target
 

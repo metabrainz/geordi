@@ -20,7 +20,7 @@ from flask.ext.login import login_required, login_user, logout_user, current_use
 from ingestr import app, login_manager, User
 from ingestr.search import do_search
 from ingestr.matching import register_match
-from ingestr.mapping import map_search_data, map_by_index
+from ingestr.mappings import map_search_data, map_by_index
 
 import json
 import uuid

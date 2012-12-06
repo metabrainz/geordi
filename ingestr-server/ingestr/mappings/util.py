@@ -18,19 +18,29 @@ from __future__ import division, absolute_import
 
 import re
 
-def use_first_text(block, regex='.*'):
+def comma_list(lst):
+    if len(lst) > 1:
+        return ", ".join(lst[:-1]) + " and " + lst[-1]
+    else:
+        return lst[0]
+
+def collect_text(block, regex='.*'):
     try:
         text = block['text']
         if re.search(regex, text):
-            return text
+            return [text]
+        else:
+            return []
     except KeyError:
-        return None
-    except TypeError:
-        return [entry['text'] for entry in block if re.search(regex, entry['text'])][0]
-
-def alternate_text(block, regex='.*'):
-    try:
-        text = block['text']
         return []
     except TypeError:
-        return [entry['text'] for entry in block if ('text' in entry and re.search(regex, entry['text']))][1:]
+        return [entry['text'] for entry in block if ('text' in entry and re.search(regex, entry['text']))]
+
+def use_first_text(block, regex='.*'):
+    return collect_text(block, regex)[0]
+
+def alternate_text(block, regex='.*'):
+    return collect_text(block, regex)[1:]
+
+def concatenate_text(block, regex='.*', combiner=comma_list):
+    return combiner(collect_text(block, regex))
