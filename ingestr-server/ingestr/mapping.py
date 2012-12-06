@@ -16,8 +16,16 @@
 
 from __future__ import division, absolute_import
 
-def map_search_data(data):
-    pass
+class_map = {}
 
-def map_by_index(index, data):
-    pass
+def map_search_data(data):
+    return [map_by_index(result['_index'], result['_source'], sparse=True) for result in data['hits']['hits']]
+
+def map_by_index(index, data, sparse=False):
+    if index in class_map:
+        if sparse:
+            return class_map[index].sparse(data)
+        else:
+            return class_map[index].full(data)
+    else:
+        return None

@@ -40,7 +40,7 @@ We found {{ data.hits.total }} results; starting at {{ start_from }}.
 {% for result in data.hits.hits %}
 <li style="clear: left" class="result expander json-expander closed">
   <span class="clicker"><big>{{ result._id }} ({{ result._index }}) <a href="/{{ result._index}}/{{ result._id }}">[info]</a></big> <small>({{ result._score }})</small></span>
-  <div class="raw collapse">{{ json_pp(result._source) }}</div>
+  <div class="raw collapse">{% if mapping[loop.index0] %}{{ mapping[loop.index0] }}{% else %}{{ json_pp(result._source) }}{% endif %}</div>
 </li>
 {% endfor %}
 </ul>
