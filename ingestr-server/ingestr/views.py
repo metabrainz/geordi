@@ -27,6 +27,8 @@ from datetime import datetime
 
 from pyelasticsearch import ElasticSearch, ElasticHttpNotFoundError
 
+es = ElasticSearch(app.config['ELASTICSEARCH_ENDPOINT'])
+
 @app.before_request
 def before_request():
     g.all_indices = app.config['AVAILABLE_INDICES']
@@ -41,7 +43,6 @@ def search():
 
 @app.route('/<index>/<item>')
 def document(index, item):
-    es = ElasticSearch(app.config['ELASTICSEARCH_ENDPOINT'])
     try:
         data = es.get(index, 'item', item)
         return render_template('document.html', item=item, index=index, data = data)
@@ -55,61 +56,27 @@ def matchitem(index, item):
     "Submit a match for this item"
     matchtype = request.args.get('type', 'release')
     mbid = request.args.get('mbid', None)
-    if not mbid:
-        return Response(json.dumps({'code': 400, 'error': 'You must provide an MBID for a match.'}), 400)
-    try:
-        uuid.UUID('{{{uuid}}}'.format(uuid=mbid))
-    except ValueError:
-        return Response(json.dumps({'code': 400, 'error': 'The provided MBID is ill-formed'}), 400)
-    es = ElasticSearch(app.config['ELASTICSEARCH_ENDPOINT'])
-    try:
-        document = es.get(index, 'item', item)
-    except ElasticHttpNotFoundError:
-        return Response(json.dumps({'code': 404, 'error': 'The provided item could not be found.'}), 404)
-    data = document['_source']
-
-    if '_ingestr' not in data:
-        data['_ingestr'] = {}
-    if 'matchings' not in data['_ingestr']:
-        data['_ingestr']['matchings'] = []
-
-    data['_ingestr']['matchings'].append(
-        {'user': current_user.id,
-         'timestamp': datetime.utcnow(),
-         'type': matchtype,
-         'mbid': mbid}
-    )
-
-    try:
-        es.index(index, 'item', data, id=item, es_version=document['_version'])
-        return Response(json.dumps({'code': 200}), 200)
-    except:
-        return Response(json.dumps({'code': 500, 'error': 'An unknown error happened while pushing to elasticsearch.'}), 500)
+    return register_match(index, item, 'item', matchtype, mbid)
 
 @app.route('/api/subitem/<index>/<subitem>')
 def subitem(index, subitem):
     "Get information for a subitem's matching"
-    pass
+    document = es.get(index, 'subitem', subitem)
+
+    return Response(json.dumps({'code': 500, 'error': 'Not Implemented.'}), 500)
 
 @app.route('/api/matchsubitem/<index>/<subitem>')
 @login_required
 def matchsubitem(index, subitem):
     "Submit a match for this subitem"
-    matchtype = request.args.get('type', 'release')
+    matchtype = request.args.get('type', 'artist')
     mbid = request.args.get('mbid', None)
-    if not mbid:
-        return Response(json.dumps({'code': 400, 'error': 'You must provide an MBID for a match.'}), 400)
-    try:
-        uuid.UUID('{{{uuid}}}'.format(uuid=mbid))
-    except ValueError:
-        return Response(json.dumps({'code': 400, 'error': 'The provided MBID is ill-formed'}), 400)
-
-    return Response(json.dumps({'code': 500, 'error': 'Not yet implemented.'}), 500)
+    return register_match(index, subitem, 'subitem', matchtype, mbid)
 
 # Login/logout-related views
 @app.route('/login', methods=["GET", "POST"])
 def login():
-    if request.method == "POST" and "username" in request.form:
+    if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
         if username and password:
@@ -129,6 +96,39 @@ def logout():
     logout_user()
     flash("Logged out.")
     return redirect(url_for("search"))
+
+# Utility functions
+def make_match_definition(user, matchtype, mbid):
+    return {'user': user,
+         'timestamp': datetime.utcnow(),
+         'type': matchtype,
+         'mbid': mbid}
+
+def register_match(index, item, itemtype, matchtype, mbid):
+    if not mbid:
+        return Response(json.dumps({'code': 400, 'error': 'You must provide an MBID for a match.'}), 400)
+    try:
+        uuid.UUID('{{{uuid}}}'.format(uuid=mbid))
+    except ValueError:
+        return Response(json.dumps({'code': 400, 'error': 'The provided MBID is ill-formed'}), 400)
+    try:
+        document = es.get(index, itemtype, item)
+    except ElasticHttpNotFoundError:
+        return Response(json.dumps({'code': 404, 'error': 'The provided item could not be found.'}), 404)
+    data = document['_source']
+
+    if '_ingestr' not in data:
+        data['_ingestr'] = {}
+    if 'matchings' not in data['_ingestr']:
+        data['_ingestr']['matchings'] = []
+
+    data['_ingestr']['matchings'].append(make_match_definition(current_user.id, matchtype, mbid))
+
+    try:
+        es.index(index, itemtype, data, id=item, es_version=document['_version'])
+        return Response(json.dumps({'code': 200}), 200)
+    except:
+        return Response(json.dumps({'code': 500, 'error': 'An unknown error happened while pushing to elasticsearch.'}), 500)
 
 # What follows, until the end of the file, is shamelessly cribbed from acoustid-server
 class DigestAuthHandler(urllib2.HTTPDigestAuthHandler):
