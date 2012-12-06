@@ -24,12 +24,23 @@ class wcd():
     def sparse(self, data):
         target = {'release': {}}
         release = target['release']
+
         try:
             release['title'] = use_first_text(data['meta_xml']['metadata']['album'])
             release['alternate_titles'] = alternate_text(data['meta_xml']['metadata']['album'])
         except KeyError:
             release['title'] = re.split(' / ', data['meta_xml']['metadata']['title']['text'])[0]
             release['alternate_titles'] = []
+
+        try:
+            release['date'] = data['meta_xml']['metadata']['year']['text']
+        except:
+            release['date'] = None
+
+        try:
+            release['artist'] = data['meta_xml']['metadata']['artist']['text']
+        except KeyError:
+            release['artist'] = data['meta_xml']['metadata']['creator']['text']
 
         return target
 

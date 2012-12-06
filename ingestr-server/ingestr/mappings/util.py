@@ -23,6 +23,8 @@ def use_first_text(block, regex='.*'):
         text = block['text']
         if re.search(regex, text):
             return text
+    except KeyError:
+        return None
     except TypeError:
         return [entry['text'] for entry in block if re.search(regex, entry['text'])][0]
 
@@ -31,4 +33,4 @@ def alternate_text(block, regex='.*'):
         text = block['text']
         return []
     except TypeError:
-        return [entry['text'] for entry in block if re.search(regex, entry['text'])][1:]
+        return [entry['text'] for entry in block if ('text' in entry and re.search(regex, entry['text']))][1:]
