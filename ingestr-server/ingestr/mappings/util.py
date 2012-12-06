@@ -16,22 +16,19 @@
 
 from __future__ import division, absolute_import
 
-from ingestr.mappings.util import use_first_text, alternate_text
-
 import re
 
-class wcd():
-    def sparse(self, data):
-        target = {'release': {}}
-        release = target['release']
-        try:
-            release['title'] = use_first_text(data['meta_xml']['metadata']['album'])
-            release['alternate_titles'] = alternate_text(data['meta_xml']['metadata']['album'])
-        except KeyError:
-            release['title'] = re.split(' / ', data['meta_xml']['metadata']['title']['text'])[0]
-            release['alternate_titles'] = []
+def use_first_text(block, regex='.*'):
+    try:
+        text = block['text']
+        if re.search(regex, text):
+            return text
+    except TypeError:
+        return [entry['text'] for entry in block if re.search(regex, entry['text'])][0]
 
-        return target
-
-    def full(self, data):
-        return self.sparse(data['_source'])
+def alternate_text(block, regex='.*'):
+    try:
+        text = block['text']
+        return []
+    except TypeError:
+        return [entry['text'] for entry in block if re.search(regex, entry['text'])][1:]
