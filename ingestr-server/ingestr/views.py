@@ -63,7 +63,7 @@ def subitem(index, subitem):
     "Get information for a subitem's matching"
     document = es.get(index, 'subitem', subitem)
 
-    return Response(json.dumps({'code': 500, 'error': 'Not Implemented.'}), 500)
+    return Response(json.dumps({'code': 500, 'error': 'Not Implemented.', 'document': document}), 500)
 
 @app.route('/api/matchsubitem/<index>/<subitem>')
 @login_required
@@ -107,15 +107,22 @@ def make_match_definition(user, matchtype, mbid):
 def register_match(index, item, itemtype, matchtype, mbid):
     if not mbid:
         return Response(json.dumps({'code': 400, 'error': 'You must provide an MBID for a match.'}), 400)
+    # Check MBID formatting
     try:
         uuid.UUID('{{{uuid}}}'.format(uuid=mbid))
     except ValueError:
         return Response(json.dumps({'code': 400, 'error': 'The provided MBID is ill-formed'}), 400)
+    # Retrieve document (or blank empty document for subitems)
     try:
         document = es.get(index, itemtype, item)
+        data = document['_source']
+        version = document['_version']
     except ElasticHttpNotFoundError:
-        return Response(json.dumps({'code': 404, 'error': 'The provided item could not be found.'}), 404)
-    data = document['_source']
+        if itemtype == 'item':
+            return Response(json.dumps({'code': 404, 'error': 'The provided item could not be found.'}), 404)
+        else:
+            data = {}
+            version = None
 
     if '_ingestr' not in data:
         data['_ingestr'] = {}
@@ -125,7 +132,10 @@ def register_match(index, item, itemtype, matchtype, mbid):
     data['_ingestr']['matchings'].append(make_match_definition(current_user.id, matchtype, mbid))
 
     try:
-        es.index(index, itemtype, data, id=item, es_version=document['_version'])
+        if version:
+            es.index(index, itemtype, data, id=item, es_version=version)
+        else:
+            es.index(index, itemtype, data, id=item)
         return Response(json.dumps({'code': 200}), 200)
     except:
         return Response(json.dumps({'code': 500, 'error': 'An unknown error happened while pushing to elasticsearch.'}), 500)
