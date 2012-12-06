@@ -13,7 +13,7 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
 {% endif %}
 <h2>Link to MusicBrainz</h2>
 <h2>JSON Source</h2> <a href="#">show all</a>
-<div>{{ json_pp(data._source) }}</div>
+<div>{{ json_pp(data._source, g.dictarray) }}</div>
 
 {% endblock %}
 

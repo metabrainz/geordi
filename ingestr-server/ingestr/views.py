@@ -20,7 +20,7 @@ from flask.ext.login import login_required, login_user, logout_user, current_use
 from ingestr import app, login_manager, User
 from ingestr.search import do_search
 from ingestr.matching import register_match
-from ingestr.mappings import map_search_data, map_by_index
+from ingestr.mappings import map_search_data, map_by_index, update_linked_by_index
 
 import json
 import uuid
@@ -31,9 +31,13 @@ from pyelasticsearch import ElasticSearch, ElasticHttpNotFoundError
 
 es = ElasticSearch(app.config['ELASTICSEARCH_ENDPOINT'])
 
+def dictarray(dictionary):
+    return [{'k': i[0], 'v': i[1]} for i in dictionary.iteritems()]
+
 @app.before_request
 def before_request():
     g.all_indices = app.config['AVAILABLE_INDICES']
+    g.dictarray = dictarray
 
 # Main user-facing views
 @app.route('/')
@@ -48,6 +52,8 @@ def search():
 def document(index, item):
     try:
         data = es.get(index, 'item', item)
+        if update_linked_by_index(index, item, data['_source']):
+            data = es.get(index, 'item', item)
         mapping = map_by_index(index, data)
         return render_template('document.html', item=item, index=index, data = data, mapping = mapping)
     except ElasticHttpNotFoundError:

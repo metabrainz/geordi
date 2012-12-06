@@ -44,3 +44,14 @@ def alternate_text(block, regex='.*'):
 
 def concatenate_text(block, regex='.*', combiner=comma_list):
     return combiner(collect_text(block, regex))
+
+def base_mapping():
+    return {
+        'release': {
+            'title': None,
+            'alternate_titles': [],
+            'date': None,
+            'artist': [],
+            'combined_artist': None
+        }
+    }

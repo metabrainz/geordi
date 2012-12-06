@@ -49,7 +49,7 @@ We found {{ data.hits.total }} results; starting at {{ start_from }}.
      <big>{{ result._id }} ({{ result._index }}) <a href="/{{ result._index}}/{{ result._id }}">[info]</a></big> <small>({{ result._score }})</small>
   {% endif %}
   </span>
-  <div class="raw collapse">{{ json_pp(result._source) }}</div>
+  <div class="raw collapse">{{ json_pp(result._source, g.dictarray) }}</div>
 </li>
 {% endfor %}
 </ul>

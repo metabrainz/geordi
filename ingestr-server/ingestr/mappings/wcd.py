@@ -16,20 +16,42 @@
 
 from __future__ import division, absolute_import
 
-from ingestr.mappings.util import use_first_text, alternate_text, concatenate_text, collect_text, comma_list
+from ingestr.mappings.util import use_first_text, alternate_text, concatenate_text, collect_text, comma_list, base_mapping
 
 import re
 
 class wcd():
+    def link_types(self):
+        return [{'name':"wcd artist id", 'type': 'artist', 'key': 'wcd_artist_id'}]
+
+    def extract_linked(self, data):
+        if 'what_cd_json' in data:
+            main_artists = [{u'name': unicode(artist['name']), u'wcd_artist_id': int(artist['id'])} for artist in data['what_cd_json']['response']['group']['musicInfo']['artists']]
+            extra_artists = [{u'name': unicode(artist['name']), u'wcd_artist_id': int(artist['id'])} for artist in data['what_cd_json']['response']['group']['musicInfo']['with']]
+            remixers = [{u'name': unicode(artist['name']), u'wcd_artist_id': int(artist['id'])} for artist in data['what_cd_json']['response']['group']['musicInfo']['remixedBy']]
+            producers = [{u'name': unicode(artist['name']), u'wcd_artist_id': int(artist['id'])} for artist in data['what_cd_json']['response']['group']['musicInfo']['producer']]
+            composers = [{u'name': unicode(artist['name']), u'wcd_artist_id': int(artist['id'])} for artist in data['what_cd_json']['response']['group']['musicInfo']['composers']]
+            conductors = [{u'name': unicode(artist['name']), u'wcd_artist_id': int(artist['id'])} for artist in data['what_cd_json']['response']['group']['musicInfo']['conductor']]
+            djs = [{u'name': unicode(artist['name']), u'wcd_artist_id': int(artist['id'])} for artist in data['what_cd_json']['response']['group']['musicInfo']['dj']]
+            seen = []
+            all_artists = [c for c in main_artists if not (c in seen or seen.append(c))]
+            all_artists.extend([c for c in extra_artists if not (c in seen or seen.append(c))])
+            all_artists.extend([c for c in remixers if not (c in seen or seen.append(c))])
+            all_artists.extend([c for c in producers if not (c in seen or seen.append(c))])
+            all_artists.extend([c for c in composers if not (c in seen or seen.append(c))])
+            all_artists.extend([c for c in conductors if not (c in seen or seen.append(c))])
+            all_artists.extend([c for c in djs if not (c in seen or seen.append(c))])
+            return [all_artists]
+
     def sparse(self, data):
-        target = {'release': {}}
+        target = base_mapping()
         release = target['release']
 
         try:
             title_candidates = collect_text(data['meta_xml']['metadata']['album'])
         except KeyError:
             title_candidates = []
-        title_candidates.append(re.split(' / ', data['meta_xml']['metadata']['title']['text'])[0])
+        title_candidates.append(re.split(' / ', data['meta_xml']['metadata']['title']['text'], maxsplit=1)[0])
         seen = []
         title_candidates = [c for c in title_candidates if not (c in seen or seen.append(c))]
         release['title'] = title_candidates[0]
@@ -40,10 +62,15 @@ class wcd():
         except:
             release['date'] = None
 
-        try:
-            release['artist'] = [{'name': name} for name in collect_text(data['meta_xml']['metadata']['artist'])]
-        except KeyError:
-            release['artist'] = [{'name': name} for name in collect_text(data['meta_xml']['metadata']['creator'])]
+        if 'what_cd_json' in data:
+            try:
+                release['artist'] = [{'name': artist['name'], 'wcd_artist_id': int(artist['id'])} for artist in data['what_cd_json']['response']['group']['musicInfo']['artists']]
+            except KeyError: pass
+        if 'artist' not in release or len(release['artist']) < 1:
+            try:
+                release['artist'] = [{'name': name} for name in collect_text(data['meta_xml']['metadata']['artist'])]
+            except KeyError:
+                release['artist'] = [{'name': name} for name in collect_text(data['meta_xml']['metadata']['creator'])]
 
         release['combined_artist'] = comma_list([artist['name'] for artist in release['artist']])
 
