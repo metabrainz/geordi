@@ -19,6 +19,7 @@ from flask import render_template, request, redirect, url_for, flash, Response, 
 from flask.ext.login import login_required, login_user, logout_user, current_user
 from ingestr import app, login_manager, User
 from ingestr.search import do_search
+from ingestr.matching import register_match
 
 import json
 import uuid
@@ -98,49 +99,6 @@ def logout():
     logout_user()
     flash("Logged out.")
     return redirect(url_for("search"))
-
-# Utility functions
-def make_match_definition(user, matchtype, mbid):
-    return {'user': user,
-         'timestamp': datetime.utcnow(),
-         'type': matchtype,
-         'mbid': mbid}
-
-def register_match(index, item, itemtype, matchtype, mbid):
-    if not mbid:
-        return Response(json.dumps({'code': 400, 'error': 'You must provide an MBID for a match.'}), 400)
-    # Check MBID formatting
-    try:
-        uuid.UUID('{{{uuid}}}'.format(uuid=mbid))
-    except ValueError:
-        return Response(json.dumps({'code': 400, 'error': 'The provided MBID is ill-formed'}), 400)
-    # Retrieve document (or blank empty document for subitems)
-    try:
-        document = es.get(index, itemtype, item)
-        data = document['_source']
-        version = document['_version']
-    except ElasticHttpNotFoundError:
-        if itemtype == 'item':
-            return Response(json.dumps({'code': 404, 'error': 'The provided item could not be found.'}), 404)
-        else:
-            data = {}
-            version = None
-
-    if '_ingestr' not in data:
-        data['_ingestr'] = {}
-    if 'matchings' not in data['_ingestr']:
-        data['_ingestr']['matchings'] = []
-
-    data['_ingestr']['matchings'].append(make_match_definition(current_user.id, matchtype, mbid))
-
-    try:
-        if version:
-            es.index(index, itemtype, data, id=item, es_version=version)
-        else:
-            es.index(index, itemtype, data, id=item)
-        return Response(json.dumps({'code': 200}), 200)
-    except:
-        return Response(json.dumps({'code': 500, 'error': 'An unknown error happened while pushing to elasticsearch.'}), 500)
 
 # What follows, until the end of the file, is shamelessly cribbed from acoustid-server
 class DigestAuthHandler(urllib2.HTTPDigestAuthHandler):
