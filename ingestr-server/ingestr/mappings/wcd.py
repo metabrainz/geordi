@@ -16,20 +16,9 @@
 
 from __future__ import division, absolute_import
 
-from ingestr.mappings.wcd import wcd
+class wcd():
+    def sparse(self, data):
+        pass
 
-class_map = {
-    'wcd': wcd()
-}
-
-def map_search_data(data):
-    return [map_by_index(result['_index'], result['_source'], sparse=True) for result in data['hits']['hits']]
-
-def map_by_index(index, data, sparse=False):
-    if index in class_map:
-        if sparse:
-            return class_map[index].sparse(data)
-        else:
-            return class_map[index].full(data)
-    else:
-        return None
+    def full(self, data):
+        pass
