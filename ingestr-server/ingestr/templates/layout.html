@@ -11,23 +11,26 @@
       <input type="text" name="query" id="id-query" placeholder="Query" {% if query %}value="{{ query }}" {% endif %}/>
       <input type="submit" class="btn primary" value="Search" />
     </div>
-    <div class="filters">
+    <!-- <div class="filters">
       <input type="checkbox" name="human" id="id-human" {% if request.args.get('human') == 'on' %}checked {% endif %}/> <label for="id-human">Show human-matched items</label>
       <input type="checkbox" name="auto" id="id-auto" {% if request.args.get('auto') == 'on' or not request.args.get('s', False) %}checked {% endif %} /> <label for="id-auto">Show auto-matched items</label>
       <input type="checkbox" name="un" id="id-un" {% if request.args.get('un') == 'on' or not request.args.get('s', False) %}checked {% endif %}/> <label for="id-un">Show unmatched items</label>
       <input type="checkbox" name="all" id="id-all" {% if request.args.get('all') == 'on' %}checked {% endif %}/> <label for="id-all">Consider all matches (not just the most recent)</label>
       <input type="checkbox" name="direct" id="id-direct" {% if request.args.get('direct') == 'on' %}checked {% endif %}/> <label for="id-direct">Show only direct links</label>
       <input type="hidden" name="s" value="1" />
-    </div>
+    </div> -->
     <div class="filters">
-      <label for="id-index">Index</label>: <select multiple name="index" id="id-index">
-      {% for index in g.all_indices %}
-      <option{% if index in request.args.getlist('index') %} selected{% endif %}>{{ index }}</option>
-      {% endfor %}</select>
+      <select multiple name="index" id="id-index">
+      <optgroup label="Index">
+      {%- for index in g.all_indices %}
+        <option{% if index in request.args.getlist('index') %} selected{% endif %}>{{ index }}</option>
+      {% endfor -%}
+      </optgroup>
+      </select>
     </div>
-    <div class="filters">
+    <!-- <div class="filters">
       User: <input type="text" name="user" value="{{ request.args.get('user', '') }}"/>
-    </div>
+    </div> -->
     <p class="filter-preview"></p>
   </form>
 {% endblock %}
