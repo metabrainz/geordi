@@ -48,7 +48,7 @@ my $processors = {
     wcd => sub {
         my $input_json = shift;
         my @acceptable_formats = ('flac', 'vbr mp3', 'apple lossless audio', 'ogg vorbis');
-        my $track_count = scalar grep { my $form = $_->{format}{text}; $_->{"_source"} eq "original" && any { lc($form) eq $_ } @acceptable_formats } @{ $input_json->{"_source"}{"files.xml"}{files}{file} };
+        my $track_count = scalar grep { my $form = $_->{format}{text}; $_->{"_source"} eq "original" && any { lc($form) eq $_ } @acceptable_formats } @{ $input_json->{"_source"}{"files_xml"}{files}{file} };
         my $tracks = [ sort { ncmp($a->{number}, $b->{number}) }
                        map +{ number => $_->{track}{text},
                               length => $_->{length}{text},
@@ -56,17 +56,17 @@ my $processors = {
                               title => $_->{title}{text},
                               acoustid => extract_identifier($_->{"external-identifier"}, qr{urn:acoustid:}),
                               recordingid => extract_identifier($_->{"external-identifier"}, qr{urn:mb_recording_id:}),
-                            }, grep { my $form = $_->{format}{text}; $_->{"_source"} eq "original" && any { lc($form) eq $_ } @acceptable_formats } @{ $input_json->{"_source"}{"files.xml"}{files}{file} } ];
+                            }, grep { my $form = $_->{format}{text}; $_->{"_source"} eq "original" && any { lc($form) eq $_ } @acceptable_formats } @{ $input_json->{"_source"}{"files_xml"}{files}{file} } ];
         my $has_acoustids = any { $_->{acoustid} } @$tracks;
         my $has_recordingids = any { $_->{recordingid} } @$tracks;
         return {
-                 release_title => use_first_text($input_json->{"_source"}{"meta.xml"}{metadata}{album}) || $input_json->{"_source"}{"meta.xml"}{metadata}{title}{text} =~ s, / .*$,,r,
-                 alternate_release_titles => all_but_first_text($input_json->{"_source"}{"meta.xml"}{metadata}{album}),
-                 release_date => $input_json->{"_source"}{"meta.xml"}{metadata}{year}{text},
-                 release_artist => $input_json->{"_source"}{"meta.xml"}{metadata}{artist}{text} // $input_json->{"_source"}{"meta.xml"}{metadata}{creator}{text},
-                 releaseid => extract_identifier($input_json->{"_source"}{"meta.xml"}{metadata}{"external-identifier"}, qr{urn:mb_release_id:}),
-                 releasegroupid => extract_identifier($input_json->{"_source"}{"meta.xml"}{metadata}{"external-identifier"}, qr{urn:mb_releasegroup_id:}),
-                 discogsid => extract_identifier($input_json->{"_source"}{"meta.xml"}{metadata}{"external-identifier"}, qr{urn:discogs:release:}),
+                 release_title => use_first_text($input_json->{"_source"}{"meta_xml"}{metadata}{album}) || $input_json->{"_source"}{"meta_xml"}{metadata}{title}{text} =~ s, / .*$,,r,
+                 alternate_release_titles => all_but_first_text($input_json->{"_source"}{"meta_xml"}{metadata}{album}),
+                 release_date => $input_json->{"_source"}{"meta_xml"}{metadata}{year}{text},
+                 release_artist => $input_json->{"_source"}{"meta_xml"}{metadata}{artist}{text} // $input_json->{"_source"}{"meta_xml"}{metadata}{creator}{text},
+                 releaseid => extract_identifier($input_json->{"_source"}{"meta_xml"}{metadata}{"external-identifier"}, qr{urn:mb_release_id:}),
+                 releasegroupid => extract_identifier($input_json->{"_source"}{"meta_xml"}{metadata}{"external-identifier"}, qr{urn:mb_releasegroup_id:}),
+                 discogsid => extract_identifier($input_json->{"_source"}{"meta_xml"}{metadata}{"external-identifier"}, qr{urn:discogs:release:}),
                  track_count => $track_count,
                  tracks => $tracks,
                  print_acoustid => $has_acoustids,
