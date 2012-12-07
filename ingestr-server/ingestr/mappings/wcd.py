@@ -31,13 +31,13 @@ class wcd():
         all_artists = []
         files = []
         if 'what_cd_json' in data:
-            main_artists = [{u'name': unicode(artist['name']), u'wcd_artist_id': int(artist['id'])} for artist in data['what_cd_json']['response']['group']['musicInfo']['artists']]
-            extra_artists = [{u'name': unicode(artist['name']), u'wcd_artist_id': int(artist['id'])} for artist in data['what_cd_json']['response']['group']['musicInfo']['with']]
-            remixers = [{u'name': unicode(artist['name']), u'wcd_artist_id': int(artist['id'])} for artist in data['what_cd_json']['response']['group']['musicInfo']['remixedBy']]
-            producers = [{u'name': unicode(artist['name']), u'wcd_artist_id': int(artist['id'])} for artist in data['what_cd_json']['response']['group']['musicInfo']['producer']]
-            composers = [{u'name': unicode(artist['name']), u'wcd_artist_id': int(artist['id'])} for artist in data['what_cd_json']['response']['group']['musicInfo']['composers']]
-            conductors = [{u'name': unicode(artist['name']), u'wcd_artist_id': int(artist['id'])} for artist in data['what_cd_json']['response']['group']['musicInfo']['conductor']]
-            djs = [{u'name': unicode(artist['name']), u'wcd_artist_id': int(artist['id'])} for artist in data['what_cd_json']['response']['group']['musicInfo']['dj']]
+            main_artists = [self._extract_artist(artist) for artist in data['what_cd_json']['response']['group']['musicInfo']['artists']]
+            extra_artists = [self._extract_artist(artist) for artist in data['what_cd_json']['response']['group']['musicInfo']['with']]
+            remixers = [self._extract_artist(artist) for artist in data['what_cd_json']['response']['group']['musicInfo']['remixedBy']]
+            producers = [self._extract_artist(artist) for artist in data['what_cd_json']['response']['group']['musicInfo']['producer']]
+            composers = [self._extract_artist(artist) for artist in data['what_cd_json']['response']['group']['musicInfo']['composers']]
+            conductors = [self._extract_artist(artist) for artist in data['what_cd_json']['response']['group']['musicInfo']['conductor']]
+            djs = [self._extract_artist(artist) for artist in data['what_cd_json']['response']['group']['musicInfo']['dj']]
             seen = []
             all_artists = [c for c in main_artists if not (c in seen or seen.append(c))]
             all_artists.extend([c for c in extra_artists if not (c in seen or seen.append(c))])
@@ -47,8 +47,30 @@ class wcd():
             all_artists.extend([c for c in conductors if not (c in seen or seen.append(c))])
             all_artists.extend([c for c in djs if not (c in seen or seen.append(c))])
         if 'files_xml' in data:
-            files = [{u'sha1': x['sha1']['text']} for x in data['files_xml']['files']['file'] if (x['_source'] == 'original' and 'sha1' in x)]
+            files = [self._extract_file(x) for x in data['files_xml']['files']['file'] if (x['_source'] == 'original' and 'sha1' in x and x['format']['text'] in self._acceptable_formats())]
         return [all_artists, files]
+
+    def _acceptable_formats(self):
+        return ['Flac', 'VBR MP3', 'Ogg Vorbis', 'Apple Lossless Audio']
+
+    def _extract_artist(self, artist):
+        return {u'name': unicode(artist['name']), u'wcd_artist_id': int(artist['id'])}
+
+    def _extract_file(self, x):
+        f = {
+            u'sha1': unicode(x['sha1']['text']),
+            u'format': unicode(x['format']['text']),
+            u'filename': unicode(x['_name'])
+            }
+        if 'title' in x:
+            f['title'] = x['title']['text']
+        if 'artist' in x:
+            f['artist'] = x['artist']['text']
+        if 'length' in x:
+            f['length'] = x['length']['text']
+        if 'track' in x:
+            f['number'] = x['track']['text']
+        return f
 
     def sparse(self, data):
         target = base_mapping()
