@@ -48,8 +48,7 @@ def concatenate_text(block, regex='.*', combiner=comma_list):
 def base_mapping():
     return {
         'release': {
-            'title': None,
-            'alternate_titles': [],
+            'title': [],
             'date': None,
             'artist': [],
             'combined_artist': None
