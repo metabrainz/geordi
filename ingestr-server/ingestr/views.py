@@ -43,6 +43,7 @@ def before_request():
 @app.route('/')
 def search():
     data = None
+    mapping = None
     if request.args.get('query', False):
         data = do_search(request.args.get('query'), request.args.getlist('index'), start_from=request.args.get('from', None))
         mapping = map_search_data(data)
@@ -54,7 +55,7 @@ def document(index, item):
         data = es.get(index, 'item', item)
         if update_linked_by_index(index, item, data['_source']):
             data = es.get(index, 'item', item)
-        mapping = map_by_index(index, data)
+        mapping = map_by_index(index, data['_source'])
         link_types = get_link_types_by_index(index)
         return render_template('document.html', item=item, index=index, data = data, mapping = mapping, link_types = link_types)
     except ElasticHttpNotFoundError:

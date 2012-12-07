@@ -72,7 +72,7 @@ class wcd():
             f[u'number'] = unicode(x['track']['text'])
         return f
 
-    def sparse(self, data):
+    def map(self, data):
         target = base_mapping()
         release = target['release']
 
@@ -103,7 +103,6 @@ class wcd():
                 release['artist'] = [{'name': name} for name in collect_text(data['meta_xml']['metadata']['creator'])]
         release['combined_artist'] = comma_list([artist['name'] for artist in release['artist']])
 
-        return target
+        # Tracks
 
-    def full(self, data):
-        return self.sparse(data['_source'])
+        return target

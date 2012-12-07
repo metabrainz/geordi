@@ -27,14 +27,11 @@ class_map = {
 }
 
 def map_search_data(data):
-    return [map_by_index(result['_index'], result['_source'], sparse=True) for result in data['hits']['hits']]
+    return [map_by_index(result['_index'], result['_source']) for result in data['hits']['hits']]
 
-def map_by_index(index, data, sparse=False):
+def map_by_index(index, data):
     if index in class_map:
-        if sparse:
-            return class_map[index].sparse(data)
-        else:
-            return class_map[index].full(data)
+        return class_map[index].map(data)
     else:
         return None
 
