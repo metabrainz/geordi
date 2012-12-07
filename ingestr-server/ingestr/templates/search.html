@@ -34,8 +34,6 @@ We found {{ data.hits.total }} results; starting at {{ start_from }}.
   <a href="{{ build_search_url((data.hits.total // 10) * 10) }}">[&raquo;]</a>
 {%- endif -%}
 
-<p>In the JSON Source view, alt-click will open and close full subtrees.</p>
-
 <ul>
 {% for result in data.hits.hits %}
 <li style="clear: left" class="result expander json-expander closed">
