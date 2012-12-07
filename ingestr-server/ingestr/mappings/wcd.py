@@ -122,7 +122,7 @@ class wcd():
         # Release Artists
         if 'what_cd_json' in data:
             try:
-                release['artist'] = [{'name': artist['name'], 'wcd_artist_id': int(artist['id'])} for artist in data['what_cd_json']['response']['group']['musicInfo']['artists']]
+                release['artist'] = [{'name': artist['name'], 'subitem': "0-{}".format(int(artist['id']))} for artist in data['what_cd_json']['response']['group']['musicInfo']['artists']]
             except KeyError: pass
         if 'artist' not in release or len(release['artist']) < 1:
             try:
