@@ -47,3 +47,22 @@ ul.flashes { list-style-type: none; padding: 0; float: right; }
 ul.flashes li { display: inline-block; background-color: papayawhip; border: 1px solid gray; margin: 2px; padding: 2px; border-radius: 2px;}
 
 h1 { margin: 0 }
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+table td, table th {
+     border-top: 1px solid #DDD;
+     padding: 4px;
+     text-align: left;
+}
+
+.zebra tbody tr:nth-child(odd) td, .zebra tbody tr:nth-child(odd) th {
+    background-color: #F9F9F9;
+}
+
+.zebra tbody tr:hover td, .zebra tbody tr:hover th {
+    background-color: whitesmoke;
+}

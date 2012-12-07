@@ -19,10 +19,15 @@ from __future__ import division, absolute_import
 import re
 
 def comma_list(lst):
-    if len(lst) > 1:
-        return ", ".join(lst[:-1]) + " and " + lst[-1]
-    else:
+    if len(lst) == 0:
+        return ''
+    elif len(lst) == 1:
         return lst[0]
+    else:
+        return ", ".join(lst[:-1]) + " and " + lst[-1]
+
+def comma_only_list(lst):
+    return ", ".join(lst)
 
 def collect_text(block, regex='.*'):
     try:
@@ -55,3 +60,15 @@ def base_mapping():
             'tracks': []
         }
     }
+
+def format_track_length(ms):
+    if ms is None:
+        return '?:??'
+    elif ms < 1000:
+        return '{} ms'.format(ms)
+    elif ms < 3600000:
+        sec = (ms + 500) // 1000
+        return '{}:{:02d}'.format(sec // 60, sec % 60)
+    else:
+        sec = (ms + 500) // 1000
+        return '{}:{:02d}:{:02d}'.format(sec // (60 * 60), (sec % (60 * 60)) // 60 , sec % 60)

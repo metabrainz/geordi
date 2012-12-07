@@ -16,7 +16,7 @@
 
 from __future__ import division, absolute_import
 
-from ingestr.mappings.util import use_first_text, alternate_text, concatenate_text, collect_text, comma_list, base_mapping
+from ingestr.mappings.util import use_first_text, alternate_text, concatenate_text, collect_text, comma_list, base_mapping, format_track_length
 
 import re
 
@@ -67,7 +67,7 @@ class wcd():
         if 'artist' in x:
             f[u'artist'] = unicode(x['artist']['text'])
         if 'length' in x:
-            f[u'length'] = unicode(x['length']['text'])
+            f[u'length'] = int(float(x['length']['text']) * 1000)
         if 'track' in x:
             f[u'number'] = unicode(x['track']['text'])
         return f
@@ -76,10 +76,11 @@ class wcd():
         f = {}
         f['title'] = track['title']['text']
         f['artist'] = track['artist']['text']
-        f['length'] = track['length']['text']
-        f['number'] = re.split('/', track['track']['text'])[0]
+        f['length'] = int(float(track['length']['text']) * 1000)
+        f['length_formatted'] = format_track_length(f['length'])
+        f['number'] = int(re.split('/', track['track']['text'])[0])
         if re.search('/', track['track']['text']):
-            f['totaltracks'] = re.split('/', track['track']['text'])[1]
+            f['totaltracks'] = int(re.split('/', track['track']['text'])[1])
         else:
             f['totaltracks'] = "0"
         if re.search('cd\s*\d+', track['_name'], re.IGNORECASE):

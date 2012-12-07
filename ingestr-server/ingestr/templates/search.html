@@ -11,11 +11,7 @@
 <p>
 This is a search for <code>{{ query }}</code>
 {%- if request.args.getlist('index') not in [[], ['']] %}
-  in
-  <code>{%- for index in request.args.getlist('index') -%}
-          {{ index }}{%- if not loop.last -%}, {% endif -%}
-        {%- endfor -%}
-  </code>
+  in <code>{{ g.comma_only_list(request.args.getlist('index')) }}</code>
 {%- endif -%}.
 We found {{ data.hits.total }} results; starting at {{ start_from }}.
 </p>

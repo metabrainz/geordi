@@ -21,6 +21,7 @@ from ingestr import app, login_manager, User
 from ingestr.search import do_search
 from ingestr.matching import register_match
 from ingestr.mappings import map_search_data, map_by_index, update_linked_by_index, get_link_types_by_index
+from ingestr.mappings.util import comma_list, comma_only_list
 
 import json
 import uuid
@@ -38,6 +39,8 @@ def dictarray(dictionary):
 def before_request():
     g.all_indices = app.config['AVAILABLE_INDICES']
     g.json = json
+    g.comma_list = comma_list
+    g.comma_only_list = comma_only_list
     g.dictarray = dictarray
 
 # Main user-facing views

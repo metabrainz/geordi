@@ -11,8 +11,36 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
 
 {% if mapping %}
 <h2>Extracted Information</h2>
-<pre>{{ g.json.dumps(mapping, indent=2) }}</pre>
+<h3>Summary</h3>
+<table class="zebra"><tbody>
+    {% for title in mapping.release.title -%}
+    <tr><th>Title{% if mapping.release.title | length > 1 %} (option){% endif %}:</th><td>{{ title }}</td></tr>
+    {%- endfor %}
+    <tr><th>Artist:</th><td>{{ mapping.release.combined_artist }}</td></tr>
+    <tr><th>Date:</th><td>{{ mapping.release.date }}</td></tr>
+    <tr><th>Tracks:</th><td>{{ mapping.release.tracks | length }}</td></tr>
+</tbody></table>
+<h3>Tracklist</h3>
+<table class="zebra">
+<thead>
+</thead>
+<tr><th>#</th><th>Title</th><th>Artist</th><th>Length</th></tr>
+<tbody>
+{%- set medium = "0" -%}
+{%- for track in mapping.release.tracks -%}
+{%- if medium != track.medium and not loop.first %}<tr><th class="mediumheader" colspan=4><hr /></th></tr>{% endif -%}
+{%- set medium = track.medium %}
+<tr>
+  <td>{% if track.medium != "0" %}{{track.medium}} - {% endif %}{{ track.number }}{% if track.totaltracks != "0" %} / {{track.totaltracks}}{% endif %}</td>
+  <td>{{ track.title }}</td>
+  <td>{{ track.artist }}</td>
+  <td>{{ track.length_formatted }} <small>({{ track.length }})</small></td>
+</tr>
+{%- endfor -%}
+</tbody></table>
+{# <pre>{{ g.json.dumps(mapping, indent=2) }}</pre> #}
 {% endif %}
+
 <h2>Link to MusicBrainz</h2>
 <dl class="clearfix">
 {%- for link_type in link_types -%}
