@@ -72,6 +72,22 @@ class wcd():
             f[u'number'] = unicode(x['track']['text'])
         return f
 
+    def _extract_track(self, track):
+        f = {}
+        f['title'] = track['title']['text']
+        f['artist'] = track['artist']['text']
+        f['length'] = track['length']['text']
+        f['number'] = re.split('/', track['track']['text'])[0]
+        if re.search('/', track['track']['text']):
+            f['totaltracks'] = re.split('/', track['track']['text'])[1]
+        else:
+            f['totaltracks'] = "0"
+        if re.search('cd\s*\d+', track['_name'], re.IGNORECASE):
+            f['medium'] = re.search('cd\s*(\d+)', track['_name'], re.IGNORECASE).group(1)
+        else:
+            f['medium'] = "0"
+        return f
+
     def map(self, data):
         target = base_mapping()
         release = target['release']
@@ -104,5 +120,10 @@ class wcd():
         release['combined_artist'] = comma_list([artist['name'] for artist in release['artist']])
 
         # Tracks
+        release['tracks'] = sorted([self._extract_track(x)
+                      for x
+                      in data['files_xml']['files']['file']
+                      if (x['_source'] == 'original' and x['format']['text'] in self._acceptable_formats())],
+                  key=lambda track: (int(track['medium']), int(track['number'])))
 
         return target

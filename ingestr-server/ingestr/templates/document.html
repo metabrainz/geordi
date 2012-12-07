@@ -11,7 +11,7 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
 
 {% if mapping %}
 <h2>Extracted Information</h2>
-{{ mapping }}
+<pre>{{ g.json.dumps(mapping, indent=2) }}</pre>
 {% endif %}
 <h2>Link to MusicBrainz</h2>
 <dl class="clearfix">

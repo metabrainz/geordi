@@ -37,6 +37,7 @@ def dictarray(dictionary):
 @app.before_request
 def before_request():
     g.all_indices = app.config['AVAILABLE_INDICES']
+    g.json = json
     g.dictarray = dictarray
 
 # Main user-facing views

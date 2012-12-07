@@ -43,6 +43,7 @@ We found {{ data.hits.total }} results; starting at {{ start_from }}.
      <big>{{ mapping[loop.index0].release.title[0] }}
        {%- if mapping[loop.index0].release.combined_artist %} by {{ mapping[loop.index0].release.combined_artist }}{% endif %}
        {%- if mapping[loop.index0].release.date %} ({{ mapping[loop.index0].release.date}}){% endif %}
+       {%- if mapping[loop.index0].release.tracks | length > 0 %} ({{ mapping[loop.index0].release.tracks | length }} tracks){% endif %}
      </big>
      {% endif %}
      <small>(<a href="/{{ result._index}}/{{ result._id }}">{{ result._index }}/{{ result._id }}</a>) ({{ result._score }})</small>
