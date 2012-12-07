@@ -28,6 +28,8 @@ class wcd():
                 ]
 
     def extract_linked(self, data):
+        all_artists = []
+        files = []
         if 'what_cd_json' in data:
             main_artists = [{u'name': unicode(artist['name']), u'wcd_artist_id': int(artist['id'])} for artist in data['what_cd_json']['response']['group']['musicInfo']['artists']]
             extra_artists = [{u'name': unicode(artist['name']), u'wcd_artist_id': int(artist['id'])} for artist in data['what_cd_json']['response']['group']['musicInfo']['with']]
@@ -44,7 +46,9 @@ class wcd():
             all_artists.extend([c for c in composers if not (c in seen or seen.append(c))])
             all_artists.extend([c for c in conductors if not (c in seen or seen.append(c))])
             all_artists.extend([c for c in djs if not (c in seen or seen.append(c))])
-            return [all_artists, []]
+        if 'files_xml' in data:
+            files = [{u'sha1': x['sha1']['text']} for x in data['files_xml']['files']['file'] if (x['_source'] == 'original' and 'sha1' in x)]
+        return [all_artists, files]
 
     def sparse(self, data):
         target = base_mapping()

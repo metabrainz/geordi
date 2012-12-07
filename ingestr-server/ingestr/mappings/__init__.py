@@ -60,8 +60,9 @@ def update_linked_by_index(index, item, data):
         links = class_map[index].extract_linked(data)
         currentlinks = data['_ingestr']['links']
         same = True
+
         if (len(links) != len(currentlinks) or
-           [len(item) for item in links] != [len(item) for item in currentlinks]):
+           [len(link) for link in links] != [len(link) for link in currentlinks]):
             same = False
         else:
             for category in range(len(class_map[index].link_types())):
