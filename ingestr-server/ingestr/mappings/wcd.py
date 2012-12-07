@@ -63,19 +63,20 @@ class wcd():
             u'filename': unicode(x['_name'])
             }
         if 'title' in x:
-            f['title'] = x['title']['text']
+            f[u'title'] = unicode(x['title']['text'])
         if 'artist' in x:
-            f['artist'] = x['artist']['text']
+            f[u'artist'] = unicode(x['artist']['text'])
         if 'length' in x:
-            f['length'] = x['length']['text']
+            f[u'length'] = unicode(x['length']['text'])
         if 'track' in x:
-            f['number'] = x['track']['text']
+            f[u'number'] = unicode(x['track']['text'])
         return f
 
     def sparse(self, data):
         target = base_mapping()
         release = target['release']
 
+        # Release Title
         try:
             title_candidates = collect_text(data['meta_xml']['metadata']['album'])
         except KeyError:
@@ -84,11 +85,13 @@ class wcd():
         seen = []
         release['title'] = [c for c in title_candidates if not (c in seen or seen.append(c))]
 
+        # Release Date
         try:
             release['date'] = data['meta_xml']['metadata']['year']['text']
         except:
             release['date'] = None
 
+        # Release Artists
         if 'what_cd_json' in data:
             try:
                 release['artist'] = [{'name': artist['name'], 'wcd_artist_id': int(artist['id'])} for artist in data['what_cd_json']['response']['group']['musicInfo']['artists']]
@@ -98,7 +101,6 @@ class wcd():
                 release['artist'] = [{'name': name} for name in collect_text(data['meta_xml']['metadata']['artist'])]
             except KeyError:
                 release['artist'] = [{'name': name} for name in collect_text(data['meta_xml']['metadata']['creator'])]
-
         release['combined_artist'] = comma_list([artist['name'] for artist in release['artist']])
 
         return target
