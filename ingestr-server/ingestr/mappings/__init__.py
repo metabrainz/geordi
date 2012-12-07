@@ -75,3 +75,16 @@ def update_linked_by_index(index, item, data):
                 return None
         else:
             return True
+
+def get_mapoptions(mapping):
+    options = {'mediums': False, 'totaltracks': False, 'acoustid': False}
+    for track in mapping['release']['tracks']:
+        if len(track['medium']) > 0:
+            options['mediums'] = True
+        if len(track['totaltracks']) > 0:
+            options['totaltracks'] = True
+        if len(track['acoustid']) > 0:
+            options['acoustid'] = True
+        if options['mediums'] and options['totaltracks'] and options['acoustid']:
+            break
+    return options

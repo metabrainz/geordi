@@ -20,7 +20,7 @@ from flask.ext.login import login_required, login_user, logout_user, current_use
 from ingestr import app, login_manager, User
 from ingestr.search import do_search
 from ingestr.matching import register_match
-from ingestr.mappings import map_search_data, map_by_index, update_linked_by_index, get_link_types_by_index
+from ingestr.mappings import map_search_data, map_by_index, update_linked_by_index, get_link_types_by_index, get_mapoptions
 from ingestr.mappings.util import comma_list, comma_only_list
 
 import json
@@ -61,7 +61,8 @@ def document(index, item):
             data = es.get(index, 'item', item)
         mapping = map_by_index(index, data['_source'])
         link_types = get_link_types_by_index(index)
-        return render_template('document.html', item=item, index=index, data = data, mapping = mapping, link_types = link_types)
+        mapoptions = get_mapoptions(mapping)
+        return render_template('document.html', item=item, index=index, data = data, mapping = mapping, link_types = link_types, mapoptions = mapoptions)
     except ElasticHttpNotFoundError:
         return render_template('notfound.html')
 

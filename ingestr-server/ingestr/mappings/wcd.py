@@ -16,7 +16,7 @@
 
 from __future__ import division, absolute_import
 
-from ingestr.mappings.util import use_first_text, alternate_text, concatenate_text, collect_text, comma_list, base_mapping, format_track_length
+from ingestr.mappings.util import concatenate_text, collect_text, comma_list, base_mapping, format_track_length
 
 import re
 
@@ -70,23 +70,34 @@ class wcd():
             f[u'length'] = int(float(x['length']['text']) * 1000)
         if 'track' in x:
             f[u'number'] = unicode(x['track']['text'])
+        if 'external-identifier' in x:
+            f[u'acoustid'] = [re.sub('^urn:acoustid:', '', acoustid) for acoustid in collect_text(x['external-identifier'], 'urn:acoustid')]
         return f
 
     def _extract_track(self, track):
         f = {}
-        f['title'] = track['title']['text']
-        f['artist'] = track['artist']['text']
-        f['length'] = int(float(track['length']['text']) * 1000)
-        f['length_formatted'] = format_track_length(f['length'])
-        f['number'] = int(re.split('/', track['track']['text'])[0])
+        f['subitem'] = '1-{}'.format(track['sha1']['text'])
+        f['title'] = [track['title']['text']]
+        f['artist'] = [track['artist']['text']]
+        f['length'] = [int(float(track['length']['text']) * 1000)]
+        f['length_formatted'] = [format_track_length(length) for length in f['length']]
+        f['number'] = [int(re.split('/', track['track']['text'])[0])]
+
         if re.search('/', track['track']['text']):
-            f['totaltracks'] = int(re.split('/', track['track']['text'])[1])
+            f['totaltracks'] = [int(re.split('/', track['track']['text'])[1])]
         else:
-            f['totaltracks'] = "0"
+            f['totaltracks'] = []
+
         if re.search('cd\s*\d+', track['_name'], re.IGNORECASE):
-            f['medium'] = re.search('cd\s*(\d+)', track['_name'], re.IGNORECASE).group(1)
+            f['medium'] = [re.search('cd\s*(\d+)', track['_name'], re.IGNORECASE).group(1)]
         else:
-            f['medium'] = "0"
+            f['medium'] = []
+
+        if 'external-identifier' in track:
+            f[u'acoustid'] = [re.sub('^urn:acoustid:', '', acoustid) for acoustid in collect_text(track['external-identifier'], 'urn:acoustid')]
+        else:
+            f[u'acoustid'] = []
+
         return f
 
     def map(self, data):
@@ -125,6 +136,6 @@ class wcd():
                       for x
                       in data['files_xml']['files']['file']
                       if (x['_source'] == 'original' and x['format']['text'] in self._acceptable_formats())],
-                  key=lambda track: (int(track['medium']), int(track['number'])))
+                  key=lambda track: (int(track['medium'][0]) if len(track['medium']) > 0 else 0, int(track['number'][0]) if len(track['number']) > 0 else 0))
 
         return target

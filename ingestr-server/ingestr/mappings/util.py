@@ -31,7 +31,7 @@ def comma_only_list(lst):
 
 def collect_text(block, regex='.*'):
     try:
-        text = block['text']
+        text = unicode(block['text'])
         if re.search(regex, text):
             return [text]
         else:
@@ -39,13 +39,7 @@ def collect_text(block, regex='.*'):
     except KeyError:
         return []
     except TypeError:
-        return [entry['text'] for entry in block if ('text' in entry and re.search(regex, entry['text']))]
-
-def use_first_text(block, regex='.*'):
-    return collect_text(block, regex)[0]
-
-def alternate_text(block, regex='.*'):
-    return collect_text(block, regex)[1:]
+        return [unicode(entry['text']) for entry in block if ('text' in entry and re.search(regex, entry['text']))]
 
 def concatenate_text(block, regex='.*', combiner=comma_list):
     return combiner(collect_text(block, regex))

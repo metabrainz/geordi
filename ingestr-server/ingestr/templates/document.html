@@ -25,18 +25,44 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
 <h3>Tracklist</h3>
 <table class="zebra">
 <thead>
-</thead>
-<tr><th>#</th><th>Title</th><th>Artist</th><th>Length</th></tr>
-<tbody>
-{%- set medium = "0" -%}
-{%- for track in mapping.release.tracks -%}
-{%- if medium != track.medium and not loop.first %}<tr><th class="mediumheader" colspan=4><hr /></th></tr>{% endif -%}
-{%- set medium = track.medium %}
+{%- set col = 5 -%}
 <tr>
-  <td>{% if track.medium != "0" %}{{track.medium}} - {% endif %}{{ track.number }}{% if track.totaltracks != "0" %} / {{track.totaltracks}}{% endif %}</td>
-  <td>{{ track.title }}</td>
-  <td>{{ track.artist }}</td>
-  <td>{{ track.length_formatted }} <small>({{ track.length }})</small></td>
+  {%- if mapoptions.mediums %}<th>Medium</th>{% set col = col + 1 %}{% endif -%}
+  <th>#</th>
+  {%- if mapoptions.totaltracks %}<th>Total</th>{% set col = col + 1 %}{% endif -%}
+  <th>Title</th><th>Artist</th><th>Length</th>
+  {%- if mapoptions.acoustid %}<th>AcoustID</th>{% set col = col + 1 %}{% endif -%}
+  <th></th>
+</tr>
+</thead>
+<tbody>
+{%- set medium = none -%}
+{%- for track in mapping.release.tracks -%}
+{%- if track.medium | length == 1 and medium != track.medium[0] and not loop.first %}<tr><th class="mediumheader" colspan={{col}}><hr /></th></tr>{% endif -%}
+{%- if track.medium | length == 1 %}{% set medium = track.medium[0] %}{% endif %}
+<tr>
+  {%- if mapoptions.mediums -%}
+  <td>
+    {%- for medium_number in track.medium %}{{ medium_number }}{% if not loop.last %}<br />{% endif %}{% endfor -%}
+  </td>
+  {%- endif -%}
+  <td>
+    {%- for tnum in track.number -%}{{ tnum }}{% if not loop.last %}/{% endif %}{% endfor -%}
+  </td>
+  {%- if mapoptions.totaltracks -%}
+  <td>
+    {%- for totaltracks in track.totaltracks %}{{ totaltracks }}{% if not loop.last %}<br />{% endif %}{% endfor -%}
+  </td>
+  {%- endif -%}
+  <td>{% for title in track.title %}{{ title }}{% if not loop.last %}<br />{% endif %}{% endfor %}</td>
+  <td>{% for artist in track.artist %}{{ artist }}{% if not loop.last %}<br />{% endif %}{% endfor %}</td>
+  <td>{% for length in track.length_formatted %}{{ length }}{% if not loop.last %}<br />{% endif %}{% endfor %}</td>
+  {%- if mapoptions.acoustid -%}
+  <td>
+    {%- for acoustid in track.acoustid %}<a href="https://acoustid.org/track/{{ acoustid }}">{{ acoustid[:4] }}…{{ acoustid[-4:]}}</a>{% if not loop.last %}<br />{% endif %}{% endfor -%}
+  </td>
+  {%- endif -%}
+  <td>{% if track.subitem %} <small>(<a href="#li-subitem-{{ track.subitem }}">subitem</a>)</small>{% endif %}</td>
 </tr>
 {%- endfor -%}
 </tbody></table>
@@ -47,11 +73,13 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
 <dl class="clearfix">
 {%- for link_type in link_types -%}
 <dt>{{ link_type.name }}</dt>
-<dd><ul>
+<dd><ul id="ul-subitem-{{loop.index0}}">
+{%- set link_id = loop.index0 -%}
 {%- for link in data._source._ingestr.links[loop.index0] %}
-  <li style="clear:both">[{{ loop.index0 }}]<dl class="clearfix">
+  <li style="clear:both" id="li-subitem-{{link_id}}-{{link[link_type.key]}}">[{{ loop.index0 }}]<dl class="clearfix" id="dl-subitem-{{link_id}}-{{link[link_type.key]}}">
     {%- for entry in link.iteritems() %}
-      <dt>{{ entry[0] }}</dt><dd>{{ entry[1] }}</dd>
+    <dt>{{ entry[0] }}</dt>
+    <dd>{{ entry[1] }}</dd>
     {% endfor -%}
   </dl></li>
 {% endfor -%}
