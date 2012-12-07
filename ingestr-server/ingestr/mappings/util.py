@@ -54,9 +54,9 @@ def base_mapping():
     return {
         'release': {
             'title': [],
-            'date': None,
+            'date': [],
             'artist': [],
-            'combined_artist': None,
+            'combined_artist': '',
             'tracks': []
         }
     }

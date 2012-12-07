@@ -104,9 +104,9 @@ class wcd():
 
         # Release Date
         try:
-            release['date'] = data['meta_xml']['metadata']['year']['text']
+            release['date'] = [data['meta_xml']['metadata']['year']['text']]
         except:
-            release['date'] = None
+            pass
 
         # Release Artists
         if 'what_cd_json' in data:

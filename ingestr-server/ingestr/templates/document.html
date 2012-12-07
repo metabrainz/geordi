@@ -14,10 +14,12 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
 <h3>Summary</h3>
 <table class="zebra"><tbody>
     {% for title in mapping.release.title -%}
-    <tr><th>Title{% if mapping.release.title | length > 1 %} (option){% endif %}:</th><td>{{ title }}</td></tr>
+    <tr><th>Title{% if mapping.release.title | length > 1 %} (alternate){% endif %}:</th><td>{{ title }}</td></tr>
     {%- endfor %}
-    <tr><th>Artist:</th><td>{{ mapping.release.combined_artist }}</td></tr>
-    <tr><th>Date:</th><td>{{ mapping.release.date }}</td></tr>
+    <tr><th>Artist:</th><td>{{ mapping.release.combined_artist }}{% if mapping.release.artist | length > 1 %} <small>({{mapping.release.artist | length}} artists)</small>{% endif %}</td></tr>
+    {% for date in mapping.release.date -%}
+    <tr><th>Date{% if mapping.release.date | length > 1 %} (alternate){% endif %}:</th><td>{{ date }}</td></tr>
+    {%- endfor %}
     <tr><th>Tracks:</th><td>{{ mapping.release.tracks | length }}</td></tr>
 </tbody></table>
 <h3>Tracklist</h3>
