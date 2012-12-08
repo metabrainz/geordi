@@ -38,7 +38,7 @@ We found {{ data.hits.total }} results; starting at {{ start_from }}.
      {% if mapping[loop.index0].release %}
      <big>{{ mapping[loop.index0].release.title[0] }}
        {%- if mapping[loop.index0].release.combined_artist %} by {{ mapping[loop.index0].release.combined_artist }}{% endif %}
-       {%- if mapping[loop.index0].release.date %} ({{ mapping[loop.index0].release.date}}){% endif %}
+       {%- if mapping[loop.index0].release.date | length > 0 %} ({{ mapping[loop.index0].release.date[0]}}){% endif %}
        {%- if mapping[loop.index0].release.tracks | length > 0 %} ({{ mapping[loop.index0].release.tracks | length }} tracks){% endif %}
      </big>
      {% endif %}
