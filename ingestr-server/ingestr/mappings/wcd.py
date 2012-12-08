@@ -71,7 +71,7 @@ class wcd():
         if 'track' in x:
             f[u'number'] = unicode(x['track']['text'])
         if 'external-identifier' in x:
-            f[u'acoustid'] = [re.sub('^urn:acoustid:', '', acoustid) for acoustid in collect_text(x['external-identifier'], 'urn:acoustid')]
+            f[u'acoustid'] = [re.sub('^urn:acoustid:', '', acoustid) for acoustid in collect_text(x['external-identifier'], 'urn:acoustid') if acoustid != 'urn:acoustid:unknown']
         return f
 
     def _extract_track(self, track):
@@ -94,7 +94,7 @@ class wcd():
             f['medium'] = []
 
         if 'external-identifier' in track:
-            f[u'acoustid'] = [re.sub('^urn:acoustid:', '', acoustid) for acoustid in collect_text(track['external-identifier'], 'urn:acoustid')]
+            f[u'acoustid'] = [re.sub('^urn:acoustid:', '', acoustid) for acoustid in collect_text(track['external-identifier'], 'urn:acoustid') if acoustid != 'urn:acoustid:unknown']
         else:
             f[u'acoustid'] = []
 
