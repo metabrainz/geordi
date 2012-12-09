@@ -16,7 +16,7 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
     {% for title in mapping.release.title -%}
     <tr><th>Title{% if mapping.release.title | length > 1 %} (alternate){% endif %}:</th><td>{{ title }}</td></tr>
     {%- endfor %}
-    <tr><th>Artist:</th><td>{% for artist in mapping.release.artist %}<a href="#li-subitem-{{artist.subitem}}">{{artist.name}}</a>{% if loop.revindex > 2 %}, {% elif loop.revindex == 2 %} and {% endif %}{% endfor %}{% if mapping.release.artist | length > 1 %} <small>({{mapping.release.artist | length}} artists)</small>{% endif %}</td></tr>
+    <tr><th>Artist:</th><td>{% for artist in mapping.release.artist %}<a class="subitem-opener" data-subitem="{{artist.subitem}}" href="#li-subitem-{{artist.subitem}}">{{artist.name}}</a>{% if loop.revindex > 2 %}, {% elif loop.revindex == 2 %} and {% endif %}{% endfor %}{% if mapping.release.artist | length > 1 %} <small>({{mapping.release.artist | length}} artists)</small>{% endif %}</td></tr>
     {% for date in mapping.release.date -%}
     <tr><th>Date{% if mapping.release.date | length > 1 %} (alternate){% endif %}:</th><td>{{ date }}</td></tr>
     {%- endfor %}
@@ -62,7 +62,7 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
     {%- for acoustid in track.acoustid %}<a href="https://acoustid.org/track/{{ acoustid }}">{{ acoustid[:4] }}…{{ acoustid[-4:]}}</a>{% if not loop.last %}<br />{% endif %}{% endfor -%}
   </td>
   {%- endif -%}
-  <td>{% if track.subitem %} <small>(<a href="#li-subitem-{{ track.subitem }}">subitem</a>)</small>{% endif %}</td>
+  <td>{% if track.subitem %} <small>(<a class="subitem-opener" data-subitem="{{ track.subitem }}" href="#li-subitem-{{ track.subitem }}">subitem</a>)</small>{% endif %}</td>
 </tr>
 {%- endfor -%}
 </tbody></table>
@@ -93,4 +93,13 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
 
 {% block js %}
 {{ expander_js() }}
+<script>
+    $('.subitem-opener').click(function() {
+      $this = $(this);
+      $li = $('#li-subitem-' + $this.attr('data-subitem'));
+      if ($li.hasClass('closed')) {
+        $li.find('span.clicker').click();
+      }
+    });
+</script>
 {% endblock %}
