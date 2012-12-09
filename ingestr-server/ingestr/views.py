@@ -72,8 +72,8 @@ def document(index, item):
 def matchitem(index, item):
     "Submit a match for this item"
     matchtype = request.args.get('type', 'release')
-    mbid = request.args.get('mbid', None)
-    return register_match(index, item, 'item', matchtype, mbid)
+    mbids = request.args.getlist('mbid')
+    return register_match(index, item, 'item', matchtype, mbids)
 
 @app.route('/api/subitem/<index>/<subitem>')
 def subitem(index, subitem):
@@ -89,8 +89,8 @@ def subitem(index, subitem):
 def matchsubitem(index, subitem):
     "Submit a match for this subitem"
     matchtype = request.args.get('type', 'artist')
-    mbid = request.args.get('mbid', None)
-    return register_match(index, subitem, 'subitem', matchtype, mbid)
+    mbids = request.args.getlist('mbid')
+    return register_match(index, subitem, 'subitem', matchtype, mbids)
 
 # Login/logout-related views
 @app.route('/login', methods=["GET", "POST"])
