@@ -5,7 +5,7 @@
             <dt class="expander block-expander closed"><i class="icon"></i> <span class="clicker">{{ item.k }}</span></dt>
             <dd class="collapse">{{ json_looper(item.v, loop, dictarray) }}</dd>
         {%- else %}
-            <li class="expander block-expander closed" style="clear: left"><span class="clicker">[{{ loop.index0 }}]</span>
+            <li class="expander block-expander closed" style="clear: left"><span class="clicker"><code>[{{ loop.index0 }}]</code></span>
                 <div class="collapse li">{{ json_looper(item, loop, dictarray) }}</div>
             </li>
         {%- endif -%}
