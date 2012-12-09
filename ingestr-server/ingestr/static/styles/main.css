@@ -28,7 +28,7 @@ div.li:after, .expander:after, .clearfix:after { content: '.'; display: block; v
 
 /* Make things respond on hover*/
 .expander > span.clicker:hover { background-color: #FF6EB4; }
-li.block-expander:hover { background-color: #D1EEEE; }
+li.block-expander.open:hover { background-color: #D1EEEE; }
 .plain-text:hover { background-color: #90EE90; }
 
 .collapse {
