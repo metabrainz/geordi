@@ -66,3 +66,13 @@ table td, table th {
 .zebra tbody tr:hover td, .zebra tbody tr:hover th {
     background-color: whitesmoke;
 }
+
+.item-linker-content { display:none; }
+.subitem-linker-content { display:none; }
+
+/* Overlay */
+#simplemodal-overlay { background-color:#000; cursor:wait; }
+
+/* Container */
+#simplemodal-container { height:360px; width:600px; background-color:#FFF; border:4px solid #444; padding:12px; }
+#simplemodal-container a.modalCloseImg {background:url('/static/images/x.png') no-repeat; width:25px; height:29px; display:inline; z-index:3200; position:absolute; top:-15px; right:-16px; cursor:pointer;}

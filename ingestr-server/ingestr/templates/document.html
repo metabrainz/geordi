@@ -72,14 +72,16 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
 <h2>Link to MusicBrainz</h2>
 <dl class="clearfix">
 <dt>Whole Item</dt>
-<dd><a href="#">(link)</a></dd>
+<dd><a class="item-linker" href="#">(link)</a>
+    <div class="item-linker-content"><h3>Link Item</h3><p>contents</p></div></dd>
 {%- for link_type in link_types -%}
 <dt>{{ link_type.name }}</dt>
 <dd><ul id="ul-subitem-{{loop.index0}}">
 {%- set link_id = loop.index0 -%}
 {%- for link in data._source._ingestr.links[loop.index0] %}
   <li style="clear:both" class="expander block-expander closed" id="li-subitem-{{link_id}}-{{link[link_type.key]}}"><span class="clicker"><code>[{{ link[link_type.key] }}]</code></span>
-    <a href="#">(link)</a>
+    <a class="subitem-linker" data-subitem="{{ link_id }}-{{ link[link_type.key] }}" href="#">(link)</a>
+    <div id="subitem-linker-content-{{ link_id }}-{{ link[link_type.key] }}" class="subitem-linker-content"><h3>Link subitem ({{ link_id }}-{{ link[link_type.key] }})</h3><p>contents</p></div>
     <div class="li collapse">
     {{ json_pp(link, g.dictarray) }}
     </div>
@@ -96,6 +98,7 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
 
 {% block js %}
 {{ expander_js() }}
+<script src="/static/jquery/jquery.simplemodal.1.4.3.min.js"></script>
 <script>
     $('.subitem-opener').click(function() {
       $this = $(this);
@@ -105,6 +108,15 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
         e.altKey = true;
         $li.find('span.clicker').trigger(e);
       }
+    });
+    $('.subitem-linker').click(function(e) {
+      e.preventDefault();
+      subitem_id = $(this).attr('data-subitem');
+      $('#subitem-linker-content-' + subitem_id).modal();
+    });
+    $('.item-linker').click(function(e) {
+      e.preventDefault();
+      $('.item-linker-content').modal();
     });
 </script>
 {% endblock %}
