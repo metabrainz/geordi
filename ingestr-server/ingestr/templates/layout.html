@@ -8,7 +8,15 @@
   {% endif %}
   <form action="/" method="get">
     <div class="actions">
-      <input type="text" name="query" id="id-query" placeholder="Query" {% if query %}value="{{ query }}" {% endif %}/>
+      <select name="type" id="id-type">
+        <option value="item"{% if request.args.get('type') == 'item' %} selected="selected"{% endif %}>Search items by query string</option>
+        <option value="raw"{% if request.args.get('type') == 'raw' %} selected="selected"{% endif %}>Search items by JSON query</option>
+      </select>
+      {%- if request.args.get('type', 'item') == 'item' -%}
+        <input type="text" style="width: 60em" name="query" id="id-query" placeholder="Query" {% if query %}value="{{ query }}" {% endif %}/>
+      {%- elif request.args.get('type', 'item') == 'raw' -%}
+        <textarea name="query" style="width: 60em" id="id-query" placeholder="Query" cols=60 rows=8>{% if query %}{{ query }}{% endif %}</textarea>
+      {%- endif -%}
       <input type="submit" class="btn primary" value="Search" />
     </div>
     <!-- <div class="filters">
@@ -33,4 +41,19 @@
     </div> -->
     <p class="filter-preview"></p>
   </form>
+{% endblock %}
+
+{% block layoutjs %}
+  <script>
+    $('#id-type').change(function() {
+      var $this = $(this);
+        if ($this.val() == 'raw') {
+          $('#id-query').replaceWith('<textarea name="query" style="width: 60em" id="id-query" placeholder="Query" cols=60 rows=8>{"query":\n  {"bool":\n    {"must": [{"query_string": {"query": "' + $('#id-query').val() + '"}}]}\n  }\n}</textarea>');
+        } else {
+          var jsonquery = $.parseJSON($('#id-query').val());
+          var query = jsonquery.query.bool.must[0].query_string ? jsonquery.query.bool.must[0].query_string.query : '';
+          $('#id-query').replaceWith('<input type="text" style="width: 60em" name="query" id="id-query" placeholder="Query" value="' + query + '" />');
+        }
+    });
+  </script>
 {% endblock %}

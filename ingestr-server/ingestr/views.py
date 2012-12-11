@@ -44,23 +44,26 @@ def before_request():
     g.dictarray = dictarray
 
 # Main user-facing views
-@app.route('/', methods=["GET", "POST"])
+@app.route('/')
 @login_required
 def search():
-    if request.method == "POST":
-        start_from = request.form.get('from', "0")
-        query = request.form.get('query')
+    search_type = request.args.get('type', 'item')
+    start_from = request.args.get('from', "0")
+    query = request.args.get('query')
+    indices = request.args.getlist('index')
+    if search_type == 'raw':
         try:
-            data = do_search_raw(json.loads(query), request.form.getlist('index'), start_from=request.form.get('from', None))
+            data = do_search_raw(json.loads(query), indices, start_from=request.args.get('from', None))
         except ValueError:
             flash("Malformed or missing JSON value.")
             return render_template('search.html', query=None, data = None, mapping = None, start_from=None)
-    else:
-        start_from = request.args.get('from', "0")
-        query = request.args.get('query')
+    elif search_type == 'item':
         data = None
         if query:
-            data = do_search(query, request.args.getlist('index'), start_from=request.args.get('from', None))
+            data = do_search(query, indices, start_from=request.args.get('from', None))
+    else:
+        print "Search type {} unimplemented".format(search_type)
+        data = None
     mapping = map_search_data(data)
     return render_template('search.html', query=query, data = data, mapping = mapping, start_from=start_from)
 
@@ -79,26 +82,28 @@ def document(index, item):
         return render_template('notfound.html')
 
 # Internal API urls for matching etc.
-@app.route('/api/search', methods=["GET", "POST"])
+@app.route('/api/search')
 def apisearch():
     "Perform a search, returning JSON"
-    if request.method == "POST":
-        indices = request.form.getlist('index')
+    search_type = request.args.get('type', 'item')
+    start_from = request.args.get('from', "0")
+    query = request.args.get('query')
+    indices = request.args.getlist('index')
+    if search_type == 'raw':
         try:
-            query = json.loads(request.form.get('query'))
+            data = do_search_raw(json.loads(query), indices)
         except ValueError:
             return Response(json.dumps({'code': 400, 'error': 'JSON raw query is malformed or missing.'}), 400, mimetype="application/json")
-
-        data = do_search_raw(query, indices)
-        mapping = map_search_data(data)
-        return Response(json.dumps({'code': 200, 'result': data, 'mapping': mapping}), 200, mimetype="application/json");
-    else:
-        if request.args.get('query', False):
-            data = do_search(request.args.get('query'), request.args.getlist('index'), start_from=request.args.get('from', None))
-            mapping = map_search_data(data)
-            return Response(json.dumps({'code': 200, 'result': data, 'mapping': mapping}), 200, mimetype="application/json");
+    elif search_type == 'item':
+        if query:
+            data = do_search(query, indices, start_from=request.args.get('from', None))
         else:
             return Response(json.dumps({'code': 400, 'error': 'You must provide a query string.'}), 400, mimetype="application/json")
+    else:
+        return Response(json.dumps({'code': 400, 'error': 'Search type {} unimplemented.'.format(search_type)}), 400, mimetype="application/json")
+
+    mapping = map_search_data(data)
+    return Response(json.dumps({'code': 200, 'result': data, 'mapping': mapping}), 200, mimetype="application/json");
 
 @app.route('/api/item/<index>/<subitem>')
 def item(index, item):
