@@ -16,7 +16,14 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
     {% for title in mapping.release.title -%}
     <tr><th>Title{% if mapping.release.title | length > 1 %} (alternate){% endif %}:</th><td>{{ title }}</td></tr>
     {%- endfor %}
-    <tr><th>Artist:</th><td>{% for artist in mapping.release.artist %}<a class="subitem-opener" data-subitem="{{artist.subitem}}" href="#li-subitem-{{artist.subitem}}">{{artist.name}}</a>{% if loop.revindex > 2 %}, {% elif loop.revindex == 2 %} and {% endif %}{% endfor %}{% if mapping.release.artist | length > 1 %} <small>({{mapping.release.artist | length}} artists)</small>{% endif %}</td></tr>
+    <tr><th>Artist:</th>
+        <td>{% for artist in mapping.release.artist -%}
+              {%- if artist.subitem -%}
+              <a class="subitem-opener" data-subitem="{{artist.subitem}}" href="#li-subitem-{{artist.subitem}}">{{artist.name}}</a>
+              {%- else -%}{{artist.name}}{%- endif -%}
+              {% if loop.revindex > 2 %}, {% elif loop.revindex == 2 %} and {% endif -%}
+            {%- endfor %}{% if mapping.release.artist | length > 1 %} <small>({{mapping.release.artist | length}} artists)</small>{% endif -%}
+    </td></tr>
     {% for date in mapping.release.date -%}
     <tr><th>Date{% if mapping.release.date | length > 1 %} (alternate){% endif %}:</th><td>{{ date }}</td></tr>
     {%- endfor %}
@@ -55,7 +62,13 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
   </td>
   {%- endif -%}
   <td>{% for title in track.title %}{{ title }}{% if not loop.last %}<br />{% endif %}{% endfor %}</td>
-  <td>{% for artist in track.artist %}{{ artist }}{% if not loop.last %}<br />{% endif %}{% endfor %}</td>
+  <td>{% for artist in track.artist -%}
+              {%- if artist.subitem -%}
+              <a class="subitem-opener" data-subitem="{{artist.subitem}}" href="#li-subitem-{{artist.subitem}}">{{artist.name}}</a>
+              {%- else -%}{{artist.name}}{%- endif -%}
+              {% if loop.revindex > 2 %}, {% elif loop.revindex == 2 %} and {% endif -%}
+            {%- endfor %}{% if track.artist | length > 1 %} <small>({{track.artist | length}} artists)</small>{% endif -%}
+  </td>
   <td>{% for length in track.length_formatted %}{{ length }}{% if not loop.last %}<br />{% endif %}{% endfor %}</td>
   {%- if mapoptions.acoustid -%}
   <td>

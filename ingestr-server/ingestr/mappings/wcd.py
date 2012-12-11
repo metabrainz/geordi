@@ -46,7 +46,7 @@ class wcd():
             all_artists.extend([c for c in djs if not (c in seen or seen.append(c))])
         if 'files_xml' in data:
             files = [self._extract_file(x) for x in data['files_xml']['files']['file'] if (x['_source'] == 'original' and 'sha1' in x and x['format']['text'] in self._acceptable_formats())]
-        return {0: all_artists, 1: files}
+        return {'0': all_artists, '1': files}
 
     def _acceptable_formats(self):
         return ['Flac', 'VBR MP3', 'Ogg Vorbis', 'Apple Lossless Audio']
@@ -72,11 +72,14 @@ class wcd():
             f[u'acoustid'] = [re.sub('^urn:acoustid:', '', acoustid) for acoustid in collect_text(x['external-identifier'], 'urn:acoustid') if acoustid != 'urn:acoustid:unknown']
         return f
 
-    def _extract_track(self, track):
+    def _extract_track(self, track, links):
         f = {}
         f['subitem'] = '1-{}'.format(track['sha1']['text'])
         f['title'] = [track['title']['text']]
-        f['artist'] = [track['artist']['text']]
+        f['artist'] = [{'name': track['artist']['text']}]
+        for artist in links['0']:
+            if artist['name'] == f['artist'][0]['name']:
+                f['artist'][0]['subitem'] = '0-{}'.format(artist['wcd_artist_id'])
         f['length'] = [int(float(track['length']['text']) * 1000)]
         f['length_formatted'] = [format_track_length(length) for length in f['length']]
         f['number'] = []
@@ -137,7 +140,8 @@ class wcd():
         release['combined_artist'] = comma_list([artist['name'] for artist in release['artist']])
 
         # Tracks
-        release['tracks'] = sorted([self._extract_track(x)
+        links = self.extract_linked(data)
+        release['tracks'] = sorted([self._extract_track(x, links)
                       for x
                       in data['files_xml']['files']['file']
                       if (x['_source'] == 'original' and x['format']['text'] in self._acceptable_formats())],
