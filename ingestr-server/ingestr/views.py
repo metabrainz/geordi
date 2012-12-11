@@ -45,6 +45,7 @@ def before_request():
 
 # Main user-facing views
 @app.route('/')
+@login_required
 def search():
     data = None
     mapping = None
@@ -54,6 +55,7 @@ def search():
     return render_template('search.html', query=request.args.get('query'), data = data, mapping = mapping, start_from=request.args.get('from', '0'))
 
 @app.route('/<index>/<item>')
+@login_required
 def document(index, item):
     try:
         data = es.get(index, 'item', item)
