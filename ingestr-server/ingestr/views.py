@@ -101,12 +101,14 @@ def item(index, item):
         return Response(json.dumps({'code': 404, 'error': 'The provided item could not be found.'}), 404, mimetype="application/json")
 
 @app.route('/api/matchitem/<index>/<item>')
-@login_required
 def matchitem(index, item):
     "Submit a match for this item"
-    matchtype = request.args.get('type', 'release')
-    mbids = request.args.getlist('mbid')
-    return register_match(index, item, 'item', matchtype, mbids)
+    if current_user.is_authenticated():
+        matchtype = request.args.get('type', 'release')
+        mbids = request.args.getlist('mbid')
+        return register_match(index, item, 'item', matchtype, mbids)
+    else:
+        return Response(json.dumps({'code': 403, 'error': 'Unauthorized.'}), 403, mimetype="application/json");
 
 @app.route('/api/subitem/<index>/<subitem>')
 def subitem(index, subitem):
@@ -118,12 +120,14 @@ def subitem(index, subitem):
         return Response(json.dumps({'code': 404, 'error': 'The provided item could not be found.'}), 404, mimetype="application/json")
 
 @app.route('/api/matchsubitem/<index>/<subitem>')
-@login_required
 def matchsubitem(index, subitem):
     "Submit a match for this subitem"
-    matchtype = request.args.get('type', 'artist')
-    mbids = request.args.getlist('mbid')
-    return register_match(index, subitem, 'subitem', matchtype, mbids)
+    if current_user.is_authenticated():
+        matchtype = request.args.get('type', 'artist')
+        mbids = request.args.getlist('mbid')
+        return register_match(index, subitem, 'subitem', matchtype, mbids)
+    else:
+        return Response(json.dumps({'code': 403, 'error': 'Unauthorized.'}), 403, mimetype="application/json");
 
 # Login/logout-related views
 @app.route('/login', methods=["GET", "POST"])
