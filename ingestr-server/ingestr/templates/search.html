@@ -32,8 +32,8 @@ We found {{ data.hits.total }} results; starting at {{ start_from }}.
 
 <ul>
 {% for result in data.hits.hits %}
-<li style="clear: left" class="result expander json-expander closed">
-  <span class="clicker">
+<li style="clear: left" class="result">
+  <span>
   {% if mapping[loop.index0] %}
      {% if mapping[loop.index0].release %}
      <big>{{ mapping[loop.index0].release.title[0] }}
@@ -47,23 +47,9 @@ We found {{ data.hits.total }} results; starting at {{ start_from }}.
      <big>{{ result._id }} ({{ result._index }}) <a href="/{{ result._index}}/{{ result._id }}">[info]</a></big> <small>({{ result._score }})</small>
   {% endif %}
   </span>
-  <div class="raw collapse">{{ json_pp(result._source, g.dictarray) }}</div>
 </li>
 {% endfor %}
 </ul>
 
 {% endif %}
-{% endblock %}
-
-{% block js %}
-{{ expander_js() }}
-<script>
-  $('li.json-expander > span.clicker').click(function(event) {
-    if (event.target.nodeName != 'A') {
-      $this = $(this).closest('.json-expander');
-      $this.toggleClass('closed open')
-         .find('div.raw').toggleClass('collapse');
-    }
-  });
-</script>
 {% endblock %}
