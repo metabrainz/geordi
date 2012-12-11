@@ -47,14 +47,22 @@ def before_request():
 @app.route('/', methods=["GET", "POST"])
 @login_required
 def search():
-    data = None
     if request.method == "POST":
-        data = do_search_raw(request.form.get('query'), request.form.getlist('index'), start_from=request.form.get('from', None))
+        start_from = request.form.get('from', "0")
+        query = request.form.get('query')
+        try:
+            data = do_search_raw(json.loads(query), request.form.getlist('index'), start_from=request.form.get('from', None))
+        except ValueError:
+            flash("Malformed or missing JSON value.")
+            return render_template('search.html', query=None, data = None, mapping = None, start_from=None)
     else:
-        if request.args.get('query', False):
-            data = do_search(request.args.get('query'), request.args.getlist('index'), start_from=request.args.get('from', None))
+        start_from = request.args.get('from', "0")
+        query = request.args.get('query')
+        data = None
+        if query:
+            data = do_search(query, request.args.getlist('index'), start_from=request.args.get('from', None))
     mapping = map_search_data(data)
-    return render_template('search.html', query=request.args.get('query'), data = data, mapping = mapping, start_from=request.args.get('from', '0'))
+    return render_template('search.html', query=query, data = data, mapping = mapping, start_from=start_from)
 
 @app.route('/<index>/<item>')
 @login_required
@@ -75,10 +83,9 @@ def document(index, item):
 def apisearch():
     "Perform a search, returning JSON"
     if request.method == "POST":
-        query = request.form['query']
-        indices = request.form['index'].split(',')
+        indices = request.form.getlist('index')
         try:
-            json.loads(query)
+            query = json.loads(request.form.get('query'))
         except ValueError:
             return Response(json.dumps({'code': 400, 'error': 'JSON raw query is malformed or missing.'}), 400, mimetype="application/json")
 
