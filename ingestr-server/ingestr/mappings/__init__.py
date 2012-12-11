@@ -27,7 +27,10 @@ class_map = {
 }
 
 def map_search_data(data):
-    return [map_by_index(result['_index'], result['_source']) for result in data['hits']['hits']]
+    try:
+        return [map_by_index(result['_index'], result['_source']) for result in data['hits']['hits']]
+    except TypeError:
+        return None
 
 def map_by_index(index, data):
     if index in class_map:

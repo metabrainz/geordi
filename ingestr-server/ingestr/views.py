@@ -44,14 +44,16 @@ def before_request():
     g.dictarray = dictarray
 
 # Main user-facing views
-@app.route('/')
+@app.route('/', methods=["GET", "POST"])
 @login_required
 def search():
     data = None
-    mapping = None
-    if request.args.get('query', False):
-        data = do_search(request.args.get('query'), request.args.getlist('index'), start_from=request.args.get('from', None))
-        mapping = map_search_data(data)
+    if request.method == "POST":
+        data = do_search_raw(request.form.get('query'), request.form.getlist('index'), start_from=request.form.get('from', None))
+    else:
+        if request.args.get('query', False):
+            data = do_search(request.args.get('query'), request.args.getlist('index'), start_from=request.args.get('from', None))
+    mapping = map_search_data(data)
     return render_template('search.html', query=request.args.get('query'), data = data, mapping = mapping, start_from=request.args.get('from', '0'))
 
 @app.route('/<index>/<item>')

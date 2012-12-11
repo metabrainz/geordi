@@ -27,11 +27,11 @@ def do_search(query_string, indices, start_from=None):
                 {"query_string": {"query": query_string}}
               ]}}
             }
-    if start_from:
-        query['from'] = start_from
     return do_search_raw(query, indices)
 
-def do_search_raw(query, indices):
+def do_search_raw(query, indices, start_from=None):
     if indices in [[], ['']]:
         indices = app.config['AVAILABLE_INDICES']
+    if start_from:
+        query['from'] = start_from
     return es.search(query, index = indices, doc_type = "item")
