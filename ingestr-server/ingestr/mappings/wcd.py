@@ -81,7 +81,14 @@ class wcd():
         f['artist'] = [track['artist']['text']]
         f['length'] = [int(float(track['length']['text']) * 1000)]
         f['length_formatted'] = [format_track_length(length) for length in f['length']]
-        f['number'] = [int(re.split('/', track['track']['text'])[0])]
+        f['number'] = []
+        numbers = [re.split('/', track['track']['text'])[0]]
+        for num in numbers:
+            try:
+                f['number'].append(str(int(num)))
+            except ValueError:
+                f['number'].append(num)
+
 
         if re.search('/', track['track']['text']):
             f['totaltracks'] = [int(re.split('/', track['track']['text'])[1])]
@@ -136,6 +143,23 @@ class wcd():
                       for x
                       in data['files_xml']['files']['file']
                       if (x['_source'] == 'original' and x['format']['text'] in self._acceptable_formats())],
-                  key=lambda track: (int(track['medium'][0]) if len(track['medium']) > 0 else 0, int(track['number'][0]) if len(track['number']) > 0 else 0))
+                  key=self._track_sorter)
 
         return target
+
+    def _track_sorter(self, track):
+        try:
+            tnum = int(track['number'][0])
+        except IndexError:
+            tnum = 0
+        except ValueError:
+            tnum = track['number'][0]
+
+        try:
+            mnum = int(track['medium'][0])
+        except IndexError:
+            mnum = 0
+        except ValueError:
+            mnum = track['medium'][0]
+
+        return (mnum, tnum)

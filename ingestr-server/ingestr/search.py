@@ -27,7 +27,7 @@ def do_search(query_string, indices, start_from=None):
                 {"query_string": {"query": query_string}}
               ]}}
             }
-    return do_search_raw(query, indices)
+    return do_search_raw(query, indices, start_from)
 
 def do_search_raw(query, indices, start_from=None):
     if indices in [[], ['']]:

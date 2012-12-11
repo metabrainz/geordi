@@ -44,13 +44,17 @@ def before_request():
     g.dictarray = dictarray
 
 # Main user-facing views
-@app.route('/')
-@login_required
-def search():
+def get_search_params():
     search_type = request.args.get('type', 'item')
     start_from = request.args.get('from', "0")
     query = request.args.get('query')
     indices = request.args.getlist('index')
+    return (search_type, start_from, query, indices)
+
+@app.route('/')
+@login_required
+def search():
+    search_type, start_from, query, indices = get_search_params()
     if search_type == 'raw':
         try:
             data = do_search_raw(json.loads(query), indices, start_from=request.args.get('from', None))
@@ -85,10 +89,7 @@ def document(index, item):
 @app.route('/api/search')
 def apisearch():
     "Perform a search, returning JSON"
-    search_type = request.args.get('type', 'item')
-    start_from = request.args.get('from', "0")
-    query = request.args.get('query')
-    indices = request.args.getlist('index')
+    search_type, start_from, query, indices = get_search_params()
     if search_type == 'raw':
         try:
             data = do_search_raw(json.loads(query), indices)
