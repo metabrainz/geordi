@@ -92,14 +92,14 @@ def apisearch():
     search_type, start_from, query, indices = get_search_params()
     if search_type == 'raw':
         try:
-            data = do_search_raw(json.loads(query), indices)
+            data = do_search_raw(json.loads(query), indices, start_from=request.args.get('from', None))
         except ValueError:
-            return Response(json.dumps({'code': 400, 'error': 'JSON raw query is malformed or missing.'}), 400, mimetype="application/json")
+            return Response(json.dumps({'code': 400, 'error': 'You must provide a query..'}), 400, mimetype="application/json")
     elif search_type == 'item':
         if query:
             data = do_search(query, indices, start_from=request.args.get('from', None))
         else:
-            return Response(json.dumps({'code': 400, 'error': 'You must provide a query string.'}), 400, mimetype="application/json")
+            return Response(json.dumps({'code': 400, 'error': 'You must provide a query.'}), 400, mimetype="application/json")
     else:
         return Response(json.dumps({'code': 400, 'error': 'Search type {} unimplemented.'.format(search_type)}), 400, mimetype="application/json")
 
