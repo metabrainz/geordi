@@ -18,7 +18,7 @@ from __future__ import division, absolute_import
 from flask import render_template, request, redirect, url_for, flash, Response, g
 from flask.ext.login import login_required, login_user, logout_user, current_user
 from ingestr import app, login_manager, User
-from ingestr.search import do_search
+from ingestr.search import do_search, do_search_raw
 from ingestr.matching import register_match
 from ingestr.mappings import map_search_data, map_by_index, update_linked_by_index, get_link_types_by_index, get_mapoptions
 from ingestr.mappings.util import comma_list, comma_only_list
@@ -67,6 +67,37 @@ def document(index, item):
         return render_template('notfound.html')
 
 # Internal API urls for matching etc.
+@app.route('/api/search', methods=["GET", "POST"])
+def apisearch():
+    "Perform a search, returning JSON"
+    if request.method == "POST":
+        query = request.form['query']
+        indices = request.form['index'].split(',')
+        try:
+            json.loads(query)
+        except ValueError:
+            return Response(json.dumps({'code': 400, 'error': 'JSON raw query is malformed or missing.'}), 400, mimetype="application/json")
+
+        data = do_search_raw(query, indices)
+        mapping = map_search_data(data)
+        return Response(json.dumps({'code': 200, 'result': data, 'mapped': mapping}), 200, mimetype="application/json");
+    else:
+        if request.args.get('query', False):
+            data = do_search(request.args.get('query'), request.args.getlist('index'), start_from=request.args.get('from', None))
+            mapping = map_search_data(data)
+            return Response(json.dumps({'code': 200, 'result': data, 'mapped': mapping}), 200, mimetype="application/json");
+        else:
+            return Response(json.dumps({'code': 400, 'error': 'You must provide a query string.'}), 400, mimetype="application/json")
+
+@app.route('/api/item/<index>/<subitem>')
+def item(index, item):
+    "Get information for an item"
+    try:
+        document = es.get(index, 'item', item)
+        return Response(json.dumps({'code': 200, 'document': document}), 200, mimetype="application/json");
+    except ElasticHttpNotFoundError:
+        return Response(json.dumps({'code': 404, 'error': 'The provided item could not be found.'}), 404, mimetype="application/json")
+
 @app.route('/api/matchitem/<index>/<item>')
 @login_required
 def matchitem(index, item):
@@ -80,9 +111,9 @@ def subitem(index, subitem):
     "Get information for a subitem's matching"
     try:
         document = es.get(index, 'subitem', subitem)
-        return Response(json.dumps({'code': 200, 'document': document}), 200);
+        return Response(json.dumps({'code': 200, 'document': document}), 200, mimetype="application/json");
     except ElasticHttpNotFoundError:
-        return Response(json.dumps({'code': 404, 'error': 'The provided item could not be found.'}), 404)
+        return Response(json.dumps({'code': 404, 'error': 'The provided item could not be found.'}), 404, mimetype="application/json")
 
 @app.route('/api/matchsubitem/<index>/<subitem>')
 @login_required

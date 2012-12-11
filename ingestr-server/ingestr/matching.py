@@ -35,12 +35,12 @@ def make_match_definition(user, matchtype, mbids):
 
 def register_match(index, item, itemtype, matchtype, mbids):
     if len(mbids) < 1:
-        return Response(json.dumps({'code': 400, 'error': 'You must provide at least one MBID for a match.'}), 400)
+        return Response(json.dumps({'code': 400, 'error': 'You must provide at least one MBID for a match.'}), 400, mimetype="application/json")
     # Check MBID formatting
     try:
         [uuid.UUID('{{{uuid}}}'.format(uuid=mbid)) for mbid in mbids]
     except ValueError:
-        return Response(json.dumps({'code': 400, 'error': 'A provided MBID is ill-formed'}), 400)
+        return Response(json.dumps({'code': 400, 'error': 'A provided MBID is ill-formed'}), 400, mimetype="application/json")
     # Retrieve document (or blank empty document for subitems)
     try:
         document = es.get(index, itemtype, item)
@@ -48,7 +48,7 @@ def register_match(index, item, itemtype, matchtype, mbids):
         version = document['_version']
     except ElasticHttpNotFoundError:
         if itemtype == 'item':
-            return Response(json.dumps({'code': 404, 'error': 'The provided item could not be found.'}), 404)
+            return Response(json.dumps({'code': 404, 'error': 'The provided item could not be found.'}), 404, mimetype="application/json")
         else:
             data = {}
             version = None
@@ -65,6 +65,6 @@ def register_match(index, item, itemtype, matchtype, mbids):
             es.index(index, itemtype, data, id=item, es_version=version)
         else:
             es.index(index, itemtype, data, id=item)
-        return Response(json.dumps({'code': 200}), 200)
+        return Response(json.dumps({'code': 200}), 200, mimetype="application/json")
     except:
-        return Response(json.dumps({'code': 500, 'error': 'An unknown error happened while pushing to elasticsearch.'}), 500)
+        return Response(json.dumps({'code': 500, 'error': 'An unknown error happened while pushing to elasticsearch.'}), 500, mimetype="application/json")
