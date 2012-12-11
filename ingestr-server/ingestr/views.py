@@ -44,33 +44,6 @@ def before_request():
     g.dictarray = dictarray
 
 # Main user-facing views
-def get_search_params():
-    search_type = request.args.get('type', 'item')
-    start_from = request.args.get('from', "0")
-    query = request.args.get('query')
-    indices = request.args.getlist('index')
-    return (search_type, start_from, query, indices)
-
-@app.route('/')
-@login_required
-def search():
-    search_type, start_from, query, indices = get_search_params()
-    if search_type == 'raw':
-        try:
-            data = do_search_raw(json.loads(query), indices, start_from=request.args.get('from', None))
-        except ValueError:
-            flash("Malformed or missing JSON value.")
-            return render_template('search.html', query=None, data = None, mapping = None, start_from=None)
-    elif search_type == 'item':
-        data = None
-        if query:
-            data = do_search(query, indices, start_from=request.args.get('from', None))
-    else:
-        print "Search type {} unimplemented".format(search_type)
-        data = None
-    mapping = map_search_data(data)
-    return render_template('search.html', query=query, data = data, mapping = mapping, start_from=start_from)
-
 @app.route('/<index>/<item>')
 @login_required
 def document(index, item):
@@ -85,26 +58,44 @@ def document(index, item):
     except ElasticHttpNotFoundError:
         return render_template('notfound.html')
 
-# Internal API urls for matching etc.
-@app.route('/api/search')
-def apisearch():
-    "Perform a search, returning JSON"
-    search_type, start_from, query, indices = get_search_params()
+def get_search_params():
+    "Shared search functionality"
+    search_type = request.args.get('type', 'item')
+    start_from = request.args.get('from', "0")
+    query = request.args.get('query')
+    indices = request.args.getlist('index')
     if search_type == 'raw':
         try:
             data = do_search_raw(json.loads(query), indices, start_from=request.args.get('from', None))
         except ValueError:
-            return Response(json.dumps({'code': 400, 'error': 'You must provide a query..'}), 400, mimetype="application/json")
+            return {'error': "Malformed or missing JSON."}
     elif search_type == 'item':
         if query:
             data = do_search(query, indices, start_from=request.args.get('from', None))
         else:
-            return Response(json.dumps({'code': 400, 'error': 'You must provide a query.'}), 400, mimetype="application/json")
+            return {'error': 'You must provide a query.'}
     else:
-        return Response(json.dumps({'code': 400, 'error': 'Search type {} unimplemented.'.format(search_type)}), 400, mimetype="application/json")
+        return {'error': 'Search type {} unimplemented.'.format(search_type)}
 
     mapping = map_search_data(data)
-    return Response(json.dumps({'code': 200, 'result': data, 'mapping': mapping}), 200, mimetype="application/json");
+    return {"start_from": start_from, "query": query, "mapping": mapping, "data": data}
+
+@app.route('/')
+@login_required
+def search():
+    params = get_search_params()
+    if 'error' in params and params['error'] != 'You must provide a query':
+        flash(params["error"])
+    return render_template('search.html', query=params.get('query'), data = params.get('data'), mapping = params.get('mapping'), start_from= params.get('start_from'))
+
+# Internal API urls for matching etc.
+@app.route('/api/search')
+def apisearch():
+    "Perform a search, returning JSON"
+    params = get_search_params()
+    if 'error' in params:
+        return Response(json.dumps({'code': 400, 'error': params['error']}), 400, mimetype="application/json")
+    return Response(json.dumps({'code': 200, 'result': params.get('data'), 'mapping': params.get('mapping')}), 200, mimetype="application/json");
 
 @app.route('/api/item/<index>/<subitem>')
 def item(index, item):
