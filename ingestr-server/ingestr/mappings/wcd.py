@@ -22,10 +22,8 @@ import re
 
 class wcd():
     def link_types(self):
-        return [
-                {'name':"wcd artist id", 'key': 'wcd_artist_id'},
-                {'name':"wcd file", 'key': 'sha1'}
-                ]
+        return {'0': {'name':"wcd artist id", 'key': 'wcd_artist_id'},
+                '1': {'name':"wcd file", 'key': 'sha1'}}
 
     def extract_linked(self, data):
         all_artists = []
@@ -48,7 +46,7 @@ class wcd():
             all_artists.extend([c for c in djs if not (c in seen or seen.append(c))])
         if 'files_xml' in data:
             files = [self._extract_file(x) for x in data['files_xml']['files']['file'] if (x['_source'] == 'original' and 'sha1' in x and x['format']['text'] in self._acceptable_formats())]
-        return [all_artists, files]
+        return {0: all_artists, 1: files}
 
     def _acceptable_formats(self):
         return ['Flac', 'VBR MP3', 'Ogg Vorbis', 'Apple Lossless Audio']
