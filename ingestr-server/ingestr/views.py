@@ -80,12 +80,12 @@ def apisearch():
 
         data = do_search_raw(query, indices)
         mapping = map_search_data(data)
-        return Response(json.dumps({'code': 200, 'result': data, 'mapped': mapping}), 200, mimetype="application/json");
+        return Response(json.dumps({'code': 200, 'result': data, 'mapping': mapping}), 200, mimetype="application/json");
     else:
         if request.args.get('query', False):
             data = do_search(request.args.get('query'), request.args.getlist('index'), start_from=request.args.get('from', None))
             mapping = map_search_data(data)
-            return Response(json.dumps({'code': 200, 'result': data, 'mapped': mapping}), 200, mimetype="application/json");
+            return Response(json.dumps({'code': 200, 'result': data, 'mapping': mapping}), 200, mimetype="application/json");
         else:
             return Response(json.dumps({'code': 400, 'error': 'You must provide a query string.'}), 400, mimetype="application/json")
 
