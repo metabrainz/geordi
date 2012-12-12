@@ -86,7 +86,10 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
 <dl class="clearfix">
 <dt>Whole Item</dt>
 <dd><span class="current-match">
-    {%- if data._source._ingestr.matchings %}{% for mbid in data._source._ingestr.matchings[0].mbid %}<a href="https://musicbrainz.org/{{ data._source._ingestr.matchings[0].type }}/{{ mbid }}">{{ mbid[:4] }}…{{ mbid[-4:] }}</a> {% endfor %}[{{ data._source._ingestr.matchings[0].user }}]
+    {%- if data._source._ingestr.matchings %}
+      {{ data._source._ingestr.matchings[0].type }}
+      {% for mbid in data._source._ingestr.matchings[0].mbid %}<a href="https://musicbrainz.org/{{ data._source._ingestr.matchings[0].type }}/{{ mbid }}">{{ mbid[:4] }}…{{ mbid[-4:] }}</a>{% if not loop.last %}, {% endif %}{% endfor %}
+      [{{ data._source._ingestr.matchings[0].user }}]
     {%- endif %}</span>
     <a class="item-linker" href="#">(link)</a>
     {{ linker_content('item-linker-content', 'item-linker-content', 'Link Item', none, 'item', data._id, data._index) }}
@@ -193,12 +196,13 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
            context: this
       })
       .done(function(data) {
-           text = '';
            type = data.document._source._ingestr.matchings[0].type;
+           text = type + ' ';
            $.each(data.document._source._ingestr.matchings[0].mbid, function(index, element) {
-               text = text + '<a href="https://musicbrainz.org/' + type + '/' + element + '">' + element.slice(0,4) + '…' + element.slice(-4) + '</a> '
+               text = text + '<a href="https://musicbrainz.org/' + type + '/' + element + '">' + element.slice(0,4) + '…' + element.slice(-4) + '</a>, '
            });
-           $(this).html(text + '[' + data.document._source._ingestr.matchings[0].user + ']');
+           text = text.slice(0,-2);
+           $(this).html(text + ' [' + data.document._source._ingestr.matchings[0].user + ']');
       });
     });
 </script>
