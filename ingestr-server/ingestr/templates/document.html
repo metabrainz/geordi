@@ -120,7 +120,14 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
       <dt class="expander block-expander open"><i class="icon"></i><span class="clicker">Match</span></dt>
       <dd><div>
         <form class="match-form" id="match-{{type}}-{{item}}" action="/api/match{{type}}/{{ index }}/{{ item }}" method="get">
-          <select name="type"><option>release</option><option>artist</option></select>
+          <select name="type">
+            <option>release</option>
+            <option>release-group</option>
+            <option>recording</option>
+            <option>work</option>
+            <option>artist</option>
+            <option>label</option>
+          </select>
           <input type="text" name="mbids" placeholder="MBIDs, comma separated" />
           <input type="submit" class="btn primary" value="Match" />
         </form>
