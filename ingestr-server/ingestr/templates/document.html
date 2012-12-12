@@ -85,8 +85,11 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
 <h2>Link to MusicBrainz</h2>
 <dl class="clearfix">
 <dt>Whole Item</dt>
-<dd><a class="item-linker" href="#">(link)</a>
-  {{ linker_content('item-linker-content', 'item-linker-content', 'Link Item', none, 'item', data._id, data._index) }}
+<dd><span class="current-match">
+    {%- if data._source._ingestr.matchings %}{% for mbid in data._source._ingestr.matchings[0].mbid %}<a href="https://musicbrainz.org/{{ data._source._ingestr.matchings[0].type }}/{{ mbid }}">{{ mbid[:4] }}…{{ mbid[-4:] }}</a> {% endfor %}[{{ data._source._ingestr.matchings[0].user }}]
+    {%- endif %}</span>
+    <a class="item-linker" href="#">(link)</a>
+    {{ linker_content('item-linker-content', 'item-linker-content', 'Link Item', none, 'item', data._id, data._index) }}
 </dd>
 {%- for (link_type_id, link_type) in link_types.iteritems() -%}
 <dt>{{ link_type.name }}</dt>
@@ -95,6 +98,7 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
 {%- for link in data._source._ingestr.links[link_type_id] %}
   {%- set subitem_id = link_id | string + '-' + link[link_type.key] | string -%}
   <li style="clear:both" class="expander block-expander closed" id="li-subitem-{{ subitem_id }}"><span class="clicker"><code>[{{ link[link_type.key] }}]</code></span>
+    <span data-subitem="{{ subitem_id }}" class="current-match"></span>
     <a class="subitem-linker" data-subitem="{{ subitem_id }}" href="#">(link)</a>
     {{ linker_content('subitem-linker-content', 'subitem-linker-content-' + subitem_id | string, 'Link subitem ' + subitem_id | string, link, 'subitem', subitem_id, data._index) }}
     <div class="li collapse">
@@ -179,6 +183,23 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
                .addClass('error').removeClass('loading');
       });
       $(this).next('div').addClass('loading').removeClass('error');
+    });
+    $('span.current-match[data-subitem]').each(function () {
+      subitem_id = $(this).attr('data-subitem');
+      $.ajax({
+           type: "GET",
+           url: '/api/subitem/{{ data._index }}/' + subitem_id,
+           dataType: 'json',
+           context: this
+      })
+      .done(function(data) {
+           text = '';
+           type = data.document._source._ingestr.matchings[0].type;
+           $.each(data.document._source._ingestr.matchings[0].mbid, function(index, element) {
+               text = text + '<a href="https://musicbrainz.org/' + type + '/' + element + '">' + element.slice(0,4) + '…' + element.slice(-4) + '</a> '
+           });
+           $(this).html(text + '[' + data.document._source._ingestr.matchings[0].user + ']');
+      });
     });
 </script>
 {% endblock %}
