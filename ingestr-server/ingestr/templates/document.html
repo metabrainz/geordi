@@ -86,15 +86,17 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
 <dl class="clearfix">
 <dt>Whole Item</dt>
 <dd><a class="item-linker" href="#">(link)</a>
-    <div class="item-linker-content"><h3>Link Item</h3><p>contents</p></div></dd>
+  {{ linker_content('item-linker-content', 'item-linker-content', 'Link Item', none, 'item', data._id, data._index) }}
+</dd>
 {%- for (link_type_id, link_type) in link_types.iteritems() -%}
 <dt>{{ link_type.name }}</dt>
 <dd><ul id="ul-subitem-{{link_type_id}}">
 {%- set link_id = link_type_id -%}
 {%- for link in data._source._ingestr.links[link_type_id] %}
-  <li style="clear:both" class="expander block-expander closed" id="li-subitem-{{link_id}}-{{link[link_type.key]}}"><span class="clicker"><code>[{{ link[link_type.key] }}]</code></span>
-    <a class="subitem-linker" data-subitem="{{ link_id }}-{{ link[link_type.key] }}" href="#">(link)</a>
-    <div id="subitem-linker-content-{{ link_id }}-{{ link[link_type.key] }}" class="subitem-linker-content"><h3>Link subitem ({{ link_id }}-{{ link[link_type.key] }})</h3><p>contents</p></div>
+  {%- set subitem_id = link_id | string + '-' + link[link_type.key] | string -%}
+  <li style="clear:both" class="expander block-expander closed" id="li-subitem-{{ subitem_id }}"><span class="clicker"><code>[{{ link[link_type.key] }}]</code></span>
+    <a class="subitem-linker" data-subitem="{{ subitem_id }}" href="#">(link)</a>
+    {{ linker_content('subitem-linker-content', 'subitem-linker-content-' + subitem_id | string, 'Link subitem ' + subitem_id | string, link, 'subitem', subitem_id, data._index) }}
     <div class="li collapse">
     {{ json_pp(link, g.dictarray) }}
     </div>
@@ -106,8 +108,26 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
 
 <h2>JSON Source</h2> <a href="#">show all</a>
 <div>{{ json_pp(data._source, g.dictarray) }}</div>
-
 {% endblock %}
+
+{%- macro linker_content(class, id, title, json, type, item, index) -%}
+<div id="{{ id }}" class="{{ class }}">
+  <h3>{{ title }}</h3>
+  <dl>{%- if json -%}
+      <dt class="expander block-expander closed"><i class="icon"></i><span class="clicker">JSON</span></dt>
+      <dd class="collapse">{{ json_pp(json, g.dictarray) }}</dd>
+      {%- endif -%}
+      <dt class="expander block-expander open"><i class="icon"></i><span class="clicker">Match</span></dt>
+      <dd><div>
+        <form action="/api/match{{type}}/{{ index }}/{{ item }}" method="get">
+          <select name="type"><option>release</option><option>artist</option></select>
+          <input type="text" name="mbids" placeholder="MBIDs, comma separated" />
+          <input type="submit" class="btn primary" value="Match" />
+        </form>
+      </div></dd>
+  </dl>
+</div>
+{%- endmacro -%}
 
 {% block js %}
 {{ expander_js() }}

@@ -26,6 +26,7 @@ from ingestr.mappings.util import comma_list, comma_only_list
 import json
 import uuid
 import urllib2
+import re
 from datetime import datetime
 
 from pyelasticsearch import ElasticSearch, ElasticHttpNotFoundError
@@ -112,6 +113,8 @@ def matchitem(index, item):
     if current_user.is_authenticated():
         matchtype = request.args.get('type', 'release')
         mbids = request.args.getlist('mbid')
+        if not mbids:
+            mbids = re.split(',\s*', request.args.get('mbids'))
         return register_match(index, item, 'item', matchtype, mbids)
     else:
         return Response(json.dumps({'code': 403, 'error': 'Unauthorized.'}), 403, mimetype="application/json");
@@ -131,6 +134,8 @@ def matchsubitem(index, subitem):
     if current_user.is_authenticated():
         matchtype = request.args.get('type', 'artist')
         mbids = request.args.getlist('mbid')
+        if not mbids:
+            mbids = re.split(',\s*', request.args.get('mbids'))
         return register_match(index, subitem, 'subitem', matchtype, mbids)
     else:
         return Response(json.dumps({'code': 403, 'error': 'Unauthorized.'}), 403, mimetype="application/json");
