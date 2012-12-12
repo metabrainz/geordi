@@ -53,12 +53,14 @@ def update_linked_by_index(index, item, data):
         version = document['_version']
 
         if '_ingestr' not in data:
-            data['_ingestr'] = {}
+            data['_ingestr'] = {'links': {'links': [], 'version': 1}}
         if 'links' not in data['_ingestr']:
-            data['_ingestr']['links'] = []
+            data['_ingestr']['links'] = {'links': [], 'version': 1}
+        if 'links' not in data['_ingestr']['links']:
+            data['_ingestr']['links']['links'] = []
 
         links = class_map[index].extract_linked(data)
-        currentlinks = data['_ingestr']['links']
+        currentlinks = data['_ingestr']['links']['links']
         same = True
 
         try:
@@ -73,7 +75,7 @@ def update_linked_by_index(index, item, data):
             same = False
 
         if not same:
-            data['_ingestr']['links'] = links
+            data['_ingestr']['links']['links'] = links
             try:
                 es.index(index, 'item', data, id=item, es_version=version)
                 return True

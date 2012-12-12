@@ -27,11 +27,13 @@ from pyelasticsearch import ElasticSearch, ElasticHttpNotFoundError
 
 es = ElasticSearch(app.config['ELASTICSEARCH_ENDPOINT'])
 
-def make_match_definition(user, matchtype, mbids):
+def make_match_definition(user, matchtype, mbids, auto=False):
     return {'user': user,
-         'timestamp': datetime.utcnow(),
-         'type': matchtype,
-         'mbid': mbids}
+            'timestamp': datetime.utcnow(),
+            'type': matchtype,
+            'mbid': mbids,
+            'auto': True if auto else False,
+            'version': 1}
 
 def register_match(index, item, itemtype, matchtype, mbids):
     if len(mbids) < 1:
@@ -54,11 +56,13 @@ def register_match(index, item, itemtype, matchtype, mbids):
             version = None
 
     if '_ingestr' not in data:
-        data['_ingestr'] = {}
+        data['_ingestr'] = {'matchings': {'matchings': [], 'version': 1}}
     if 'matchings' not in data['_ingestr']:
-        data['_ingestr']['matchings'] = []
+        data['_ingestr']['matchings'] = {'matchings': [], 'version': 1}
+    if 'matchings' not in data['_ingestr']['matchings']:
+        data['_ingestr']['matchings']['matchings'] = []
 
-    data['_ingestr']['matchings'].append(make_match_definition(current_user.id, matchtype, mbids))
+    data['_ingestr']['matchings']['matchings'].append(make_match_definition(current_user.id, matchtype, mbids))
 
     try:
         if version:
