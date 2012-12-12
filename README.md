@@ -1,4 +1,4 @@
-ingestr
+geordi
 -------
 
 This project allows the consumption of arbitrary data, for use as a data source and matching tool.
@@ -16,8 +16,8 @@ virtualenv some-dir
 
 ----
 
-To run the server, from ingestr-server directory:
-/virtualenv/dir/bin/python ingestr.py
+To run the server, from geordi directory:
+/virtualenv/dir/bin/python run.py
 
 ----
 
@@ -40,7 +40,7 @@ Thus far, only displays data, updates when that's fixed!
 Code Layout
 ===========
 
-ingestr-server subdir: new python codebase (GPLv3+)
+geordi subdir: new python codebase (GPLv3+)
 
 tools subdir:
  * submit-dir.pl
