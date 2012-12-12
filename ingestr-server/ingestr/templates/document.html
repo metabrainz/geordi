@@ -119,7 +119,7 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
       {%- endif -%}
       <dt class="expander block-expander open"><i class="icon"></i><span class="clicker">Match</span></dt>
       <dd><div>
-        <form action="/api/match{{type}}/{{ index }}/{{ item }}" method="get">
+        <form class="match-form" id="match-{{type}}-{{item}}" action="/api/match{{type}}/{{ index }}/{{ item }}" method="get">
           <select name="type"><option>release</option><option>artist</option></select>
           <input type="text" name="mbids" placeholder="MBIDs, comma separated" />
           <input type="submit" class="btn primary" value="Match" />
@@ -150,6 +150,21 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
     $('.item-linker').click(function(e) {
       e.preventDefault();
       $('.item-linker-content').modal();
+    });
+</script>
+<script>
+    $('form.match-form').submit(function (e) {
+      e.preventDefault();
+      $.ajax({
+           type: "GET",
+           url: $(this).attr('action'),
+           data: $(this).serialize(),
+           dataType: 'json',
+           success: function(data)
+           {
+               console.log(data);
+           }
+         });
     });
 </script>
 {% endblock %}
