@@ -3,6 +3,8 @@ geordi
 
 This project allows the consumption of arbitrary data, for use as a data source and matching tool.
 
+It's named after [Geordi La Forge](http://en.memory-alpha.org/wiki/Geordi_La_Forge), in reference to [MusicBrainz Picard](https://github.com/musicbrainz/picard).
+
 Setup
 =====
 
