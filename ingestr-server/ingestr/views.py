@@ -20,7 +20,7 @@ from flask.ext.login import login_required, login_user, logout_user, current_use
 from ingestr import app, login_manager, User
 from ingestr.search import do_search, do_search_raw
 from ingestr.matching import register_match
-from ingestr.mappings import map_search_data, map_by_index, update_linked_by_index, get_link_types_by_index, get_mapoptions
+from ingestr.mappings import map_search_data, update_map_by_index, update_linked_by_index, get_link_types_by_index, get_mapoptions
 from ingestr.mappings.util import comma_list, comma_only_list
 
 import json
@@ -50,12 +50,14 @@ def before_request():
 def document(index, item):
     try:
         data = es.get(index, 'item', item)
-        if update_linked_by_index(index, item, data['_source']):
+        linked_update = update_linked_by_index(index, item, data['_source'])
+        map_update = update_map_by_index(index, item, data['_source'])
+        if linked_update or map_update:
             data = es.get(index, 'item', item)
-        mapping = map_by_index(index, data['_source'])
+            print 'getting new data linked: {}, map: {}'.format(linked_update, map_update)
         link_types = get_link_types_by_index(index)
-        mapoptions = get_mapoptions(mapping)
-        return render_template('document.html', item=item, index=index, data = data, mapping = mapping, link_types = link_types, mapoptions = mapoptions)
+        mapoptions = get_mapoptions(data['_source']['_ingestr']['mapping'])
+        return render_template('document.html', item=item, index=index, data = data, mapping = data['_source']['_ingestr']['mapping'], link_types = link_types, mapoptions = mapoptions)
     except ElasticHttpNotFoundError:
         return render_template('notfound.html')
 

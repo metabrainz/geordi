@@ -42,6 +42,34 @@ def get_link_types_by_index (index):
     if index in class_map:
         return class_map[index].link_types()
 
+def update_map_by_index(index, item, data):
+    if index in class_map:
+        try:
+            document = es.get(index, 'item', item)
+        except ElasticHttpNotFoundError:
+            return None
+
+        data = document['_source']
+        version = document['_version']
+
+        if '_ingestr' not in data:
+            data['_ingestr'] = {'mapping': {'version': -50}}
+        if 'mapping' not in data['_ingestr']:
+            data['_ingestr']['mapping'] = {'version': -50}
+
+        currentmapping = {'version': data['_ingestr']['mapping']['version']}
+        mapping = map_by_index(index, data)
+
+        if not currentmapping['version'] == mapping['version']:
+            data['_ingestr']['mapping'] = mapping
+            try:
+                es.index(index, 'item', data, id=item, es_version=version)
+                return True
+            except:
+                return None
+        else:
+            return False
+
 def update_linked_by_index(index, item, data):
     if index in class_map:
         try:
@@ -65,10 +93,10 @@ def update_linked_by_index(index, item, data):
 
         try:
             if (len(links.keys()) != len(currentlinks.keys()) or
-               [len(link) for link in links.values()] != [len(link) for link in currentlinks.values()]):
+                [len(link[1]) for link in links.iteritems() if link[0] != 'version'] != [len(link[1]) for link in currentlinks.iteritems() if link[0] != 'version']):
                 same = False
             else:
-                for category in range(len(class_map[index].link_types())):
+                for category in class_map[index].link_types().keys():
                     if links[category] != currentlinks[category]:
                         same = False
         except:
@@ -82,7 +110,7 @@ def update_linked_by_index(index, item, data):
             except:
                 return None
         else:
-            return True
+            return False
 
 def get_mapoptions(mapping):
     options = {'mediums': False, 'totaltracks': False, 'acoustid': False}

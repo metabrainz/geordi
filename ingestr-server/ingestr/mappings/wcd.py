@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import division, absolute_import
+from __future__ import division, absolute_import, unicode_literals
 
 from ingestr.mappings.util import concatenate_text, collect_text, comma_list, base_mapping, format_track_length
 
@@ -47,7 +47,7 @@ class wcd():
             all_artists.extend([c for c in djs if not (c in seen or seen.append(c))])
         if 'files_xml' in data:
             files = [self._extract_file(x) for x in data['files_xml']['files']['file'] if (x['_source'] == 'original' and 'sha1' in x and x['format']['text'] in self._acceptable_formats())]
-        return {'artist_id': all_artists, 'file': files, 'version': 1}
+        return {u'artist_id': all_artists, u'file': files, 'version': 1}
 
     def _acceptable_formats(self):
         return ['Flac', 'VBR MP3', 'Ogg Vorbis', 'Apple Lossless Audio']
@@ -75,12 +75,12 @@ class wcd():
 
     def _extract_track(self, track, links):
         f = {}
-        f['subitem'] = '1-{}'.format(track['sha1']['text'])
+        f['subitem'] = 'file-{}'.format(track['sha1']['text'])
         f['title'] = [track['title']['text']]
         f['artist'] = [{'name': track['artist']['text']}]
-        for artist in links['0']:
+        for artist in links['artist_id']:
             if artist['name'] == f['artist'][0]['name']:
-                f['artist'][0]['subitem'] = '0-{}'.format(artist['wcd_artist_id'])
+                f['artist'][0]['subitem'] = 'artist_id-{}'.format(artist['wcd_artist_id'])
         f['length'] = [int(float(track['length']['text']) * 1000)]
         f['length_formatted'] = [format_track_length(length) for length in f['length']]
         f['number'] = []
@@ -132,7 +132,7 @@ class wcd():
         # Release Artists
         if 'what_cd_json' in data:
             try:
-                release['artist'] = [{'name': artist['name'], 'subitem': "0-{}".format(int(artist['id']))} for artist in data['what_cd_json']['response']['group']['musicInfo']['artists']]
+                release['artist'] = [{'name': artist['name'], 'subitem': "artist_id-{}".format(int(artist['id']))} for artist in data['what_cd_json']['response']['group']['musicInfo']['artists']]
             except KeyError: pass
         if 'artist' not in release or len(release['artist']) < 1:
             try:
