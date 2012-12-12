@@ -124,6 +124,7 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
           <input type="text" name="mbids" placeholder="MBIDs, comma separated" />
           <input type="submit" class="btn primary" value="Match" />
         </form>
+        <div class="response"></p>
       </div></dd>
   </dl>
 </div>
@@ -160,11 +161,17 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
            url: $(this).attr('action'),
            data: $(this).serialize(),
            dataType: 'json',
-           success: function(data)
-           {
-               console.log(data);
-           }
-         });
+           context: this
+      })
+      .done(function() {
+           $(this).next('div').text('success!').removeClass('error loading');
+      })
+      .fail(function(jqXHR) {
+           $(this).next('div')
+               .text($.parseJSON(jqXHR.responseText).error)
+               .addClass('error').removeClass('loading');
+      });
+      $(this).next('div').addClass('loading').removeClass('error');
     });
 </script>
 {% endblock %}

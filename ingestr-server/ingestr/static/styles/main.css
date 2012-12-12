@@ -67,6 +67,17 @@ table td, table th {
     background-color: whitesmoke;
 }
 
+.error {
+    background-color: red;
+}
+.loading {
+    width: 50px;
+    height: 50px;
+    margin: auto;
+    background-repeat: no-repeat;
+    background-image: url('/static/images/loading.gif');
+}
+
 .item-linker-content { display:none; }
 .subitem-linker-content { display:none; }
 
