@@ -1,4 +1,4 @@
-# ingestr-server
+# geordi
 # Copyright (C) 2012 Ian McEwen, MetaBrainz Foundation
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,11 +17,11 @@
 from __future__ import division, absolute_import
 from flask import render_template, request, redirect, url_for, flash, Response, g
 from flask.ext.login import login_required, login_user, logout_user, current_user
-from ingestr import app, login_manager, User
-from ingestr.search import do_search, do_search_raw
-from ingestr.matching import register_match
-from ingestr.mappings import map_search_data, update_map_by_index, update_linked_by_index, get_link_types_by_index, get_mapoptions
-from ingestr.mappings.util import comma_list, comma_only_list
+from geordi import app, login_manager, User
+from geordi.search import do_search, do_search_raw
+from geordi.matching import register_match
+from geordi.mappings import map_search_data, update_map_by_index, update_linked_by_index, get_link_types_by_index, get_mapoptions
+from geordi.mappings.util import comma_list, comma_only_list
 
 import json
 import uuid
@@ -56,8 +56,8 @@ def document(index, item):
             data = es.get(index, 'item', item)
             print 'getting new data linked: {}, map: {}'.format(linked_update, map_update)
         link_types = get_link_types_by_index(index)
-        mapoptions = get_mapoptions(data['_source']['_ingestr']['mapping'])
-        return render_template('document.html', item=item, index=index, data = data, mapping = data['_source']['_ingestr']['mapping'], link_types = link_types, mapoptions = mapoptions)
+        mapoptions = get_mapoptions(data['_source']['_geordi']['mapping'])
+        return render_template('document.html', item=item, index=index, data = data, mapping = data['_source']['_geordi']['mapping'], link_types = link_types, mapoptions = mapoptions)
     except ElasticHttpNotFoundError:
         return render_template('notfound.html')
 
@@ -188,7 +188,7 @@ def check_mb_account(username, password):
     auth_handler.add_password('musicbrainz.org', 'https://musicbrainz.org/',
                               username.encode('utf8'), password.encode('utf8'))
     opener = urllib2.build_opener(auth_handler)
-    opener.addheaders = [('User-Agent', 'Ingestr-Login +http://ingestr.musicbrainz.org/login')]
+    opener.addheaders = [('User-Agent', 'Geordi-Login +http://geordi.musicbrainz.org/login')]
     try:
         opener.open(url, timeout=5)
     except StandardError:

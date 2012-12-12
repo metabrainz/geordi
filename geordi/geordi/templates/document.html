@@ -86,8 +86,8 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
 <dl class="clearfix">
 <dt>Whole Item</dt>
 <dd><span class="current-match">
-    {%- if data._source._ingestr.matchings and data._source._ingestr.matchings.matchings | length > 0 %}
-      {%- set topmatch = data._source._ingestr.matchings.matchings[0] -%}
+    {%- if data._source._geordi.matchings and data._source._geordi.matchings.matchings | length > 0 %}
+      {%- set topmatch = data._source._geordi.matchings.matchings[0] -%}
       {{ topmatch.type }}
       {% for mbid in topmatch.mbid %}<a href="https://musicbrainz.org/{{ topmatch.type }}/{{ mbid }}">{{ mbid[:4] }}…{{ mbid[-4:] }}</a>{% if not loop.last %}, {% endif %}{% endfor %}
       [{{ topmatch.user }}]
@@ -99,7 +99,7 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
 <dt>{{ link_type.name }}</dt>
 <dd><ul id="ul-subitem-{{link_type_id}}">
 {%- set link_id = link_type_id -%}
-{%- for link in data._source._ingestr.links.links[link_type_id] %}
+{%- for link in data._source._geordi.links.links[link_type_id] %}
   {%- set subitem_id = link_id | string + '-' + link[link_type.key] | string -%}
   <li style="clear:both" class="expander block-expander closed" id="li-subitem-{{ subitem_id }}"><span class="clicker"><code>[{{ link[link_type.key] }}]</code></span>
     <span data-subitem="{{ subitem_id }}" class="current-match"></span>
@@ -197,7 +197,7 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
            context: this
       })
       .done(function(data) {
-           topmatch = data.document._source._ingestr.matchings.matchings[0];
+           topmatch = data.document._source._geordi.matchings.matchings[0];
            type = topmatch.type;
            text = type + ' ';
            $.each(topmatch.mbid, function(index, mbid) {

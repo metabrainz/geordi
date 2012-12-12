@@ -1,4 +1,4 @@
-# ingestr-server
+# geordi
 # Copyright (C) 2012 Ian McEwen, MetaBrainz Foundation
 #
 # This program is free software: you can redistribute it and/or modify

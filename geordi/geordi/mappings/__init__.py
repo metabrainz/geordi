@@ -1,4 +1,4 @@
-# ingestr-server
+# geordi
 # Copyright (C) 2012 Ian McEwen, MetaBrainz Foundation
 #
 # This program is free software: you can redistribute it and/or modify
@@ -16,8 +16,8 @@
 
 from __future__ import division, absolute_import
 
-from ingestr import app
-from ingestr.mappings.wcd import wcd
+from geordi import app
+from geordi.mappings.wcd import wcd
 from pyelasticsearch import ElasticSearch, ElasticHttpNotFoundError
 
 es = ElasticSearch(app.config['ELASTICSEARCH_ENDPOINT'])
@@ -52,16 +52,16 @@ def update_map_by_index(index, item, data):
         data = document['_source']
         version = document['_version']
 
-        if '_ingestr' not in data:
-            data['_ingestr'] = {'mapping': {'version': -50}}
-        if 'mapping' not in data['_ingestr']:
-            data['_ingestr']['mapping'] = {'version': -50}
+        if '_geordi' not in data:
+            data['_geordi'] = {'mapping': {'version': -50}}
+        if 'mapping' not in data['_geordi']:
+            data['_geordi']['mapping'] = {'version': -50}
 
-        currentmapping = {'version': data['_ingestr']['mapping']['version']}
+        currentmapping = {'version': data['_geordi']['mapping']['version']}
         mapping = map_by_index(index, data)
 
         if not currentmapping['version'] == mapping['version']:
-            data['_ingestr']['mapping'] = mapping
+            data['_geordi']['mapping'] = mapping
             try:
                 es.index(index, 'item', data, id=item, es_version=version)
                 return True
@@ -80,15 +80,15 @@ def update_linked_by_index(index, item, data):
         data = document['_source']
         version = document['_version']
 
-        if '_ingestr' not in data:
-            data['_ingestr'] = {'links': {'links': [], 'version': 1}}
-        if 'links' not in data['_ingestr']:
-            data['_ingestr']['links'] = {'links': [], 'version': 1}
-        if 'links' not in data['_ingestr']['links']:
-            data['_ingestr']['links']['links'] = []
+        if '_geordi' not in data:
+            data['_geordi'] = {'links': {'links': [], 'version': 1}}
+        if 'links' not in data['_geordi']:
+            data['_geordi']['links'] = {'links': [], 'version': 1}
+        if 'links' not in data['_geordi']['links']:
+            data['_geordi']['links']['links'] = []
 
         links = class_map[index].extract_linked(data)
-        currentlinks = data['_ingestr']['links']['links']
+        currentlinks = data['_geordi']['links']['links']
         same = True
 
         try:
@@ -103,7 +103,7 @@ def update_linked_by_index(index, item, data):
             same = False
 
         if not same:
-            data['_ingestr']['links']['links'] = links
+            data['_geordi']['links']['links'] = links
             try:
                 es.index(index, 'item', data, id=item, es_version=version)
                 return True

@@ -1,4 +1,4 @@
-# ingestr-server
+# geordi
 # Copyright (C) 2012 Ian McEwen, MetaBrainz Foundation
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
 from __future__ import division, absolute_import
 from flask import Response
 from flask.ext.login import current_user
-from ingestr import app
+from geordi import app
 
 import json
 import uuid
@@ -55,14 +55,14 @@ def register_match(index, item, itemtype, matchtype, mbids):
             data = {}
             version = None
 
-    if '_ingestr' not in data:
-        data['_ingestr'] = {'matchings': {'matchings': [], 'version': 1}}
-    if 'matchings' not in data['_ingestr']:
-        data['_ingestr']['matchings'] = {'matchings': [], 'version': 1}
-    if 'matchings' not in data['_ingestr']['matchings']:
-        data['_ingestr']['matchings']['matchings'] = []
+    if '_geordi' not in data:
+        data['_geordi'] = {'matchings': {'matchings': [], 'version': 1}}
+    if 'matchings' not in data['_geordi']:
+        data['_geordi']['matchings'] = {'matchings': [], 'version': 1}
+    if 'matchings' not in data['_geordi']['matchings']:
+        data['_geordi']['matchings']['matchings'] = []
 
-    data['_ingestr']['matchings']['matchings'].append(make_match_definition(current_user.id, matchtype, mbids))
+    data['_geordi']['matchings']['matchings'].append(make_match_definition(current_user.id, matchtype, mbids))
 
     try:
         if version:

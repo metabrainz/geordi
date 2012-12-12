@@ -1,4 +1,4 @@
-# ingestr-server
+# geordi
 # Copyright (C) 2012 Ian McEwen, MetaBrainz Foundation
 #
 # This program is free software: you can redistribute it and/or modify
@@ -15,23 +15,28 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division, absolute_import
-from ingestr import app
+from flask import Flask
+from flask.ext.login import LoginManager, UserMixin
 
-from pyelasticsearch import ElasticSearch, ElasticHttpNotFoundError
+# CONFIG
+SECRET_KEY = 'super seekrit'
+ELASTICSEARCH_ENDPOINT = 'http://localhost:9200/'
+AVAILABLE_INDICES = ['wcd']
 
-es = ElasticSearch(app.config['ELASTICSEARCH_ENDPOINT'])
+app = Flask(__name__)
+app.config.from_object(__name__)
 
-def do_search(query_string, indices, start_from=None):
-    query = {'query':
-              {'bool': {'must': [
-                {"query_string": {"query": query_string}}
-              ]}}
-            }
-    return do_search_raw(query, indices, start_from)
+class User(UserMixin):
+    def __init__(self, id):
+        self.id = id
 
-def do_search_raw(query, indices, start_from=None):
-    if indices in [[], ['']]:
-        indices = app.config['AVAILABLE_INDICES']
-    if start_from:
-        query['from'] = start_from
-    return es.search(query, index = indices, doc_type = "item")
+login_manager = LoginManager()
+login_manager.login_view = "login"
+
+@login_manager.user_loader
+def load_user(username):
+    return User(username)
+
+login_manager.setup_app(app, add_context_processor = True)
+
+import geordi.views

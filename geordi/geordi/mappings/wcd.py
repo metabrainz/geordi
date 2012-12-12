@@ -1,4 +1,4 @@
-# ingestr-server
+# geordi
 # Copyright (C) 2012 Ian McEwen, MetaBrainz Foundation
 #
 # This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,7 @@
 
 from __future__ import division, absolute_import, unicode_literals
 
-from ingestr.mappings.util import concatenate_text, collect_text, comma_list, base_mapping, format_track_length
+from geordi.mappings.util import concatenate_text, collect_text, comma_list, base_mapping, format_track_length
 
 import re
 
