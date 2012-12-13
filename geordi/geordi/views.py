@@ -54,7 +54,6 @@ def document(index, item):
         map_update = update_map_by_index(index, item, data['_source'])
         if linked_update or map_update:
             data = es.get(index, 'item', item)
-            print 'getting new data linked: {}, map: {}'.format(linked_update, map_update)
         link_types = get_link_types_by_index(index)
         mapoptions = get_mapoptions(data['_source']['_geordi']['mapping'])
         return render_template('document.html', item=item, index=index, data = data, mapping = data['_source']['_geordi']['mapping'], link_types = link_types, mapoptions = mapoptions)
