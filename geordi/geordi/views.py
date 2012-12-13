@@ -18,7 +18,7 @@ from __future__ import division, absolute_import
 from flask import render_template, request, redirect, url_for, flash, Response, g
 from flask.ext.login import login_required, login_user, logout_user, current_user
 from geordi import app, login_manager, User
-from geordi.search import do_search, do_search_raw
+from geordi.search import do_search, do_search_raw, do_subitem_search
 from geordi.matching import register_match
 from geordi.mappings import map_search_data, update_map_by_index, update_linked_by_index, get_link_types_by_index, get_mapoptions
 from geordi.mappings.util import comma_list, comma_only_list
@@ -39,6 +39,7 @@ def dictarray(dictionary):
 @app.before_request
 def before_request():
     g.all_indices = app.config['AVAILABLE_INDICES']
+    g.link_types = dict([(index, get_link_types_by_index(index)) for index in app.config['AVAILABLE_INDICES']])
     g.json = json
     g.comma_list = comma_list
     g.comma_only_list = comma_only_list
@@ -54,9 +55,8 @@ def document(index, item):
         map_update = update_map_by_index(index, item, data['_source'])
         if linked_update or map_update:
             data = es.get(index, 'item', item)
-        link_types = get_link_types_by_index(index)
         mapoptions = get_mapoptions(data['_source']['_geordi']['mapping'])
-        return render_template('document.html', item=item, index=index, data = data, mapping = data['_source']['_geordi']['mapping'], link_types = link_types, mapoptions = mapoptions)
+        return render_template('document.html', item=item, index=index, data = data, mapping = data['_source']['_geordi']['mapping'], mapoptions = mapoptions)
     except ElasticHttpNotFoundError:
         return render_template('notfound.html')
 
@@ -76,6 +76,12 @@ def get_search_params():
             data = do_search(query, indices, start_from=request.args.get('from', None))
         else:
             return {'error': 'You must provide a query.'}
+    elif search_type == 'subitem':
+        index = request.args.get('subitem_index')
+        subtype = request.args.get('subitem_type')
+        if subtype not in get_link_types_by_index(index).keys():
+            return {'error': 'Invalid subitem type for index {}'.format(index)}
+        data = do_subitem_search(query, index, subtype, start_from=request.args.get('from', None))
     else:
         return {'error': 'Search type {} unimplemented.'.format(search_type)}
 

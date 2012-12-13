@@ -95,7 +95,7 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
     <a class="item-linker" href="#">(link)</a>
     {{ linker_content('item-linker-content', 'item-linker-content', 'Link Item', none, 'item', data._id, data._index) }}
 </dd>
-{%- for (link_type_id, link_type) in link_types.iteritems() if not link_type_id == 'version' -%}
+{%- for (link_type_id, link_type) in g.link_types[data._index].iteritems() if not link_type_id == 'version' -%}
 <dt>{{ link_type.name }}</dt>
 <dd><ul id="ul-subitem-{{link_type_id}}">
 {%- set link_id = link_type_id -%}

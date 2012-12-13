@@ -11,11 +11,27 @@
       <select name="type" id="id-type">
         <option value="item"{% if request.args.get('type') == 'item' %} selected="selected"{% endif %}>Search items by query string</option>
         <option value="raw"{% if request.args.get('type') == 'raw' %} selected="selected"{% endif %}>Search items by JSON query</option>
+        <option value="subitem"{% if request.args.get('type') == 'subitem' %} selected="selected"{% endif %}>Search items by linked subitem</option>
       </select>
       {%- if request.args.get('type', 'item') == 'item' -%}
         <input type="text" style="width: 60em" name="query" id="id-query" placeholder="Query" {% if query %}value="{{ query }}" {% endif %}/>
       {%- elif request.args.get('type', 'item') == 'raw' -%}
         <textarea name="query" style="width: 60em" id="id-query" placeholder="Query" cols=60 rows=8>{% if query %}{{ query }}{% endif %}</textarea>
+      {%- elif request.args.get('type', 'item') == 'subitem' -%}
+        <div id="id-query" style="display: inline-block;">
+          <input type="text" name="query" placeholder="ID" style="width: 20em" {% if query %}value="{{ query }}" {% endif %}/>
+          {%- if request.args.get('subitem_index') -%}
+            {%- set selected_subitem_index = request.args.get('subitem_index') -%}
+          {%- else -%}
+            {%- set selected_subitem_index = g.all_indices[0] -%}
+          {%- endif -%}
+          <select name="subitem_type" style="width: 20em">
+          {%- for (subitem_type, opts) in g.link_types[selected_subitem_index].iteritems() if subitem_type != "version" -%}
+            <option{% if subitem_type == request.args.get('subitem_type') %} selected=selected{% endif %} value="{{ subitem_type }}">{{ opts.name }}</option>
+          {%- endfor -%}
+          </select>
+          <select name="subitem_index" style="width: 20em">{% for index in g.all_indices %}<option{% if index == request.args.get('subitem_index') %} selected=selected{% endif %}>{{index}}</option>{% endfor %}</select>
+        </div>
       {%- endif -%}
       <input type="submit" class="btn primary" value="Search" />
     </div>
@@ -45,14 +61,39 @@
 
 {% block layoutjs %}
   <script>
+    function add_subitem_type_listener() {
+      $('#id-subitem_index').change(function () {
+        var subtype_options = { {% for (index, link_types) in g.link_types.iteritems() %}"{{index}}": [{% for (subitem_type, opts) in link_types.iteritems() if subitem_type != "version" %}["{{subitem_type}}", "{{opts.name}}"]{% if not loop.last %}, {% endif %}{% endfor %}]{% endfor %} }
+        var new_html = '';
+        $.each(subtype_options[$(this).val()], function(idx, option) {
+          new_html = new_html + '<option value="' + option[0] + '">' + option[1] + '</option>'
+        });
+        $('#id-subitem_type').html(new_html);
+      });
+    }
+    add_subitem_type_listener()
     $('#id-type').change(function() {
       var $this = $(this);
         if ($this.val() == 'raw') {
-          $('#id-query').replaceWith('<textarea name="query" style="width: 60em" id="id-query" placeholder="Query" cols=60 rows=8>{"query":\n  {"bool":\n    {"must": [{"query_string": {"query": "' + $('#id-query').val() + '"}}]}\n  }\n}</textarea>');
-        } else {
-          var jsonquery = $.parseJSON($('#id-query').val());
-          var query = jsonquery.query.bool.must[0].query_string ? jsonquery.query.bool.must[0].query_string.query : '';
+          if ($('#id-query').get(0).tagName == 'input') {
+              var query = '{"query":\n  {"bool":\n    {"must": [{"query_string": {"query": "' + $('#id-query').val() + '"}}]}\n  }\n }';
+          } else { var query = '{"query":\n  {\n  }\n}'; }
+          $('#id-query').replaceWith('<textarea name="query" style="width: 60em" id="id-query" placeholder="Query" cols=60 rows=8>' + query + '</textarea>');
+        } else if ($this.val() == 'item') {
+          if ($('#id-query').get(0).tagName == 'textarea') {
+            var jsonquery = $.parseJSON($('#id-query').val());
+            var query = jsonquery.query.bool.must[0].query_string ? jsonquery.query.bool.must[0].query_string.query : '';
+          } else { var query = '' }
           $('#id-query').replaceWith('<input type="text" style="width: 60em" name="query" id="id-query" placeholder="Query" value="' + query + '" />');
+        } else if ($this.val() == 'subitem') {
+          $('#id-query').replaceWith('<div id="id-query" style="display: inline-block;">' +
+            '<input type="text" name="query" placeholder="ID" style="width: 20em" />' +
+            '<select id="id-subitem_type" name="subitem_type" style="width: 20em">' +
+            '</select>' +
+            '<select id="id-subitem_index" name="subitem_index" style="width: 20em">{% for index in g.all_indices %}<option>{{index}}</option>{% endfor %}</select>' +
+            '</div>');
+            add_subitem_type_listener();
+            $('#id-subitem_index').change();
         }
     });
   </script>
