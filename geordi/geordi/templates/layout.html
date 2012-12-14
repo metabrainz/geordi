@@ -35,14 +35,14 @@
       {%- endif -%}
       <input type="submit" class="btn primary" value="Search" />
     </div>
-    <!-- <div class="filters">
+    {# <div class="filters">
       <input type="checkbox" name="human" id="id-human" {% if request.args.get('human') == 'on' %}checked {% endif %}/> <label for="id-human">Show human-matched items</label>
       <input type="checkbox" name="auto" id="id-auto" {% if request.args.get('auto') == 'on' or not request.args.get('s', False) %}checked {% endif %} /> <label for="id-auto">Show auto-matched items</label>
       <input type="checkbox" name="un" id="id-un" {% if request.args.get('un') == 'on' or not request.args.get('s', False) %}checked {% endif %}/> <label for="id-un">Show unmatched items</label>
       <input type="checkbox" name="all" id="id-all" {% if request.args.get('all') == 'on' %}checked {% endif %}/> <label for="id-all">Consider all matches (not just the most recent)</label>
       <input type="checkbox" name="direct" id="id-direct" {% if request.args.get('direct') == 'on' %}checked {% endif %}/> <label for="id-direct">Show only direct links</label>
       <input type="hidden" name="s" value="1" />
-    </div> -->
+    </div> #}
     <div class="filters">
       <select multiple name="index" id="id-index">
       <optgroup label="Index">
@@ -52,49 +52,17 @@
       </optgroup>
       </select>
     </div>
-    <!-- <div class="filters">
+    {# <div class="filters">
       User: <input type="text" name="user" value="{{ request.args.get('user', '') }}"/>
-    </div> -->
+    </div> #}
     <p class="filter-preview"></p>
   </form>
 {% endblock %}
 
 {% block layoutjs %}
   <script>
-    function add_subitem_type_listener() {
-      $('#id-subitem_index').change(function () {
-        var subtype_options = { {% for (index, link_types) in g.link_types.iteritems() %}"{{index}}": [{% for (subitem_type, opts) in link_types.iteritems() if subitem_type != "version" %}["{{subitem_type}}", "{{opts.name}}"]{% if not loop.last %}, {% endif %}{% endfor %}]{% endfor %} }
-        var new_html = '';
-        $.each(subtype_options[$(this).val()], function(idx, option) {
-          new_html = new_html + '<option value="' + option[0] + '">' + option[1] + '</option>'
-        });
-        $('#id-subitem_type').html(new_html);
-      });
-    }
-    add_subitem_type_listener()
-    $('#id-type').change(function() {
-      var $this = $(this);
-        if ($this.val() == 'raw') {
-          if ($('#id-query').get(0).tagName == 'input') {
-              var query = '{"query":\n  {"bool":\n    {"must": [{"query_string": {"query": "' + $('#id-query').val() + '"}}]}\n  }\n }';
-          } else { var query = '{"query":\n  {\n  }\n}'; }
-          $('#id-query').replaceWith('<textarea name="query" style="width: 60em" id="id-query" placeholder="Query" cols=60 rows=8>' + query + '</textarea>');
-        } else if ($this.val() == 'item') {
-          if ($('#id-query').get(0).tagName == 'textarea') {
-            var jsonquery = $.parseJSON($('#id-query').val());
-            var query = jsonquery.query.bool.must[0].query_string ? jsonquery.query.bool.must[0].query_string.query : '';
-          } else { var query = '' }
-          $('#id-query').replaceWith('<input type="text" style="width: 60em" name="query" id="id-query" placeholder="Query" value="' + query + '" />');
-        } else if ($this.val() == 'subitem') {
-          $('#id-query').replaceWith('<div id="id-query" style="display: inline-block;">' +
-            '<input type="text" name="query" placeholder="ID" style="width: 20em" />' +
-            '<select id="id-subitem_type" name="subitem_type" style="width: 20em">' +
-            '</select>' +
-            '<select id="id-subitem_index" name="subitem_index" style="width: 20em">{% for index in g.all_indices %}<option>{{index}}</option>{% endfor %}</select>' +
-            '</div>');
-            add_subitem_type_listener();
-            $('#id-subitem_index').change();
-        }
-    });
+    geordi.subtype_options = { {% for (index, link_types) in g.link_types.iteritems() %}"{{index}}": [{% for (subitem_type, opts) in link_types.iteritems() if subitem_type != "version" %}["{{subitem_type}}", "{{opts.name}}"]{% if not loop.last %}, {% endif %}{% endfor %}]{% endfor %} };
+    geordi.index_options_html = '<select id="id-subitem_index" name="subitem_index" style="width: 20em">{% for index in g.all_indices %}<option>{{index}}</option>{% endfor %}</select>';
   </script>
+  <script src="/static/scripts/search_form.js"></script>
 {% endblock %}

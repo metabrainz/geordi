@@ -1,4 +1,3 @@
-{%- from "json_pp.html" import json_pp, expander_js -%}
 {%- macro build_search_url(from_value) -%}
 {{ url_for('search', from=from_value, query=query, type=request.args.get('type'), s=1, index=request.args.getlist('index'), auto=request.args.get('auto'), un=request.args.get('un'), human=request.args.get('human'), all=request.args.get('all'), direct=request.args.get('direct'), user=request.args.getlist('user')) }}
 {%- endmacro -%}

@@ -24,24 +24,5 @@
 {%- endmacro -%}
 
 {%- macro expander_js() -%}
-<script>
-  function changeRegion($region) {
-    $region.children('div.li').add($region.next('dd'))
-              [$region.hasClass('closed') ? 'removeClass' : 'addClass']('collapse')
-           .end().end()
-
-           .toggleClass('closed open');
-  }
-
-  $('.block-expander span.clicker').click(function(event) {
-    event.stopPropagation();
-    var $this = $(this).parent('.block-expander');
-    changeRegion($this);
-    if (event.altKey) {
-        $this.children('div.li').add($this.next('dd'))
-             .find('.block-expander.' + ($this.hasClass('open') ? 'closed' : 'open'))
-             .each(function() { changeRegion($(this)) });
-    }
-  });
-</script>
+<script src="/static/scripts/expander.js"></script>
 {%- endmacro -%}
