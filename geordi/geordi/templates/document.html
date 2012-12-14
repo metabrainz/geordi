@@ -79,19 +79,12 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
 </tr>
 {%- endfor -%}
 </tbody></table>
-{# <pre>{{ g.json.dumps(mapping, indent=2) }}</pre> #}
 {% endif %}
 
 <h2>Link to MusicBrainz</h2>
 <dl class="clearfix">
 <dt>Whole Item</dt>
-<dd><span class="current-match">
-    {%- if data._source._geordi.matchings and data._source._geordi.matchings.matchings | length > 0 %}
-      {%- set topmatch = data._source._geordi.matchings.matchings[0] -%}
-      {{ topmatch.type }}
-      {% for mbid in topmatch.mbid %}<a href="https://musicbrainz.org/{{ topmatch.type }}/{{ mbid }}">{{ mbid[:4] }}…{{ mbid[-4:] }}</a>{% if not loop.last %}, {% endif %}{% endfor %}
-      [{{ topmatch.user }}]
-    {%- endif %}</span>
+<dd>{{ current_match_span(data) }}
     <a class="item-linker" href="#">(link)</a>
     {{ linker_content('item-linker-content', 'item-linker-content', 'Link Item', none, 'item', data._id, data._index) }}
 </dd>
@@ -102,7 +95,7 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
 {%- for link in data._source._geordi.links.links[link_type_id] %}
   {%- set subitem_id = link_id | string + '-' + link[link_type.key] | string -%}
   <li style="clear:both" class="expander block-expander closed" id="li-subitem-{{ subitem_id }}"><span class="clicker"><code>[{{ link[link_type.key] }}]</code></span>
-    <span data-subitem="{{ subitem_id }}" class="current-match"></span>
+    {{ current_match_span(subitems[subitem_id]) }}
     <a class="subitem-linker" data-subitem="{{ subitem_id }}" href="#">(link)</a>
     {{ linker_content('subitem-linker-content', 'subitem-linker-content-' + subitem_id | string, 'Link subitem ' + subitem_id | string, link, 'subitem', subitem_id, data._index) }}
     <div class="li collapse">
@@ -118,6 +111,16 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
 <div>{{ json_pp(data._source, g.dictarray) }}</div>
 {% endblock %}
 
+{%- macro current_match_span(data) -%}
+<span class="current-match">
+    {%- if data and data._source._geordi.matchings and data._source._geordi.matchings.matchings | length > 0 %}
+      {%- set topmatch = data._source._geordi.matchings.matchings[0] -%}
+      {{ topmatch.type }}
+      {% for mbid in topmatch.mbid %}<a href="https://musicbrainz.org/{{ topmatch.type }}/{{ mbid }}">{{ mbid[:4] }}…{{ mbid[-4:] }}</a>{% if not loop.last %}, {% endif %}{% endfor %}
+      [{{ topmatch.user }}]
+    {%- endif -%}
+</span>
+{%- endmacro -%}
 {%- macro linker_content(class, id, title, json, type, item, index) -%}
 <div id="{{ id }}" class="{{ class }}">
   <h3>{{ title }}</h3>

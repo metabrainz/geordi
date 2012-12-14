@@ -56,7 +56,14 @@ def document(index, item):
         if linked_update or map_update:
             data = es.get(index, 'item', item)
         mapoptions = get_mapoptions(data['_source']['_geordi']['mapping'])
-        return render_template('document.html', item=item, index=index, data = data, mapping = data['_source']['_geordi']['mapping'], mapoptions = mapoptions)
+        subitems = {}
+        link_types = get_link_types_by_index(index)
+        for (link_type, links) in data['_source']['_geordi']['links']['links'].iteritems():
+            if link_type != 'version':
+                for link in links:
+                    subitem = "{}-{}".format(link_type, link[link_types[link_type]['key']])
+                    subitems[subitem] = get_subitem(index, subitem)
+        return render_template('document.html', item=item, index=index, data = data, mapping = data['_source']['_geordi']['mapping'], mapoptions = mapoptions, subitems=subitems)
     except ElasticHttpNotFoundError:
         return render_template('notfound.html')
 
@@ -126,13 +133,19 @@ def matchitem(index, item):
     else:
         return Response(json.dumps({'code': 403, 'error': 'Unauthorized.'}), 403, mimetype="application/json");
 
+def get_subitem(index, subitem):
+    try:
+        return es.get(index, 'subitem', subitem)
+    except ElasticHttpNotFoundError:
+        return None
+
 @app.route('/api/subitem/<index>/<subitem>')
 def subitem(index, subitem):
     "Get information for a subitem's matching"
-    try:
-        document = es.get(index, 'subitem', subitem)
-        return Response(json.dumps({'code': 200, 'document': document}), 200, mimetype="application/json");
-    except ElasticHttpNotFoundError:
+    subitem = get_subitem(index, subitem)
+    if subitem:
+        return Response(json.dumps({'code': 200, 'document': subitem}), 200, mimetype="application/json");
+    else:
         return Response(json.dumps({'code': 404, 'error': 'The provided item could not be found.'}), 404, mimetype="application/json")
 
 @app.route('/api/matchsubitem/<index>/<subitem>')
