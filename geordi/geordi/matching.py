@@ -18,6 +18,7 @@ from __future__ import division, absolute_import
 from flask import Response
 from flask.ext.login import current_user
 from geordi import app
+from geordi.mappings import check_data_format
 
 import json
 import uuid
@@ -55,12 +56,7 @@ def register_match(index, item, itemtype, matchtype, mbids):
             data = {}
             version = None
 
-    if '_geordi' not in data:
-        data['_geordi'] = {'matchings': {'matchings': [], 'version': 1}}
-    if 'matchings' not in data['_geordi']:
-        data['_geordi']['matchings'] = {'matchings': [], 'version': 1}
-    if 'matchings' not in data['_geordi']['matchings']:
-        data['_geordi']['matchings']['matchings'] = []
+    data = check_data_format(data)
 
     data['_geordi']['matchings']['matchings'].append(make_match_definition(current_user.id, matchtype, mbids))
 

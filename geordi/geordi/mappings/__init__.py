@@ -42,6 +42,20 @@ def get_link_types_by_index (index):
     if index in class_map:
         return class_map[index].link_types()
 
+def check_data_format(data):
+    "Initialize or correct the special _geordi key in the document"
+    data.setdefault('_geordi', {
+            'mapping': {'version': 0},
+            'links': {'links': [], 'version': 1},
+            'matchings': {'matchings': [], 'version': 1}
+    })
+
+    data['_geordi'].setdefault('mapping', {'version': 0})
+    data['_geordi'].setdefault('links', {'links': [], 'version': 1})
+    data['_geordi'].setdefault('matchings', {'matchings': [], 'version': 1})
+
+    return data
+
 def update_map_by_index(index, item, data):
     if index in class_map:
         try:
@@ -52,12 +66,9 @@ def update_map_by_index(index, item, data):
         data = document['_source']
         version = document['_version']
 
-        if '_geordi' not in data:
-            data['_geordi'] = {'mapping': {'version': -50}}
-        if 'mapping' not in data['_geordi']:
-            data['_geordi']['mapping'] = {'version': -50}
+        data = check_data_format(data)
 
-        currentmapping = {'version': data['_geordi']['mapping']['version']}
+        currentmapping = data['_geordi']['mapping']
         mapping = map_by_index(index, data)
 
         if not currentmapping['version'] == mapping['version']:
@@ -80,12 +91,7 @@ def update_linked_by_index(index, item, data):
         data = document['_source']
         version = document['_version']
 
-        if '_geordi' not in data:
-            data['_geordi'] = {'links': {'links': [], 'version': 1}}
-        if 'links' not in data['_geordi']:
-            data['_geordi']['links'] = {'links': [], 'version': 1}
-        if 'links' not in data['_geordi']['links']:
-            data['_geordi']['links']['links'] = []
+        data = check_data_format(data)
 
         links = class_map[index].extract_linked(data)
         currentlinks = data['_geordi']['links']['links']
