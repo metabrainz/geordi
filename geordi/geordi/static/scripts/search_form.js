@@ -20,13 +20,19 @@ $('#id-type').change(function() {
           var query = '{"query":\n  {"match":\n   {"_geordi.links.links.' + subitem_type + '.' + subitem_key + '": "' + $('#id-query input').val() + '"}\n  }\n}';
       }
       $('#id-query').replaceWith('<textarea name="query" style="width: 60em" id="id-query" placeholder="Query" cols=60 rows=8>' + query + '</textarea>');
-    } else if ($this.val() == 'item') {
+    }
+
+    else if ($this.val() == 'item') {
       if ($('#id-query').get(0).tagName.toLowerCase() == 'textarea') {
-        var jsonquery = $.parseJSON($('#id-query').val());
-        var query = jsonquery.query.query_string ? jsonquery.query.query_string.query : '';
-      } else { var query = '' }
+          var jsonquery = $.parseJSON($('#id-query').val());
+          var query = jsonquery.query.query_string ? jsonquery.query.query_string.query : '';
+      } else {
+          var query = ''
+      }
       $('#id-query').replaceWith('<input type="text" style="width: 60em" name="query" id="id-query" placeholder="Query" value="' + query + '" />');
-    } else if ($this.val() == 'subitem') {
+    }
+
+    else if ($this.val() == 'subitem') {
       $('#id-query').replaceWith('<div id="id-query" style="display: inline-block;">' +
         '<input type="text" name="query" placeholder="ID" style="width: 20em" />' +
         '<select id="id-subitem_type" name="subitem_type" style="width: 20em">' +
