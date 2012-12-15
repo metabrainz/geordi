@@ -112,11 +112,15 @@ def apisearch():
         return Response(json.dumps({'code': 400, 'error': params['error']}), 400, mimetype="application/json")
     return Response(json.dumps({'code': 200, 'result': params.get('data'), 'mapping': params.get('mapping')}), 200, mimetype="application/json");
 
-@app.route('/api/item/<index>/<subitem>')
+@app.route('/api/item/<index>/<item>')
 def item(index, item):
     "Get information for an item"
     try:
         document = es.get(index, 'item', item)
+        linked_update = update_linked_by_index(index, item, document['_source'])
+        map_update = update_map_by_index(index, item, document['_source'])
+        if linked_update or map_update:
+            document = es.get(index, 'item', item)
         return Response(json.dumps({'code': 200, 'document': document}), 200, mimetype="application/json");
     except ElasticHttpNotFoundError:
         return Response(json.dumps({'code': 404, 'error': 'The provided item could not be found.'}), 404, mimetype="application/json")
