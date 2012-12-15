@@ -84,8 +84,7 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
 <h2>Link to MusicBrainz</h2>
 <dl class="clearfix">
 <dt>Whole Item</dt>
-<dd>{{ current_match_span(data) }}
-    <a class="item-linker" href="#">(link)</a>
+<dd>{{ current_match_span(data, 'item') }}
     {{ linker_content('item-linker-content', 'item-linker-content', 'Link Item', none, 'item', data._id, data._index) }}
 </dd>
 {%- for (link_type_id, link_type) in g.link_types[data._index].iteritems() if not link_type_id == 'version' -%}
@@ -95,8 +94,7 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
 {%- for link in data._source._geordi.links.links[link_type_id] %}
   {%- set subitem_id = link_id | string + '-' + link[link_type.key] | string -%}
   <li style="clear:both" class="expander block-expander closed" id="li-subitem-{{ subitem_id }}"><span class="clicker"><code>[{{ link[link_type.key] }}]</code></span>
-    {{ current_match_span(subitems[subitem_id]) }}
-    <a class="subitem-linker" data-subitem="{{ subitem_id }}" href="#">(link)</a>
+    {{ current_match_span(subitems[subitem_id], 'subitem', subitem_id) }}
     {{ linker_content('subitem-linker-content', 'subitem-linker-content-' + subitem_id | string, 'Link subitem ' + subitem_id | string, link, 'subitem', subitem_id, data._index) }}
     <div class="li collapse">
     {{ json_pp(link, g.dictarray) }}
@@ -111,7 +109,7 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
 <div>{{ json_pp(data._source, g.dictarray) }}</div>
 {% endblock %}
 
-{%- macro current_match_span(data) -%}
+{%- macro current_match_span(data, linker_type, id) -%}
 <span class="current-match">
     {%- if data and data._source._geordi and data._source._geordi.matchings.current_matching %}
       {%- set current_matching = data._source._geordi.matchings.current_matching -%}
@@ -123,8 +121,12 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
          {{ current_matching.user }}
        {%- endif %}]&gt;
     {%- endif -%}
+    <a class="{{ linker_type }}-linker" {% if id %}data-{{linker_type}}="{{id}}" {% endif %}href="#">
+      ({% if data and data._source._geordi and data._source._geordi.matchings.current_matching %}re{% endif %}link)
+    </a>
 </span>
 {%- endmacro -%}
+
 {%- macro linker_content(class, id, title, json, type, item, index) -%}
 <div id="{{ id }}" class="{{ class }}">
   <h3>{{ title }}</h3>
