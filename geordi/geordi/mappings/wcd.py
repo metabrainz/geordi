@@ -61,13 +61,13 @@ class wcd():
             u'format': unicode(x['format']['text']),
             u'filename': unicode(x['_name'])
             }
-        if 'title' in x:
+        if 'title' in x and 'text' in x['title']:
             f[u'title'] = unicode(x['title']['text'])
-        if 'artist' in x:
+        if 'artist' in x and 'text' in x['artist']:
             f[u'artist'] = unicode(x['artist']['text'])
-        if 'length' in x:
+        if 'length' in x and 'text' in x['length']:
             f[u'length'] = int(float(x['length']['text']) * 1000)
-        if 'track' in x:
+        if 'track' in x and 'text' in x['track']:
             f[u'number'] = unicode(x['track']['text'])
         if 'external-identifier' in x:
             f[u'acoustid'] = [re.sub('^urn:acoustid:', '', acoustid) for acoustid in collect_text(x['external-identifier'], 'urn:acoustid') if acoustid != 'urn:acoustid:unknown']
@@ -83,19 +83,20 @@ class wcd():
                 f['artist'][0]['subitem'] = 'artist_id-{}'.format(artist['wcd_artist_id'])
         f['length'] = [int(float(track['length']['text']) * 1000)]
         f['length_formatted'] = [format_track_length(length) for length in f['length']]
-        f['number'] = []
-        numbers = [re.split('/', track['track']['text'])[0]]
-        for num in numbers:
-            try:
-                f['number'].append(str(int(num)))
-            except ValueError:
-                f['number'].append(num)
+        f['number'] = f['totaltracks'] = []
+        if 'track' in track and 'text' in track['track']:
+            numbers = [re.split('/', track['track']['text'])[0]]
+            for num in numbers:
+                try:
+                    f['number'].append(str(int(num)))
+                except ValueError:
+                    f['number'].append(num)
 
 
-        if re.search('/', track['track']['text']):
-            f['totaltracks'] = [int(re.split('/', track['track']['text'])[1])]
-        else:
-            f['totaltracks'] = []
+            if re.search('/', track['track']['text']):
+                f['totaltracks'] = [int(re.split('/', track['track']['text'])[1])]
+            else:
+                f['totaltracks'] = []
 
         if re.search('cd\s*\d+', track['_name'], re.IGNORECASE):
             f['medium'] = [re.search('cd\s*(\d+)', track['_name'], re.IGNORECASE).group(1)]
