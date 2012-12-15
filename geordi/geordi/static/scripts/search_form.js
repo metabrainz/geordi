@@ -14,7 +14,11 @@ $('#id-type').change(function() {
     if ($this.val() == 'raw') {
       if ($('#id-query').get(0).tagName == 'input') {
           var query = '{"query":\n  {"bool":\n    {"must": [{"query_string": {"query": "' + $('#id-query').val() + '"}}]}\n  }\n }';
-      } else { var query = '{"query":\n  {\n  }\n}'; }
+      } else {
+          var subitem_type = $('#id-subitem_type').val();
+          var subitem_key = geordi.link_types[$('#id-subitem_index').val()][subitem_type]['key'];
+          var query = '{"query":\n  {"match":\n   {"_geordi.links.links.' + subitem_type + '.' + subitem_key + '": "' + $('#id-query input').val() + '"}\n  }\n}';
+      }
       $('#id-query').replaceWith('<textarea name="query" style="width: 60em" id="id-query" placeholder="Query" cols=60 rows=8>' + query + '</textarea>');
     } else if ($this.val() == 'item') {
       if ($('#id-query').get(0).tagName == 'textarea') {
@@ -29,7 +33,7 @@ $('#id-type').change(function() {
         '</select>' +
         geordi.index_options_html +
         '</div>');
-        add_subitem_type_listener();
-        $('#id-subitem_index').change();
+      add_subitem_type_listener();
+      $('#id-subitem_index').change();
     }
 });

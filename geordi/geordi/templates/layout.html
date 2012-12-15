@@ -63,6 +63,7 @@
   <script>
     geordi.subtype_options = { {% for (index, link_types) in g.link_types.iteritems() %}"{{index}}": [{% for (subitem_type, opts) in link_types.iteritems() if subitem_type != "version" %}["{{subitem_type}}", "{{opts.name}}"]{% if not loop.last %}, {% endif %}{% endfor %}]{% endfor %} };
     geordi.index_options_html = '<select id="id-subitem_index" name="subitem_index" style="width: 20em">{% for index in g.all_indices %}<option>{{index}}</option>{% endfor %}</select>';
+    geordi.link_types = {{ g.json.dumps(g.link_types) | safe }}
   </script>
   <script src="/static/scripts/search_form.js"></script>
 {% endblock %}
