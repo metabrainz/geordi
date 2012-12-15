@@ -29,3 +29,11 @@ $('form.match-form').submit(function (e) {
   });
   $(this).next('div').addClass('loading').removeClass('error');
 });
+
+$('form.match-form input').bind('change keyup input propertychange', function(event) {
+    var $this = $(this);
+    var mbids = $this.val().match(/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/);
+    if (mbids !== null) {
+        $this.val(mbids.join(', '))
+    }
+});
