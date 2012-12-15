@@ -115,9 +115,13 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
 <span class="current-match">
     {%- if data and data._source._geordi and data._source._geordi.matchings.current_matching %}
       {%- set current_matching = data._source._geordi.matchings.current_matching -%}
-      {{ current_matching.type }}
+      &lt;{{ current_matching.type }}
       {% for mbid in current_matching.mbid %}<a href="https://musicbrainz.org/{{ current_matching.type }}/{{ mbid }}">{{ mbid[:4] }}…{{ mbid[-4:] }}</a>{% if not loop.last %}, {% endif %}{% endfor %}
-      [{{ current_matching.user }}]
+      [{% if not current_matching.auto -%}
+         <a href="https://musicbrainz.org/user/{{ current_matching.user }}">{{ current_matching.user }}</a>
+       {%- else -%}
+         {{ current_matching.user }}
+       {%- endif %}]&gt;
     {%- endif -%}
 </span>
 {%- endmacro -%}
