@@ -50,7 +50,7 @@ class wcd():
         return {u'artist_id': all_artists, u'file': files, 'version': 1}
 
     def _acceptable_formats(self):
-        return ['Flac', 'VBR MP3', 'Ogg Vorbis', 'Apple Lossless Audio']
+        return ['Flac', '24bit Flac', 'VBR MP3', 'Ogg Vorbis', 'Apple Lossless Audio']
 
     def _extract_artist(self, artist):
         return {u'name': unicode(artist['name']), u'wcd_artist_id': int(artist['id'])}
