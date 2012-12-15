@@ -61,30 +61,35 @@ class wcd():
             u'format': unicode(x['format']['text']),
             u'filename': unicode(x['_name'])
             }
-        if 'title' in x and 'text' in x['title']:
+        if 'title' in x and x['title'] and 'text' in x['title']:
             f[u'title'] = unicode(x['title']['text'])
-        if 'artist' in x and 'text' in x['artist']:
+        if 'artist' in x and x['artist'] and 'text' in x['artist']:
             f[u'artist'] = unicode(x['artist']['text'])
-        if 'length' in x and 'text' in x['length']:
+        if 'length' in x and x['length'] and 'text' in x['length']:
             f[u'length'] = int(float(x['length']['text']) * 1000)
-        if 'track' in x and 'text' in x['track']:
+        if 'track' in x and x['track'] and 'text' in x['track']:
             f[u'number'] = unicode(x['track']['text'])
         if 'external-identifier' in x:
             f[u'acoustid'] = [re.sub('^urn:acoustid:', '', acoustid) for acoustid in collect_text(x['external-identifier'], 'urn:acoustid') if acoustid != 'urn:acoustid:unknown']
         return f
 
     def _extract_track(self, track, links):
-        f = {}
+        f = {'title': [], 'artist': [], 'length': [], 'length_formatted': [], 'number': [], 'totaltracks': []}
         f['subitem'] = 'file-{}'.format(track['sha1']['text'])
-        f['title'] = [track['title']['text']]
-        f['artist'] = [{'name': track['artist']['text']}]
-        for artist in links['artist_id']:
-            if artist['name'] == f['artist'][0]['name']:
-                f['artist'][0]['subitem'] = 'artist_id-{}'.format(artist['wcd_artist_id'])
-        f['length'] = [int(float(track['length']['text']) * 1000)]
-        f['length_formatted'] = [format_track_length(length) for length in f['length']]
-        f['number'] = f['totaltracks'] = []
-        if 'track' in track and 'text' in track['track']:
+        try:
+            f['title'] = [track['title']['text']]
+        except (KeyError, TypeError): pass
+        try:
+            f['artist'] = [{'name': track['artist']['text']}]
+            for artist in links['artist_id']:
+                if artist['name'] == f['artist'][0]['name']:
+                    f['artist'][0]['subitem'] = 'artist_id-{}'.format(artist['wcd_artist_id'])
+        except (KeyError, TypeError): pass
+        try:
+            f['length'] = [int(float(track['length']['text']) * 1000)]
+            f['length_formatted'] = [format_track_length(length) for length in f['length']]
+        except (KeyError, TypeError): pass
+        if 'track' in track and track['track'] and 'text' in track['track']:
             numbers = [re.split('/', track['track']['text'])[0]]
             for num in numbers:
                 try:
@@ -95,8 +100,6 @@ class wcd():
 
             if re.search('/', track['track']['text']):
                 f['totaltracks'] = [int(re.split('/', track['track']['text'])[1])]
-            else:
-                f['totaltracks'] = []
 
         if re.search('cd\s*\d+', track['_name'], re.IGNORECASE):
             f['medium'] = [re.search('cd\s*(\d+)', track['_name'], re.IGNORECASE).group(1)]

@@ -30,6 +30,8 @@ def comma_only_list(lst):
     return ", ".join(lst)
 
 def collect_text(block, regex='.*'):
+    if block is None:
+        return []
     try:
         text = unicode(block['text'])
         if re.search(regex, text):
