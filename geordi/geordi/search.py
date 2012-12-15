@@ -24,9 +24,7 @@ es = ElasticSearch(app.config['ELASTICSEARCH_ENDPOINT'])
 
 def do_search(query_string, indices, start_from=None):
     query = {'query':
-              {'bool': {'must': [
-                {"query_string": {"query": query_string}}
-              ]}}
+               {"query_string": {"query": query_string}}
             }
     return do_search_raw(query, indices, start_from)
 

@@ -12,8 +12,8 @@ add_subitem_type_listener()
 $('#id-type').change(function() {
   var $this = $(this);
     if ($this.val() == 'raw') {
-      if ($('#id-query').get(0).tagName == 'input') {
-          var query = '{"query":\n  {"bool":\n    {"must": [{"query_string": {"query": "' + $('#id-query').val() + '"}}]}\n  }\n }';
+      if ($('#id-query').get(0).tagName.toLowerCase() == 'input') {
+          var query = '{"query":\n  {"query_string": {"query": "' + $('#id-query').val() + '"}}\n}';
       } else {
           var subitem_type = $('#id-subitem_type').val();
           var subitem_key = geordi.link_types[$('#id-subitem_index').val()][subitem_type]['key'];
@@ -21,9 +21,9 @@ $('#id-type').change(function() {
       }
       $('#id-query').replaceWith('<textarea name="query" style="width: 60em" id="id-query" placeholder="Query" cols=60 rows=8>' + query + '</textarea>');
     } else if ($this.val() == 'item') {
-      if ($('#id-query').get(0).tagName == 'textarea') {
+      if ($('#id-query').get(0).tagName.toLowerCase() == 'textarea') {
         var jsonquery = $.parseJSON($('#id-query').val());
-        var query = jsonquery.query.bool.must[0].query_string ? jsonquery.query.bool.must[0].query_string.query : '';
+        var query = jsonquery.query.query_string ? jsonquery.query.query_string.query : '';
       } else { var query = '' }
       $('#id-query').replaceWith('<input type="text" style="width: 60em" name="query" id="id-query" placeholder="Query" value="' + query + '" />');
     } else if ($this.val() == 'subitem') {
