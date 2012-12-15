@@ -58,7 +58,9 @@ def register_match(index, item, itemtype, matchtype, mbids):
 
     data = check_data_format(data)
 
-    data['_geordi']['matchings']['matchings'].append(make_match_definition(current_user.id, matchtype, mbids))
+    match = make_match_definition(current_user.id, matchtype, mbids)
+    data['_geordi']['matchings']['current_matching'] = match
+    data['_geordi']['matchings']['matchings'].append(match)
 
     try:
         if version:

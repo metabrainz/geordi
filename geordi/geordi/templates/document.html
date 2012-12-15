@@ -113,11 +113,11 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
 
 {%- macro current_match_span(data) -%}
 <span class="current-match">
-    {%- if data and data._source._geordi.matchings and data._source._geordi.matchings.matchings | length > 0 %}
-      {%- set topmatch = data._source._geordi.matchings.matchings[-1] -%}
-      {{ topmatch.type }}
-      {% for mbid in topmatch.mbid %}<a href="https://musicbrainz.org/{{ topmatch.type }}/{{ mbid }}">{{ mbid[:4] }}…{{ mbid[-4:] }}</a>{% if not loop.last %}, {% endif %}{% endfor %}
-      [{{ topmatch.user }}]
+    {%- if data and data._source._geordi and data._source._geordi.matchings.current_matching %}
+      {%- set current_matching = data._source._geordi.matchings.current_matching -%}
+      {{ current_matching.type }}
+      {% for mbid in current_matching.mbid %}<a href="https://musicbrainz.org/{{ current_matching.type }}/{{ mbid }}">{{ mbid[:4] }}…{{ mbid[-4:] }}</a>{% if not loop.last %}, {% endif %}{% endfor %}
+      [{{ current_matching.user }}]
     {%- endif -%}
 </span>
 {%- endmacro -%}

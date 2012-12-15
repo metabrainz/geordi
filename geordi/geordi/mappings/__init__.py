@@ -47,12 +47,12 @@ def check_data_format(data):
     data.setdefault('_geordi', {
             'mapping': {'version': 0},
             'links': {'links': [], 'version': 1},
-            'matchings': {'matchings': [], 'version': 1}
+            'matchings': {'matchings': [], 'current_matching': {}, 'version': 2}
     })
 
     data['_geordi'].setdefault('mapping', {'version': 0})
     data['_geordi'].setdefault('links', {'links': [], 'version': 1})
-    data['_geordi'].setdefault('matchings', {'matchings': [], 'version': 1})
+    data['_geordi'].setdefault('matchings', {'matchings': [], 'current_matching': {}, 'version': 2})
 
     return data
 
