@@ -15,6 +15,7 @@ es = ElasticSearch('http://localhost:9200')
 
 def process_dir(index, directory):
     base = re.sub('(.*?)/([^/]+)/?$', r'\2', directory)
+    print('processing {}...'.format(base))
     try:
         document = es.get(index, 'item', base)
         doc = document["_source"]
