@@ -30,21 +30,23 @@ class wcd():
         all_artists = []
         files = []
         if 'what_cd_json' in data:
-            main_artists = [self._extract_artist(artist) for artist in data['what_cd_json']['response']['group']['musicInfo']['artists']]
-            extra_artists = [self._extract_artist(artist) for artist in data['what_cd_json']['response']['group']['musicInfo']['with']]
-            remixers = [self._extract_artist(artist) for artist in data['what_cd_json']['response']['group']['musicInfo']['remixedBy']]
-            producers = [self._extract_artist(artist) for artist in data['what_cd_json']['response']['group']['musicInfo']['producer']]
-            composers = [self._extract_artist(artist) for artist in data['what_cd_json']['response']['group']['musicInfo']['composers']]
-            conductors = [self._extract_artist(artist) for artist in data['what_cd_json']['response']['group']['musicInfo']['conductor']]
-            djs = [self._extract_artist(artist) for artist in data['what_cd_json']['response']['group']['musicInfo']['dj']]
-            seen = []
-            all_artists = [c for c in main_artists if not (c in seen or seen.append(c))]
-            all_artists.extend([c for c in extra_artists if not (c in seen or seen.append(c))])
-            all_artists.extend([c for c in remixers if not (c in seen or seen.append(c))])
-            all_artists.extend([c for c in producers if not (c in seen or seen.append(c))])
-            all_artists.extend([c for c in composers if not (c in seen or seen.append(c))])
-            all_artists.extend([c for c in conductors if not (c in seen or seen.append(c))])
-            all_artists.extend([c for c in djs if not (c in seen or seen.append(c))])
+            try:
+                main_artists = [self._extract_artist(artist) for artist in data['what_cd_json']['response']['group']['musicInfo']['artists']]
+                extra_artists = [self._extract_artist(artist) for artist in data['what_cd_json']['response']['group']['musicInfo']['with']]
+                remixers = [self._extract_artist(artist) for artist in data['what_cd_json']['response']['group']['musicInfo']['remixedBy']]
+                producers = [self._extract_artist(artist) for artist in data['what_cd_json']['response']['group']['musicInfo']['producer']]
+                composers = [self._extract_artist(artist) for artist in data['what_cd_json']['response']['group']['musicInfo']['composers']]
+                conductors = [self._extract_artist(artist) for artist in data['what_cd_json']['response']['group']['musicInfo']['conductor']]
+                djs = [self._extract_artist(artist) for artist in data['what_cd_json']['response']['group']['musicInfo']['dj']]
+                seen = []
+                all_artists = [c for c in main_artists if not (c in seen or seen.append(c))]
+                all_artists.extend([c for c in extra_artists if not (c in seen or seen.append(c))])
+                all_artists.extend([c for c in remixers if not (c in seen or seen.append(c))])
+                all_artists.extend([c for c in producers if not (c in seen or seen.append(c))])
+                all_artists.extend([c for c in composers if not (c in seen or seen.append(c))])
+                all_artists.extend([c for c in conductors if not (c in seen or seen.append(c))])
+                all_artists.extend([c for c in djs if not (c in seen or seen.append(c))])
+            except: pass
         if 'files_xml' in data:
             files = [self._extract_file(x) for x in data['files_xml']['files']['file'] if (x['_source'] == 'original' and 'sha1' in x and x['format']['text'] in self._acceptable_formats())]
         return {u'artist_id': all_artists, u'file': files, 'version': 1}
@@ -97,9 +99,14 @@ class wcd():
                 except ValueError:
                     f['number'].append(num)
 
-
             if re.search('/', track['track']['text']):
-                f['totaltracks'] = [int(re.split('/', track['track']['text'])[1])]
+                numbers = [re.split('/', track['track']['text'])[1]]
+                for num in numbers:
+                    try:
+                        f['totaltracks'].append(str(int(num)))
+                    except ValueError:
+                        f['totaltracks'].append(num)
+
 
         if re.search('cd\s*\d+', track['_name'], re.IGNORECASE):
             f['medium'] = [re.search('cd\s*(\d+)', track['_name'], re.IGNORECASE).group(1)]
@@ -137,7 +144,7 @@ class wcd():
         if 'what_cd_json' in data:
             try:
                 release['artist'] = [{'name': artist['name'], 'subitem': "artist_id-{}".format(int(artist['id']))} for artist in data['what_cd_json']['response']['group']['musicInfo']['artists']]
-            except KeyError: pass
+            except (KeyError, TypeError): pass
         if 'artist' not in release or len(release['artist']) < 1:
             try:
                 release['artist'] = [{'name': name} for name in collect_text(data['meta_xml']['metadata']['artist'])]
