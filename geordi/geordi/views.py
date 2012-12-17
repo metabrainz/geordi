@@ -134,12 +134,9 @@ def matchitem(index, item):
     else:
         auto = True
         user = request.args.get('user')
-    print request.args
     matchtype = request.args.get('type', 'release')
-    print 'mbids: {}'.format(request.args.getlist('mbid'))
     mbids = request.args.getlist('mbid')
     if not mbids:
-        print 'mbids: {}'.format(request.args.getlist('mbids'))
         mbids = re.split(',\s*', request.args.get('mbids'))
     return register_match(index, item, 'item', matchtype, mbids, auto, user)
 
