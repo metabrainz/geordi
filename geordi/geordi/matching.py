@@ -36,7 +36,7 @@ def make_match_definition(user, matchtype, mbids, auto=False):
             'auto': True if auto else False,
             'version': 1}
 
-def register_match(index, item, itemtype, matchtype, mbids):
+def register_match(index, item, itemtype, matchtype, mbids, auto=False, user=None):
     if len(mbids) < 1:
         return Response(json.dumps({'code': 400, 'error': 'You must provide at least one MBID for a match.'}), 400, mimetype="application/json")
     # Check MBID formatting
@@ -58,9 +58,21 @@ def register_match(index, item, itemtype, matchtype, mbids):
 
     data = check_data_format(data)
 
-    match = make_match_definition(current_user.id, matchtype, mbids)
-    data['_geordi']['matchings']['current_matching'] = match
-    data['_geordi']['matchings']['matchings'].append(match)
+    if auto:
+        if not user:
+            return Response(json.dumps({'code': 400, 'error': 'Automatic matches must provide a name.'}), 400, mimetype="application/json")
+    else:
+        user = current_user.id
+
+    match = make_match_definition(user, matchtype, mbids, auto)
+    if (not auto or
+        len(data['_geordi']['matchings']['matchings']) == 0 or
+        data['_geordi']['matchings']['current_matching']['auto']):
+        data['_geordi']['matchings']['current_matching'] = match
+    if not auto:
+        data['_geordi']['matchings']['matchings'].append(match)
+    else:
+        data['_geordi']['matchings']['auto_matchings'].append(match)
 
     try:
         if version:
