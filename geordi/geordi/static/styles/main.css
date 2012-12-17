@@ -67,6 +67,15 @@ table td, table th {
     background-color: whitesmoke;
 }
 
+.match-dd{
+    width: 100%;
+}
+
+.match-form textarea {
+    height: 60px;
+    width: 50%;
+}
+
 .error {
     background-color: red;
 }

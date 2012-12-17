@@ -32,10 +32,24 @@ $('form.match-form').submit(function (e) {
   });
 });
 
-$('form.match-form input').bind('change keyup input propertychange', function(event) {
+$('form.match-form textarea').bind('change keyup input propertychange', function(event) {
     var $this = $(this);
-    var mbids = $this.val().match(/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/);
+    var matches = $this.val().match(/^(.*?),?\s*([^,]*)$/);
+
+    var rewrite = null;
+    var lastmbid = matches[2].match(/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/);
+    if (lastmbid === null) {
+        rewrite = matches[2];
+    } else {
+        rewrite = lastmbid;
+    }
+
+    var mbids = matches[1].match(/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/g);
     if (mbids !== null) {
-        $this.val(mbids.join(', '))
+        rewrite = mbids.join(', ') + ', ' + rewrite;
+    }
+
+    if (rewrite) {
+        $this.val(rewrite)
     }
 });

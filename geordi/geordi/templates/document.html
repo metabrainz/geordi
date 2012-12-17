@@ -135,7 +135,7 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
       <dd class="collapse">{{ json_pp(json, g.dictarray) }}</dd>
       {%- endif -%}
       <dt class="expander block-expander open"><i class="icon"></i><span class="clicker">Match</span></dt>
-      <dd><div>
+      <dd class="match-dd"><div>
         <form class="match-form" id="match-{{type}}-{{item}}" action="/api/match{{type}}/{{ index }}/{{ item }}" method="get">
           <select name="type">
             <option>release</option>
@@ -145,7 +145,7 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
             <option>artist</option>
             <option>label</option>
           </select>
-          <input type="text" name="mbids" placeholder="MBIDs, comma separated" />
+          <textarea name="mbids" placeholder="MBIDs, comma separated"></textarea>
           <input type="submit" class="btn primary" value="Match" />
         </form>
         <div class="response"></p>
