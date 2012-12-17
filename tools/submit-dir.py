@@ -73,4 +73,8 @@ if __name__ == '__main__':
     index = sys.argv[1]
     directories = sys.argv[2:]
     for directory in directories:
-        process_dir(index, directory)
+        try:
+            process_dir(index, directory)
+        except Exception, e:
+            print("GOT EXCEPTION: {}".format(e))
+            continue
