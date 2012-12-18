@@ -99,7 +99,7 @@ def get_search_params():
 @login_required
 def search():
     params = get_search_params()
-    if 'error' in params and params['error'] != 'You must provide a query':
+    if 'error' in params and params['error'] != 'You must provide a query.':
         flash(params["error"])
     return render_template('search.html', query=params.get('query'), data = params.get('data'), mapping = params.get('mapping'), start_from= params.get('start_from'))
 
