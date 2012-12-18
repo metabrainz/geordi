@@ -15,12 +15,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division, absolute_import
-from geordi import app
+from geordi import app, es
 from geordi.mappings import get_link_types_by_index
 
-from pyelasticsearch import ElasticSearch, ElasticHttpNotFoundError
-
-es = ElasticSearch(app.config['ELASTICSEARCH_ENDPOINT'])
+from pyelasticsearch import ElasticHttpNotFoundError
 
 def do_search(query_string, indices, start_from=None):
     query = {'query':

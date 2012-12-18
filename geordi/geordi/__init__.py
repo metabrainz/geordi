@@ -18,6 +18,8 @@ from __future__ import division, absolute_import
 from flask import Flask
 from flask.ext.login import LoginManager, UserMixin
 
+from pyelasticsearch import ElasticSearch
+
 # CONFIG
 SECRET_KEY = 'super seekrit'
 ELASTICSEARCH_ENDPOINT = 'http://localhost:9200/'
@@ -47,5 +49,7 @@ def load_user(username):
     return User(username)
 
 login_manager.setup_app(app, add_context_processor = True)
+
+es = ElasticSearch(app.config['ELASTICSEARCH_ENDPOINT'], max_retries=2)
 
 import geordi.views

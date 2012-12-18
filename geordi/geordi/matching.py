@@ -17,16 +17,14 @@
 from __future__ import division, absolute_import
 from flask import Response, request
 from flask.ext.login import current_user
-from geordi import app
+from geordi import app, es
 from geordi.mappings import check_data_format
 
 import json
 import uuid
 from datetime import datetime
 
-from pyelasticsearch import ElasticSearch, ElasticHttpNotFoundError
-
-es = ElasticSearch(app.config['ELASTICSEARCH_ENDPOINT'])
+from pyelasticsearch import ElasticHttpNotFoundError
 
 def make_match_definition(user, matchtype, mbids, auto=False, ip=False):
     match = {'user': user,

@@ -16,11 +16,9 @@
 
 from __future__ import division, absolute_import
 
-from geordi import app
+from geordi import app, es
 from geordi.mappings.wcd import wcd
-from pyelasticsearch import ElasticSearch, ElasticHttpNotFoundError
-
-es = ElasticSearch(app.config['ELASTICSEARCH_ENDPOINT'])
+from pyelasticsearch import ElasticHttpNotFoundError
 
 class_map = {
     'wcd': wcd()

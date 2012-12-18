@@ -17,7 +17,7 @@
 from __future__ import division, absolute_import
 from flask import render_template, request, redirect, url_for, flash, Response, g
 from flask.ext.login import login_required, login_user, logout_user, current_user
-from geordi import app, login_manager, User
+from geordi import app, login_manager, User, es
 from geordi.search import do_search, do_search_raw, do_subitem_search
 from geordi.matching import register_match
 from geordi.mappings import map_search_data, update_map_by_index, update_linked_by_index, get_link_types_by_index, get_mapoptions
@@ -29,9 +29,7 @@ import urllib2
 import re
 from datetime import datetime
 
-from pyelasticsearch import ElasticSearch, ElasticHttpNotFoundError
-
-es = ElasticSearch(app.config['ELASTICSEARCH_ENDPOINT'])
+from pyelasticsearch import ElasticHttpNotFoundError
 
 def dictarray(dictionary):
     return [{'k': i[0], 'v': i[1]} for i in dictionary.iteritems()]
