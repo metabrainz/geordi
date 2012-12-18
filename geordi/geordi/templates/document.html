@@ -85,7 +85,7 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
 <dl class="clearfix">
 <dt>Whole Item</dt>
 <dd>{{ current_match_span(data, 'item') }}
-    {{ linker_content('item-linker-content', 'item-linker-content', 'Link Item', none, 'item', data._id, data._index) }}
+    {{ linker_content('item-linker-content', 'item-linker-content', 'Link Item', none, 'item', data._id, data._index, data) }}
 </dd>
 {%- for (link_type_id, link_type) in g.link_types[data._index].iteritems() if not link_type_id == 'version' -%}
 <dt>{{ link_type.name }}</dt>
@@ -95,7 +95,7 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
   {%- set subitem_id = link_id | string + '-' + link[link_type.key] | string -%}
   <li style="clear:both" class="expander block-expander closed" id="li-subitem-{{ subitem_id }}"><span class="clicker"><code>[{{ link[link_type.key] }}]</code></span>
     {{ current_match_span(subitems[subitem_id], 'subitem', subitem_id) }}
-    {{ linker_content('subitem-linker-content', 'subitem-linker-content-' + subitem_id | string, 'Link subitem ' + subitem_id | string, link, 'subitem', subitem_id, data._index) }}
+    {{ linker_content('subitem-linker-content', 'subitem-linker-content-' + subitem_id | string, 'Link subitem ' + subitem_id | string, link, 'subitem', subitem_id, data._index, subitems[subitem_id]) }}
     <div class="li collapse">
     {{ json_pp(link, g.dictarray) }}
     </div>
@@ -113,27 +113,38 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
 <span class="current-match">
     {%- if data and data._source._geordi and data._source._geordi.matchings.current_matching %}
       {%- set current_matching = data._source._geordi.matchings.current_matching -%}
-      &lt;{{ current_matching.type }}
-      {% for mbid in current_matching.mbid %}<a href="https://musicbrainz.org/{{ current_matching.type }}/{{ mbid }}">{{ mbid[:4] }}…{{ mbid[-4:] }}</a>{% if not loop.last %}, {% endif %}{% endfor %}
-      [{% if not current_matching.auto -%}
-         <a href="https://musicbrainz.org/user/{{ current_matching.user }}">{{ current_matching.user }}</a>
-       {%- else -%}
-         {{ current_matching.user }}
-       {%- endif %}]&gt;
+      {{ match_span(current_matching) }}
     {%- endif -%}
     <a class="{{ linker_type }}-linker" {% if id %}data-{{linker_type}}="{{id}}" {% endif %}href="#">
       ({% if data and data._source._geordi and data._source._geordi.matchings.current_matching %}re{% endif %}link)
     </a>
 </span>
 {%- endmacro -%}
+{%- macro match_span(matching, show_timestamp) -%}
+  &lt;{{ matching.type }}
+  {% for mbid in matching.mbid %}<a href="https://musicbrainz.org/{{ matching.type }}/{{ mbid }}">{{ mbid[:4] }}…{{ mbid[-4:] }}</a>{% if not loop.last %}, {% endif %}{% endfor %}
+  [{% if not matching.auto -%}
+     <a href="https://musicbrainz.org/user/{{ matching.user }}">{{ matching.user }}</a>
+   {%- else -%}
+     {{ matching.user }}
+   {%- endif %}]
+   {%- if show_timestamp %}
+     {{ matching.timestamp }}
+   {%- endif -%}&gt;
+{%- endmacro -%}
 
-{%- macro linker_content(class, id, title, json, type, item, index) -%}
+{%- macro linker_content(class, id, title, json, type, item, index, matches_json) -%}
 <div id="{{ id }}" class="{{ class }}">
   <h3>{{ title }}</h3>
   <dl>{%- if json -%}
       <dt class="expander block-expander closed"><i class="icon"></i><span class="clicker">JSON</span></dt>
       <dd class="collapse">{{ json_pp(json, g.dictarray) }}</dd>
       {%- endif -%}
+      {%- if matches_json -%}
+      <dt class="expander block-expander closed"><i class="icon"></i><span class="clicker">All Matches</span></dt>
+      <dd class="collapse">{% for match in matches_json._source._geordi.matchings.matchings %}{{ match_span(match, true) }}{% if not loop.last %}<br />{% endif %}{% endfor %}</dd>
+      {%- endif -%}
+
       <dt class="expander block-expander open"><i class="icon"></i><span class="clicker">Match</span></dt>
       <dd class="match-dd"><div>
         <form class="match-form" id="match-{{type}}-{{item}}" action="/api/match{{type}}/{{ index }}/{{ item }}" method="get">
