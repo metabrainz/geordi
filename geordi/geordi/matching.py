@@ -37,7 +37,7 @@ def make_match_definition(user, matchtype, mbids, auto=False, ip=False):
         match['ip'] = ip
     return match
 
-def register_match(index, item, itemtype, matchtype, mbids, auto=False, user=None):
+def register_match(index, item, itemtype, matchtype, mbids, auto=False, user=None, ip=False):
     if len(mbids) < 1:
         return Response(json.dumps({'code': 400, 'error': 'You must provide at least one MBID for a match.'}), 400, mimetype="application/json")
     # Check MBID formatting
@@ -59,16 +59,17 @@ def register_match(index, item, itemtype, matchtype, mbids, auto=False, user=Non
 
     data = check_data_format(data)
 
-    ip = False
     if auto:
         if not user:
             return Response(json.dumps({'code': 400, 'error': 'Automatic matches must provide a name.'}), 400, mimetype="application/json")
-        try:
-            ip = request.environ['HTTP_X_FORWARDED_FOR'].split(',')[-1].strip()
-        except KeyError:
-            ip = request.environ['REMOTE_ADDR']
+        if not ip:
+            try:
+                ip = request.environ['HTTP_X_FORWARDED_FOR'].split(',')[-1].strip()
+            except KeyError:
+                ip = request.environ['REMOTE_ADDR']
     else:
         user = current_user.id
+        ip = False
 
     match = make_match_definition(user, matchtype, mbids, auto, ip)
     if (not auto or
