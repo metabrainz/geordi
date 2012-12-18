@@ -159,13 +159,16 @@ def subitem(index, subitem):
 def matchsubitem(index, subitem):
     "Submit a match for this subitem"
     if current_user.is_authenticated():
-        matchtype = request.args.get('type', 'artist')
-        mbids = request.args.getlist('mbid')
-        if not mbids:
-            mbids = re.split(',\s*', request.args.get('mbids'))
-        return register_match(index, subitem, 'subitem', matchtype, mbids)
+        auto = False
+        user = None
     else:
-        return Response(json.dumps({'code': 403, 'error': 'Unauthorized.'}), 403, mimetype="application/json");
+        auto = True
+        user = request.args.get('user')
+    matchtype = request.args.get('type', 'artist')
+    mbids = request.args.getlist('mbid')
+    if not mbids:
+        mbids = re.split(',\s*', request.args.get('mbids'))
+    return register_match(index, subitem, 'subitem', matchtype, mbids, auto, user)
 
 # Login/logout-related views
 @app.route('/login', methods=["GET", "POST"])

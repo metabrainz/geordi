@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division, absolute_import
-from flask import Response
+from flask import Response, request
 from flask.ext.login import current_user
 from geordi import app
 from geordi.mappings import check_data_format
@@ -28,13 +28,16 @@ from pyelasticsearch import ElasticSearch, ElasticHttpNotFoundError
 
 es = ElasticSearch(app.config['ELASTICSEARCH_ENDPOINT'])
 
-def make_match_definition(user, matchtype, mbids, auto=False):
-    return {'user': user,
+def make_match_definition(user, matchtype, mbids, auto=False, ip=False):
+    match = {'user': user,
             'timestamp': datetime.utcnow(),
             'type': matchtype,
             'mbid': mbids,
             'auto': True if auto else False,
             'version': 1}
+    if ip:
+        match['ip'] = ip
+    return match
 
 def register_match(index, item, itemtype, matchtype, mbids, auto=False, user=None):
     if len(mbids) < 1:
@@ -58,13 +61,18 @@ def register_match(index, item, itemtype, matchtype, mbids, auto=False, user=Non
 
     data = check_data_format(data)
 
+    ip = False
     if auto:
         if not user:
             return Response(json.dumps({'code': 400, 'error': 'Automatic matches must provide a name.'}), 400, mimetype="application/json")
+        try:
+            ip = request.environ['HTTP_X_FORWARDED_FOR'].split(',')[-1].strip()
+        except KeyError:
+            ip = request.environ['REMOTE_ADDR']
     else:
         user = current_user.id
 
-    match = make_match_definition(user, matchtype, mbids, auto)
+    match = make_match_definition(user, matchtype, mbids, auto, ip)
     if (not auto or
         len(data['_geordi']['matchings']['matchings']) == 0 or
         data['_geordi']['matchings']['current_matching']['auto']):
