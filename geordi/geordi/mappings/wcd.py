@@ -48,7 +48,9 @@ class wcd():
                 all_artists.extend([c for c in djs if not (c in seen or seen.append(c))])
             except: pass
         if 'files_xml' in data:
-            files = [self._extract_file(x) for x in data['files_xml']['files']['file'] if (x['_source'] == 'original' and 'sha1' in x and x['format']['text'] in self._acceptable_formats())]
+            try:
+                files = [self._extract_file(x) for x in data['files_xml']['files']['file'] if (x['_source'] == 'original' and 'sha1' in x and x['format']['text'] in self._acceptable_formats())]
+            except: pass
         return {u'artist_id': all_artists, u'file': files, 'version': 1}
 
     def _acceptable_formats(self):
