@@ -123,8 +123,14 @@ def update_automatic_item_matches_by_index(index, item, data):
         return changed
 
 def map_search_data(data):
+    maps = []
     try:
-        return [get_map_by_index(result['_index'], result['_source']) for result in data['hits']['hits']]
+        for result in data['hits']['hits']:
+            try:
+                maps.append(get_map_by_index(result['_index'], result['_source']))
+            except:
+                maps.append(None)
+        return maps
     except TypeError:
         return None
 
