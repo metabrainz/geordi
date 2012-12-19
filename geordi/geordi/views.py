@@ -134,6 +134,8 @@ def matchitem(index, item):
     else:
         auto = True
         user = request.args.get('user')
+        if user in ['matched by index']:
+            return Response(json.dumps({'code': 400, 'error': 'The name "{}" is reserved.'.format(user)}), 400, mimetype="application/json")
     matchtype = request.args.get('type', 'release')
     mbids = request.args.getlist('mbid')
     if not mbids:
