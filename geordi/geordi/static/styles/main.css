@@ -4,7 +4,7 @@ ul { margin-bottom: 0px; margin-top: 0px; }
 dt::after { content: ': ' }
 dt, dd { float: left; }
 dt { clear: left; line-height: 20px; }
-dd { line-height: 20px; }
+dd { line-height: 20px; padding-right: 3px; }
 li.closed { list-style-image: url('/static/images/closed.png') }
 li.open { list-style-image: url('/static/images/open.png') }
 div.li { margin-left: 10px }
@@ -102,10 +102,22 @@ table td, table th {
     margin-top: 1em;
 }
 
-.item-linker img, .subitem-linker img {
-    border-bottom: 1px dotted transparent;
+.item-linker, .subitem-linker {
+    display: inline-block;
 }
 
-.item-linker:hover img, .subitem-linker:hover img {
-    border-bottom: 1px dotted #444;
+.item-linker.verbose, .subitem-linker.verbose {
+    border: 1px solid #444;
+    border-radius: 2px;
+    text-decoration: none;
+    color: inherit;
+    padding: 0px 2px;
+}
+
+.item-linker img, .subitem-linker img {
+    vertical-align: -2px;
+}
+
+.item-linker:hover, .subitem-linker:hover {
+    border-color: #666;
 }
