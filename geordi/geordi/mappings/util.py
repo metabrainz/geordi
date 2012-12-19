@@ -41,7 +41,7 @@ def collect_text(block, regex='.*'):
     except KeyError:
         return []
     except TypeError:
-        return [unicode(entry['text']) for entry in block if ('text' in entry and re.search(regex, entry['text']))]
+        return [unicode(entry['text']) for entry in block if (entry and 'text' in entry and re.search(regex, entry['text']))]
 
 def concatenate_text(block, regex='.*', combiner=comma_list):
     return combiner(collect_text(block, regex))
