@@ -10,7 +10,8 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
 <p>In the JSON Source view, alt-click will open and close full subtrees.</p>
 
 {% if mapping %}
-<h2>Extracted Information</h2>
+{{ section_links('mapping') }}
+<h2 id="mapping">Extracted Information</h2>
 <h3>Summary</h3>
 <table class="zebra"><tbody>
     {% for title in mapping.release.title -%}
@@ -81,7 +82,8 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
 </tbody></table>
 {% endif %}
 
-<h2>Link to MusicBrainz</h2>
+{{ section_links('link') }}
+<h2 id="link">Link to MusicBrainz</h2>
 <dl class="clearfix">
 <dt>Whole Item</dt>
 <dd>{{ current_match_span(data, 'item') }}
@@ -105,9 +107,18 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
 {%- endfor -%}
 </dl>
 
-<h2>JSON Source</h2> <a href="#">show all</a>
+{{ section_links('json-source') }}
+<h2 id="json-source">JSON Source</h2>
 <div>{{ json_pp(data._source, g.dictarray) }}</div>
 {% endblock %}
+
+{%- macro section_links(section) -%}
+<div class="section-links"><small>Other sections:
+  {% if section != 'mapping' %}<a href="#mapping">[Extracted Information]</a>{% endif %}
+  {% if section != 'link' %}<a href="#link">[Link to MusicBrainz]</a>{% endif %}
+  {% if section != 'json-source' %}<a href="#json-source">[JSON Source]</a></small>{% endif %}
+</div>
+{%- endmacro -%}
 
 {%- macro current_match_span(data, linker_type, id) -%}
 <span class="current-match">
