@@ -20,7 +20,7 @@ from flask.ext.login import login_required, login_user, logout_user, current_use
 from geordi import app, login_manager, User, es
 from geordi.search import do_search, do_search_raw, do_subitem_search
 from geordi.matching import register_match
-from geordi.mappings import map_search_data, update_map_by_index, update_linked_by_index, get_link_types_by_index, update_automatic_item_matches_by_index, get_automatic_subitem_matches_by_index, get_mapoptions
+from geordi.mappings import map_search_data, update_map_by_index, update_linked_by_index, get_link_types_by_index, update_automatic_item_matches_by_index, update_automatic_subitem_matches_by_index, get_mapoptions
 from geordi.mappings.util import comma_list, comma_only_list
 
 import json
@@ -69,6 +69,7 @@ def resolve_data(index, item):
     match_update = update_automatic_item_matches_by_index(index, item, data['_source'])
     if linked_update or map_update or match_update:
         data = es.get(index, 'item', item)
+    update_automatic_subitem_matches_by_index(index, item, data['_source'])
     return data
 
 def get_search_params():
