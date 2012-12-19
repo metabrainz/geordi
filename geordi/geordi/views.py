@@ -22,6 +22,7 @@ from geordi.search import do_search, do_search_raw, do_subitem_search
 from geordi.matching import register_match
 from geordi.mappings import map_search_data, update_map_by_index, update_linked_by_index, get_link_types_by_index, update_automatic_item_matches_by_index, update_automatic_subitem_matches_by_index, get_mapoptions
 from geordi.mappings.util import comma_list, comma_only_list
+from geordi.utils import check_data_format
 
 import json
 import uuid
@@ -56,7 +57,7 @@ def document(index, item):
             if link_type != 'version':
                 for link in links:
                     subitem = "{}-{}".format(link_type, link[link_types[link_type]['key']])
-                    subitems[subitem] = get_subitem(index, subitem)
+                    subitems[subitem] = get_subitem(index, subitem, create=True)
         return render_template('document.html', item=item, index=index, data = data, mapping = data['_source']['_geordi']['mapping'], mapoptions = mapoptions, subitems=subitems)
     except ElasticHttpNotFoundError:
         return render_template('notfound.html')
@@ -122,6 +123,13 @@ def item(index, item):
     "Get information for an item"
     try:
         document = resolve_data(index, item)
+        if request.args.get('subitems', False):
+            link_types = get_link_types_by_index(index)
+            for (link_type, links) in document['_source']['_geordi']['links']['links'].iteritems():
+                if link_type != 'version':
+                    for link in links:
+                        subitem = "{}-{}".format(link_type, link[link_types[link_type]['key']])
+                        get_subitem(index, subitem, create=True)
         return Response(json.dumps({'code': 200, 'document': document}), 200, mimetype="application/json");
     except ElasticHttpNotFoundError:
         return Response(json.dumps({'code': 404, 'error': 'The provided item could not be found.'}), 404, mimetype="application/json")
@@ -143,10 +151,13 @@ def matchitem(index, item):
         mbids = re.split(',\s*', request.args.get('mbids'))
     return register_match(index, item, 'item', matchtype, mbids, auto, user)
 
-def get_subitem(index, subitem):
+def get_subitem(index, subitem, create=False):
     try:
         return es.get(index, 'subitem', subitem)
     except ElasticHttpNotFoundError:
+        if create:
+            data = check_data_format({})
+            es.index(index, 'subitem', data, id=subitem)
         return None
 
 @app.route('/api/subitem/<index>/<subitem>')
