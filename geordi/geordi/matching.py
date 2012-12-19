@@ -62,6 +62,8 @@ def register_match(index, item, itemtype, matchtype, mbids, auto=False, user=Non
     if auto:
         if not user:
             return Response(json.dumps({'code': 400, 'error': 'Automatic matches must provide a name.'}), 400, mimetype="application/json")
+        if user in ['matched by index']:
+            return Response(json.dumps({'code': 400, 'error': 'The name "{}" is reserved.'.format(user)}), 400, mimetype="application/json")
         if not ip:
             try:
                 ip = request.environ['HTTP_X_FORWARDED_FOR'].split(',')[-1].strip()
