@@ -49,9 +49,30 @@ class wcd():
             except: pass
         if 'files_xml' in data:
             try:
-                files = [self._extract_file(x) for x in data['files_xml']['files']['file'] if (x['_source'] == 'original' and 'sha1' in x and x['format']['text'] in self._acceptable_formats())]
+                files = [self._extract_file(x) for x in self._linkable_files(data)]
             except: pass
         return {u'artist_id': all_artists, u'file': files, 'version': 1}
+
+    def automatic_item_matches(self, data):
+        matches = {}
+        try:
+            matches['release'] = [re.sub('^urn:mb_release_id:', '', r) for r in collect_text(data['meta_xml']['metadata']['external-identifier'], 'urn:mb_release_id:')]
+            matches['release-group'] = [re.sub('^urn:mb_releasegroup_id:', '', r) for r in collect_text(data['meta_xml']['metadata']['external-identifier'], 'urn:mb_releasegroup_id:')]
+        except KeyError: pass
+        return matches
+
+    def automatic_subitem_matches(self, data):
+        matches = {}
+        try:
+            for f in self._linkable_files(data):
+                try:
+                    matches['file-{}'.format(f['sha1']['text'])] = {'recording': [re.sub('^urn:mb_recording_id:', '', r) for r in collect_text(f['external-identifier'], 'urn:mb_recording_id:')]}
+                except: pass
+        except KeyError: pass
+        return matches
+
+    def _linkable_files(self, data):
+        return [f for f in data['files_xml']['files']['file'] if (f['_source'] == 'original' and 'sha1' in f and f['format']['text'] in self._acceptable_formats())]
 
     def _acceptable_formats(self):
         return ['Flac', '24bit Flac', 'VBR MP3', 'Ogg Vorbis', 'Apple Lossless Audio']

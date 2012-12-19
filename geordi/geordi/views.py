@@ -20,7 +20,7 @@ from flask.ext.login import login_required, login_user, logout_user, current_use
 from geordi import app, login_manager, User, es
 from geordi.search import do_search, do_search_raw, do_subitem_search
 from geordi.matching import register_match
-from geordi.mappings import map_search_data, update_map_by_index, update_linked_by_index, get_link_types_by_index, get_mapoptions
+from geordi.mappings import map_search_data, update_map_by_index, update_linked_by_index, get_link_types_by_index, update_automatic_item_matches_by_index, get_automatic_subitem_matches_by_index, get_mapoptions
 from geordi.mappings.util import comma_list, comma_only_list
 
 import json
@@ -48,11 +48,7 @@ def before_request():
 @login_required
 def document(index, item):
     try:
-        data = es.get(index, 'item', item)
-        linked_update = update_linked_by_index(index, item, data['_source'])
-        map_update = update_map_by_index(index, item, data['_source'])
-        if linked_update or map_update:
-            data = es.get(index, 'item', item)
+        data = resolve_data(index, item)
         mapoptions = get_mapoptions(data['_source']['_geordi']['mapping'])
         subitems = {}
         link_types = get_link_types_by_index(index)
@@ -64,6 +60,16 @@ def document(index, item):
         return render_template('document.html', item=item, index=index, data = data, mapping = data['_source']['_geordi']['mapping'], mapoptions = mapoptions, subitems=subitems)
     except ElasticHttpNotFoundError:
         return render_template('notfound.html')
+
+def resolve_data(index, item):
+    "Shared data-update functionality"
+    data = es.get(index, 'item', item)
+    linked_update = update_linked_by_index(index, item, data['_source'])
+    map_update = update_map_by_index(index, item, data['_source'])
+    match_update = update_automatic_item_matches_by_index(index, item, data['_source'])
+    if linked_update or map_update or match_update:
+        data = es.get(index, 'item', item)
+    return data
 
 def get_search_params():
     "Shared search functionality"
@@ -114,11 +120,7 @@ def apisearch():
 def item(index, item):
     "Get information for an item"
     try:
-        document = es.get(index, 'item', item)
-        linked_update = update_linked_by_index(index, item, document['_source'])
-        map_update = update_map_by_index(index, item, document['_source'])
-        if linked_update or map_update:
-            document = es.get(index, 'item', item)
+        document = resolve_data(index, item)
         return Response(json.dumps({'code': 200, 'document': document}), 200, mimetype="application/json");
     except ElasticHttpNotFoundError:
         return Response(json.dumps({'code': 404, 'error': 'The provided item could not be found.'}), 404, mimetype="application/json")

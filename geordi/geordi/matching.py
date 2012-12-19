@@ -18,7 +18,7 @@ from __future__ import division, absolute_import
 from flask import Response, request
 from flask.ext.login import current_user
 from geordi import app, es
-from geordi.mappings import check_data_format
+from geordi.utils import check_data_format
 
 import json
 import uuid

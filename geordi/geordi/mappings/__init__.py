@@ -17,46 +17,31 @@
 from __future__ import division, absolute_import
 
 from geordi import app, es
-from geordi.mappings.wcd import wcd
+from geordi.matching import register_match
+from geordi.utils import check_data_format
 from pyelasticsearch import ElasticHttpNotFoundError
+
+from geordi.mappings.wcd import wcd
 
 class_map = {
     'wcd': wcd()
 }
 
-def map_search_data(data):
-    try:
-        return [map_by_index(result['_index'], result['_source']) for result in data['hits']['hits']]
-    except TypeError:
-        return None
-
-def map_by_index(index, data):
+def get_map_by_index(index, data):
     if index in class_map:
         return class_map[index].map(data)
-    else:
-        return None
 
 def get_link_types_by_index (index):
     if index in class_map:
         return class_map[index].link_types()
 
-def check_data_format(data):
-    "Initialize or correct the special _geordi key in the document"
-    data.setdefault('_geordi', {
-            'mapping': {'version': 0},
-            'links': {'links': [], 'version': 1},
-            'matchings': {'matchings': [], 'auto_matchings': [], 'current_matching': {}, 'version': 3}
-    })
+def get_automatic_item_matches_by_index(index, data):
+    if index in class_map:
+        return class_map[index].automatic_item_matches(data)
 
-    data['_geordi'].setdefault('mapping', {'version': 0})
-    data['_geordi'].setdefault('links', {'links': [], 'version': 1})
-    data['_geordi'].setdefault('matchings', {'matchings': [], 'auto_matchings': [], 'current_matching': {}, 'version': 2})
-
-    if 'auto_matchings' not in data['_geordi']['matchings']:
-        data['_geordi']['matchings']['auto_matchings'] = []
-        data['_geordi']['matchings']['version'] = 2
-
-    return data
+def get_automatic_subitem_matches_by_index(index, data):
+    if index in class_map:
+        return class_map[index].automatic_subitem_matches(data)
 
 def update_map_by_index(index, item, data):
     if index in class_map:
@@ -71,7 +56,7 @@ def update_map_by_index(index, item, data):
         data = check_data_format(data)
 
         currentmapping = data['_geordi']['mapping']
-        mapping = map_by_index(index, data)
+        mapping = get_map_by_index(index, data)
 
         if not currentmapping['version'] == mapping['version']:
             data['_geordi']['mapping'] = mapping
@@ -119,6 +104,28 @@ def update_linked_by_index(index, item, data):
                 return None
         else:
             return False
+
+def update_automatic_item_matches_by_index(index, item, data):
+    if index in class_map:
+        data = check_data_format(data)
+        matches = get_automatic_item_matches_by_index(index, data)
+        fakeip = 'internal, matched by index {}'.format(index)
+        automatches = data['_geordi']['matchings']['auto_matchings']
+        changed = False
+        # Do matches with more linked items first, then supersede with fewer-ID matches
+        for (matchtype, mbids) in sorted(matches.iteritems(), key=lambda x: len(x[1]), reverse=True):
+            if (fakeip not in [match.get('ip') for match in automatches] or
+                ",".join(sorted(mbids)) not in [",".join(sorted(match.get('mbid', []))) for match in automatches]):
+                register_match(index, item, 'item', matchtype, mbids, auto=True, user='matched by index', ip=fakeip)
+                changed = True
+            else: continue
+        return changed
+
+def map_search_data(data):
+    try:
+        return [get_map_by_index(result['_index'], result['_source']) for result in data['hits']['hits']]
+    except TypeError:
+        return None
 
 def get_mapoptions(mapping):
     options = {'mediums': False, 'totaltracks': False, 'acoustid': False}
