@@ -101,3 +101,11 @@ table td, table th {
     float: right;
     margin-top: 1em;
 }
+
+.item-linker img, .subitem-linker img {
+    border-bottom: 1px dotted transparent;
+}
+
+.item-linker:hover img, .subitem-linker:hover img {
+    border-bottom: 1px dotted #444;
+}

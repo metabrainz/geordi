@@ -21,6 +21,7 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
         <td>{% for artist in mapping.release.artist -%}
               {%- if artist.subitem -%}
               <a class="subitem-opener" data-subitem="{{artist.subitem}}" href="#li-subitem-{{artist.subitem}}">{{artist.name}}</a>
+              {{ link_opener('subitem', artist.subitem) }}
               {%- else -%}{{artist.name}}{%- endif -%}
               {% if loop.revindex > 2 %}, {% elif loop.revindex == 2 %} and {% endif -%}
             {%- endfor %}{% if mapping.release.artist | length > 1 %} <small>({{mapping.release.artist | length}} artists)</small>{% endif -%}
@@ -66,6 +67,7 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
   <td>{% for artist in track.artist -%}
               {%- if artist.subitem -%}
               <a class="subitem-opener" data-subitem="{{artist.subitem}}" href="#li-subitem-{{artist.subitem}}">{{artist.name}}</a>
+              {{ link_opener('subitem', artist.subitem) }}
               {%- else -%}{{artist.name}}{%- endif -%}
               {% if loop.revindex > 2 %}, {% elif loop.revindex == 2 %} and {% endif -%}
             {%- endfor %}{% if track.artist | length > 1 %} <small>({{track.artist | length}} artists)</small>{% endif -%}
@@ -76,7 +78,7 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
     {%- for acoustid in track.acoustid %}<a href="https://acoustid.org/track/{{ acoustid }}">{{ acoustid[:4] }}…{{ acoustid[-4:]}}</a>{% if not loop.last %}<br />{% endif %}{% endfor -%}
   </td>
   {%- endif -%}
-  <td>{% if track.subitem %} <small>(<a class="subitem-opener" data-subitem="{{ track.subitem }}" href="#li-subitem-{{ track.subitem }}">subitem</a>)</small>{% endif %}</td>
+  <td>{% if track.subitem %} <small>(<a class="subitem-opener" data-subitem="{{ track.subitem }}" href="#li-subitem-{{ track.subitem }}">subitem</a>) {{ link_opener('subitem', track.subitem) }}</small>{% endif %}</td>
 </tr>
 {%- endfor -%}
 </tbody></table>
@@ -87,7 +89,7 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
 <dl class="clearfix">
 <dt>Whole Item</dt>
 <dd>{{ current_match_span(data, 'item') }}
-    {{ linker_content('item-linker-content', 'item-linker-content', 'Link Item', none, 'item', data._id, data._index, data) }}
+    {{ linker_content('item-linker-content', 'item-linker-content', 'Match Item', none, 'item', data._id, data._index, data) }}
 </dd>
 {%- for (link_type_id, link_type) in g.link_types[data._index].iteritems() if not link_type_id == 'version' -%}
 <dt>{{ link_type.name }}</dt>
@@ -97,7 +99,7 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
   {%- set subitem_id = link_id | string + '-' + link[link_type.key] | string -%}
   <li style="clear:both" class="expander block-expander closed" id="li-subitem-{{ subitem_id }}"><span class="clicker"><code>[{{ link[link_type.key] }}]</code></span>
     {{ current_match_span(subitems[subitem_id], 'subitem', subitem_id) }}
-    {{ linker_content('subitem-linker-content', 'subitem-linker-content-' + subitem_id | string, 'Link subitem ' + subitem_id | string, link, 'subitem', subitem_id, data._index, subitems[subitem_id]) }}
+    {{ linker_content('subitem-linker-content', 'subitem-linker-content-' + subitem_id | string, 'Match ' + subitem_id | string, link, 'subitem', subitem_id, data._index, subitems[subitem_id]) }}
     <div class="li collapse">
     {{ json_pp(link, g.dictarray) }}
     </div>
@@ -121,16 +123,17 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
 {%- endmacro -%}
 
 {%- macro current_match_span(data, linker_type, id) -%}
-<span class="current-match">
-    {%- if data and data._source._geordi and data._source._geordi.matchings.current_matching %}
-      {%- set current_matching = data._source._geordi.matchings.current_matching -%}
+{%- if data and data._source._geordi and data._source._geordi.matchings.current_matching %}
+{%- set current_matching = data._source._geordi.matchings.current_matching -%}
+{%- endif %}
+<span class="current-match{% if current_matching and current_matching.auto %} auto{% endif %}">
+    {%- if current_matching %}
       {{ match_span(current_matching) }}
-    {%- endif -%}
-    <a class="{{ linker_type }}-linker" {% if id %}data-{{linker_type}}="{{id}}" {% endif %}href="#">
-      ({% if data and data._source._geordi and data._source._geordi.matchings.current_matching %}re{% endif %}link)
-    </a>
+    {%- endif %}
+    {{ link_opener(linker_type, id, data) }}
 </span>
 {%- endmacro -%}
+
 {%- macro match_span(matching, show_timestamp) -%}
   &lt;{{ matching.type }}
   {% for mbid in matching.mbid %}<a href="https://musicbrainz.org/{{ matching.type }}/{{ mbid }}">{{ mbid[:4] }}…{{ mbid[-4:] }}</a>{% if not loop.last %}, {% endif %}{% endfor %}
@@ -142,6 +145,10 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
    {%- if show_timestamp %}
      {{ matching.timestamp }}
    {%- endif -%}&gt;
+{%- endmacro -%}
+
+{%- macro link_opener(linker_type, id, data) -%}
+    <a class="{{ linker_type }}-linker" {% if id %}data-{{linker_type}}="{{id}}" {% endif %}href="#"><img src="/static/images/link.png" alt="{% if data and data._source._geordi and data._source._geordi.matchings.current_matching %}re{% endif %}link" /></a>
 {%- endmacro -%}
 
 {%- macro linker_content(class, id, title, json, type, item, index, matches_json) -%}
