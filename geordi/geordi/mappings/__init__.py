@@ -112,8 +112,9 @@ def update_automatic_item_matches_by_index(index, item, data):
         fakeip = 'internal, matched by index {}'.format(index)
         automatches = data['_geordi']['matchings']['auto_matchings']
         changed = False
+        order = ['work', 'recording', 'label', 'artist', 'release', 'release_group']
         # Do matches with more linked items first, then supersede with fewer-ID matches
-        for (matchtype, mbids) in sorted(matches.iteritems(), key=lambda x: len(x[1]), reverse=True):
+        for (matchtype, mbids) in sorted(matches.iteritems(), key=lambda x: (len(x[1]), order.index(x[0]) if x[0] in order else 999), reverse=True):
             if (fakeip not in [match.get('ip') for match in automatches] or
                 ",".join(sorted(mbids)) not in [",".join(sorted(match.get('mbid', []))) for match in automatches]):
                 register_match(index, item, 'item', matchtype, mbids, auto=True, user='matched by index', ip=fakeip)
