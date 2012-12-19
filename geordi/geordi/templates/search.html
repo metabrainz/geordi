@@ -33,18 +33,14 @@ We found {{ data.hits.total }} results; starting at {{ start_from }}.
 {% for result in data.hits.hits %}
 <li style="clear: left" class="result">
   <span>
-  {% if mapping[loop.index0] %}
-     {% if mapping[loop.index0].release %}
+     {% if mapping[loop.index0] and mapping[loop.index0].release -%}
      <big>{{ mapping[loop.index0].release.title[0] }}
        {%- if mapping[loop.index0].release.combined_artist %} by {{ mapping[loop.index0].release.combined_artist }}{% endif %}
        {%- if mapping[loop.index0].release.date | length > 0 %} ({{ mapping[loop.index0].release.date[0]}}){% endif %}
        {%- if mapping[loop.index0].release.tracks | length > 0 %} ({{ mapping[loop.index0].release.tracks | length }} tracks){% endif %}
      </big>
-     {% endif %}
+     {% endif -%}
      <small>(<a href="/{{ result._index}}/{{ result._id }}">{{ result._index }}/{{ result._id }}</a>) ({{ result._score }})</small>
-  {% else %}
-     <big>{{ result._id }} ({{ result._index }}) <a href="/{{ result._index}}/{{ result._id }}">[info]</a></big> <small>({{ result._score }})</small>
-  {% endif %}
   </span>
 </li>
 {% endfor %}
