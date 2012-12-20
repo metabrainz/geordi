@@ -145,7 +145,7 @@ class wcd():
 
     def map(self, data):
         target = base_mapping()
-        target['version'] = 2
+        target['version'] = 3
         release = target['release']
 
         # Release Title
@@ -177,7 +177,7 @@ class wcd():
 
         try:
             if data['what_cd_json']['response']['group']['recordLabel']:
-                release['label'] = [data['what_cd_json']['response']['group']['recordLabel']]
+                release['label'] = [{'name': data['what_cd_json']['response']['group']['recordLabel']}]
         except: pass
 
         try:

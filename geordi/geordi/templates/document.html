@@ -30,7 +30,12 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
     <tr><th>Date{% if mapping.release.date | length > 1 %} (alternate){% endif %}:</th><td>{{ date }}</td></tr>
     {%- endfor %}
     {% for label in mapping.release.label -%}
-    <tr><th>Label:</th><td>{{ label }}</td></tr>
+    <tr><th>Label:</th>
+        <td>{%- if label.subitem -%}
+              <a class="subitem-opener" data-subitem="{{label.subitem}}" href="#li-subitem-{{label.subitem}}">{{label.name}}</a>
+              {{ link_opener('subitem', label.subitem, subitems[label.subitem]) }}
+              {%- else -%}{{label.name}}{%- endif -%}
+    </td></tr>
     {%- endfor %}
     {% for catalog_number in mapping.release.catalog_number -%}
     <tr><th>Catalog Number:</th><td>{{ catalog_number }}</td></tr>
