@@ -18,7 +18,7 @@ from __future__ import division, absolute_import
 from flask import render_template, request, redirect, url_for, flash, Response, g
 from flask.ext.login import login_required, login_user, logout_user, current_user
 from geordi import app, login_manager, User, es
-from geordi.search import do_search, do_search_raw, do_subitem_search
+from geordi.search import do_search, do_search_raw, do_subitem_search, make_filters
 from geordi.matching import register_match
 from geordi.mappings import map_search_data, update_map_by_index, update_linked_by_index, get_link_types_by_index, update_automatic_item_matches_by_index, update_automatic_subitem_matches_by_index, get_mapoptions
 from geordi.mappings.util import comma_list, comma_only_list
@@ -79,14 +79,17 @@ def get_search_params():
     start_from = request.args.get('from', "0")
     query = request.args.get('query')
     indices = request.args.getlist('index')
+
+    filters = make_filters(human=request.args.get('human', False), auto=request.args.get('auto', False), un=request.args.get('un', False))
+
     if search_type == 'raw':
         try:
-            data = do_search_raw(json.loads(query), indices, start_from=request.args.get('from', None))
+            data = do_search_raw(json.loads(query), indices, start_from=request.args.get('from', None), filters=filters)
         except ValueError:
             return {'error': "Malformed or missing JSON."}
     elif search_type == 'item':
         if query:
-            data = do_search(query, indices, start_from=request.args.get('from', None))
+            data = do_search(query, indices, start_from=request.args.get('from', None), filters=filters)
         else:
             return {'error': 'You must provide a query.'}
     elif search_type == 'subitem':
@@ -94,7 +97,7 @@ def get_search_params():
         subtype = request.args.get('subitem_type')
         if subtype not in get_link_types_by_index(index).keys():
             return {'error': 'Invalid subitem type for index {}'.format(index)}
-        data = do_subitem_search(query, index, subtype, start_from=request.args.get('from', None))
+        data = do_subitem_search(query, index, subtype, start_from=request.args.get('from', None), filters=filters)
     else:
         return {'error': 'Search type {} unimplemented.'.format(search_type)}
 
