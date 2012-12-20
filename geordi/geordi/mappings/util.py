@@ -52,6 +52,8 @@ def base_mapping():
             'title': [],
             'date': [],
             'artist': [],
+            'label': [],
+            'catalog_number': [],
             'combined_artist': '',
             'tracks': []
         }

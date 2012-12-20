@@ -145,7 +145,7 @@ class wcd():
 
     def map(self, data):
         target = base_mapping()
-        target['version'] = 1
+        target['version'] = 2
         release = target['release']
 
         # Release Title
@@ -174,6 +174,16 @@ class wcd():
             except KeyError:
                 release['artist'] = [{'name': name} for name in collect_text(data['meta_xml']['metadata']['creator'])]
         release['combined_artist'] = comma_list([artist['name'] for artist in release['artist']])
+
+        try:
+            if data['what_cd_json']['response']['group']['recordLabel']:
+                release['label'] = [data['what_cd_json']['response']['group']['recordLabel']]
+        except: pass
+
+        try:
+            if data['what_cd_json']['response']['group']['catalogueNumber']:
+                release['catalog_number'] = [data['what_cd_json']['response']['group']['catalogueNumber']]
+        except: pass
 
         # Tracks
         links = self.extract_linked(data)

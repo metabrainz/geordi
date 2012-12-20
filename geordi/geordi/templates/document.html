@@ -29,6 +29,12 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
     {% for date in mapping.release.date -%}
     <tr><th>Date{% if mapping.release.date | length > 1 %} (alternate){% endif %}:</th><td>{{ date }}</td></tr>
     {%- endfor %}
+    {% for label in mapping.release.label -%}
+    <tr><th>Label:</th><td>{{ label }}</td></tr>
+    {%- endfor %}
+    {% for catalog_number in mapping.release.catalog_number -%}
+    <tr><th>Catalog Number:</th><td>{{ catalog_number }}</td></tr>
+    {%- endfor %}
     <tr><th>Tracks:</th><td>{{ mapping.release.tracks | length }}</td></tr>
 </tbody></table>
 <h3>Tracklist</h3>
