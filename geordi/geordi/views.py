@@ -20,7 +20,7 @@ from flask.ext.login import login_required, login_user, logout_user, current_use
 from geordi import app, login_manager, User, es
 from geordi.search import do_search, do_search_raw, do_subitem_search, make_filters
 from geordi.matching import register_match
-from geordi.mappings import map_search_data, update_map_by_index, update_linked_by_index, get_link_types_by_index, update_automatic_item_matches_by_index, update_automatic_subitem_matches_by_index, get_mapoptions
+from geordi.mappings import map_search_data, update_map_by_index, update_linked_by_index, get_link_types_by_index, update_automatic_item_matches_by_index, update_automatic_subitem_matches_by_index, get_mapoptions, get_code_url_by_index
 from geordi.mappings.util import comma_list, comma_only_list
 from geordi.utils import check_data_format
 
@@ -54,12 +54,13 @@ def document(index, item):
         mapoptions = get_mapoptions(data['_source']['_geordi']['mapping'])
         subitems = {}
         link_types = get_link_types_by_index(index)
+        code_url = get_code_url_by_index(index)
         for (link_type, links) in data['_source']['_geordi']['links']['links'].iteritems():
             if link_type != 'version':
                 for link in links:
                     subitem = "{}-{}".format(link_type, link[link_types[link_type]['key']])
                     subitems[subitem] = get_subitem(index, subitem, create=True, seed=copy.deepcopy(link))
-        return render_template('document.html', item=item, index=index, data = data, mapping = data['_source']['_geordi']['mapping'], mapoptions = mapoptions, subitems=subitems)
+        return render_template('document.html', item=item, index=index, data = data, mapping = data['_source']['_geordi']['mapping'], mapoptions = mapoptions, subitems=subitems, code_url=code_url)
     except ElasticHttpNotFoundError:
         return render_template('notfound.html')
 

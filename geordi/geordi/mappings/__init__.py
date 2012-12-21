@@ -31,6 +31,10 @@ def get_map_by_index(index, data):
     if index in class_map:
         return class_map[index].map(data)
 
+def get_code_url_by_index(index):
+    if index in class_map:
+        return class_map[index].code_url()
+
 def get_link_types_by_index (index):
     if index in class_map:
         return class_map[index].link_types()

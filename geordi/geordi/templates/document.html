@@ -12,6 +12,7 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
 {% if mapping %}
 {{ section_links('mapping') }}
 <h2 id="mapping">Extracted Information</h2>
+<p>This mapping was generated using version <code>{{ mapping.version }}</code> of the <code>{{ data._index }}</code> mapping. For further details, or to make suggestions, please see <a href="{{code_url}}">the mapping code</a>.</p>
 <h3>Summary</h3>
 <table class="zebra"><tbody>
     {% for title in mapping.release.title -%}

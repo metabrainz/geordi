@@ -26,6 +26,9 @@ class wcd():
                 'file': {'name':"file sha1", 'key': 'sha1'},
                 'version': 1}
 
+    def code_url(self):
+        return "https://github.com/metabrainz/geordi/blob/master/geordi/geordi/mappings/wcd.py"
+
     def extract_linked(self, data):
         all_artists = []
         files = []
