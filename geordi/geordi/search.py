@@ -20,11 +20,11 @@ from geordi.mappings import get_link_types_by_index
 
 from pyelasticsearch import ElasticHttpNotFoundError
 
-def do_search(query_string, indices, start_from=None, filters=None):
+def do_search(query_string, indices, start_from=None, filters=None, doc_type='item'):
     query = {'query':
                {"query_string": {"query": query_string}}
             }
-    return do_search_raw(query, indices, start_from, filters)
+    return do_search_raw(query, indices, start_from, filters, doc_type)
 
 def do_subitem_search(query_string, index, subtype, start_from=None, filters=None):
     link_types = get_link_types_by_index(index)
@@ -34,16 +34,16 @@ def do_subitem_search(query_string, index, subtype, start_from=None, filters=Non
                   {'_geordi.links.links.{subtype}.{key}'.format(subtype=subtype, key=key): query_string}
               }
             }
-    return do_search_raw(query, [index], start_from, filters)
+    return do_search_raw(query, [index], start_from, filters, 'item')
 
-def do_search_raw(query, indices, start_from=None, filters=None):
+def do_search_raw(query, indices, start_from=None, filters=None, doc_type='item'):
     if indices in [[], ['']]:
         indices = app.config['AVAILABLE_INDICES']
     if start_from:
         query['from'] = start_from
     if filters:
         query['filter'] = filters
-    return es.search(query, index = indices, doc_type = "item")
+    return es.search(query, index = indices, doc_type = doc_type)
 
 def make_filters(human=False, auto=False, un=False):
     if human and auto and un:

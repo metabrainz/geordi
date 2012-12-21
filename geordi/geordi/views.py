@@ -79,6 +79,7 @@ def get_search_params():
     start_from = request.args.get('from', "0")
     query = request.args.get('query')
     indices = request.args.getlist('index')
+    itemtype = 'item'
 
     filters = make_filters(human=request.args.get('human', False), auto=request.args.get('auto', False), un=request.args.get('un', False))
 
@@ -92,16 +93,32 @@ def get_search_params():
             data = do_search(query, indices, start_from=request.args.get('from', None), filters=filters)
         else:
             return {'error': 'You must provide a query.'}
-    elif search_type == 'subitem':
+    elif search_type == 'sub':
         index = request.args.get('subitem_index')
         subtype = request.args.get('subitem_type')
         if subtype not in get_link_types_by_index(index).keys():
             return {'error': 'Invalid subitem type for index {}'.format(index)}
         data = do_subitem_search(query, index, subtype, start_from=request.args.get('from', None), filters=filters)
+    elif search_type == 'subitem':
+        if query:
+            data = do_search(query, indices, start_from=request.args.get('from', None), filters=filters, doc_type='subitem')
+            itemtype = 'subitem'
+        else:
+            return {'error': 'You must provide a query.'}
+    elif search_type == 'raw-subitem':
+        try:
+            data = do_search_raw(json.loads(query), indices, start_from=request.args.get('from', None), filters=filters, doc_type='subitem')
+            itemtype = 'subitem'
+        except ValueError:
+            return {'error': "Malformed or missing JSON."}
     else:
         return {'error': 'Search type {} unimplemented.'.format(search_type)}
 
-    mapping = map_search_data(data)
+    if itemtype == 'item':
+        mapping = map_search_data(data)
+    elif itemtype == 'subitem':
+        mapping = [re.split('-', item['_id'], maxsplit=0) for item in data['hits']['hits']]
+
     return {"start_from": start_from, "query": query, "mapping": mapping, "data": data}
 
 @app.route('/')
