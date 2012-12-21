@@ -19,9 +19,11 @@ We found {{ data.hits.total }} results; starting at {{ start_from }}.
   <a href="{{ build_search_url(0) }}">[&laquo;]</a>
   <a href="{{ build_search_url(start_from | int - 10) }}">[&lsaquo;]</a>
 {%- endif -%}
-{%- for page_start in range(0, data.hits.total, 10) -%}
+{%- if start_from | int < 100 -%}{% set start_page = 0 %}{%- else -%}{% set start_page = start_from | int - 100 %}{%- endif -%}
+{%- if data.hits.total | int > (start_from | int + 100) -%}{% set end_page = start_from | int + 100 %}{%- else -%}{% set end_page = data.hits.total %}{%- endif -%}
+{%- for page_start in range(start_page, end_page, 10) -%}
   {%- if start_from | int == page_start -%}<b>{%- else -%}<a href="{{ build_search_url(page_start) }}">{%- endif -%}
-  [{{ loop.index }}]
+  [{{ page_start // 10 + 1 }}]
   {%- if start_from | int == page_start -%}</b>{%- else -%}</a>{%- endif -%}
 {%- endfor -%}
 {%- if data.hits.total > start_from | int + 10 -%}
@@ -34,17 +36,16 @@ We found {{ data.hits.total }} results; starting at {{ start_from }}.
 <li style="clear: left" class="result">
   <span>
      {% if result._type == 'item' -%}
-     {%- if mapping[loop.index0] and mapping[loop.index0].release -%}
-     <big>{{ mapping[loop.index0].release.title[0] }}
-       {%- if mapping[loop.index0].release.combined_artist %} by {{ mapping[loop.index0].release.combined_artist }}{% endif %}
-       {%- if mapping[loop.index0].release.date | length > 0 %} ({{ mapping[loop.index0].release.date[0]}}){% endif %}
-       {%- if mapping[loop.index0].release.tracks | length > 0 %} ({{ mapping[loop.index0].release.tracks | length }} tracks){% endif %}
-     </big>
-     {% endif -%}
-     <small>(<a href="/{{ result._index}}/{{ result._id }}">{{ result._index }}/{{ result._id }}</a>) ({{ result._score }})</small>
+       {%- if mapping[loop.index0] and mapping[loop.index0].release -%}
+         <big>{{ mapping[loop.index0].release.title[0] }}
+           {%- if mapping[loop.index0].release.combined_artist %} by {{ mapping[loop.index0].release.combined_artist }}{% endif %}
+           {%- if mapping[loop.index0].release.date | length > 0 %} ({{ mapping[loop.index0].release.date[0]}}){% endif %}
+           {%- if mapping[loop.index0].release.tracks | length > 0 %} ({{ mapping[loop.index0].release.tracks | length }} tracks){% endif %}
+         </big>
+       {% endif -%}
+       <small>(<a href="/{{ result._index}}/{{ result._id }}">{{ result._index }}/{{ result._id }}</a>) ({{ result._score }})</small>
      {%- elif result._type == 'subitem' -%}
-     <!-- {{ mapping[loop.index0] }} -->
-     <small>(<a href="/?type=sub&subitem_index={{result._index}}&subitem_type={{mapping[loop.index0][0]}}&query={{mapping[loop.index0][1]}}">{{ result._index }}/{{ result._id }}</a>) ({{ result._score }})</small>
+       <small>(<a href="/?type=sub&subitem_index={{result._index}}&subitem_type={{mapping[loop.index0][0]}}&query={{mapping[loop.index0][1]}}">{{ result._index }}/{{ result._id }}</a>) ({{ result._score }})</small>
      {%- endif -%}
   </span>
 </li>
