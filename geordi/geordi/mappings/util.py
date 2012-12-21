@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import division, absolute_import
+from __future__ import division, absolute_import, unicode_literals
 
 import re
 
@@ -24,7 +24,7 @@ def comma_list(lst):
     elif len(lst) == 1:
         return lst[0]
     else:
-        return ", ".join(lst[:-1]) + " and " + lst[-1]
+        return ", ".join([unicode(i) for i in lst[:-1]]) + " and " + unicode(lst[-1])
 
 def comma_only_list(lst):
     return ", ".join(lst)
