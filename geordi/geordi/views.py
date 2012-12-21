@@ -174,7 +174,29 @@ def matchitem(index, item):
 
 def get_subitem(index, subitem, create=False, seed={}):
     try:
-        return es.get(index, 'subitem', subitem)
+        document = es.get(index, 'subitem', subitem)
+        if seed == {}:
+            return document
+        else:
+            data = document['_source']
+            data = check_data_format(data)
+            changed = False
+            for key in seed.keys():
+                if key not in data:
+                    data[key] = seed[key]
+                    changed = True
+                elif key in data:
+                    try:
+                        if seed[key] not in data[key]:
+                            data[key].append(seed[key])
+                            changed = True
+                    except TypeError:
+                        data[key] = [data[key], seed[key]]
+                        changed = True
+            if changed:
+                es.index(index, 'subitem', data, id=subitem)
+                document = es.get(index, 'subitem', subitem)
+            return document
     except ElasticHttpNotFoundError:
         if create:
             data = check_data_format(seed)
