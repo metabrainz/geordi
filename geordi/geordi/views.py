@@ -28,6 +28,7 @@ import json
 import uuid
 import urllib2
 import re
+import copy
 from datetime import datetime
 
 from pyelasticsearch import ElasticHttpNotFoundError
@@ -57,7 +58,7 @@ def document(index, item):
             if link_type != 'version':
                 for link in links:
                     subitem = "{}-{}".format(link_type, link[link_types[link_type]['key']])
-                    subitems[subitem] = get_subitem(index, subitem, create=True)
+                    subitems[subitem] = get_subitem(index, subitem, create=True, seed=copy.deepcopy(link))
         return render_template('document.html', item=item, index=index, data = data, mapping = data['_source']['_geordi']['mapping'], mapoptions = mapoptions, subitems=subitems)
     except ElasticHttpNotFoundError:
         return render_template('notfound.html')
@@ -149,7 +150,7 @@ def item(index, item):
                 if link_type != 'version':
                     for link in links:
                         subitem = "{}-{}".format(link_type, link[link_types[link_type]['key']])
-                        get_subitem(index, subitem, create=True)
+                        get_subitem(index, subitem, create=True, seed=copy.deepcopy(link))
         return Response(json.dumps({'code': 200, 'document': document}), 200, mimetype="application/json");
     except ElasticHttpNotFoundError:
         return Response(json.dumps({'code': 404, 'error': 'The provided item could not be found.'}), 404, mimetype="application/json")
@@ -171,12 +172,12 @@ def matchitem(index, item):
         mbids = re.split(',\s*', request.args.get('mbids'))
     return register_match(index, item, 'item', matchtype, mbids, auto, user)
 
-def get_subitem(index, subitem, create=False):
+def get_subitem(index, subitem, create=False, seed={}):
     try:
         return es.get(index, 'subitem', subitem)
     except ElasticHttpNotFoundError:
         if create:
-            data = check_data_format({})
+            data = check_data_format(seed)
             es.index(index, 'subitem', data, id=subitem)
         return None
 
