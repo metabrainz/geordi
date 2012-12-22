@@ -188,9 +188,9 @@ def get_subitem(index, subitem, create=False, seed={}):
                     changed = True
                 elif key in data:
                     try:
-                        data[key] = list(set(data[key]))
                         if unicode(seed[key]) not in [unicode(i) for i in data[key]]:
                             data[key].append(seed[key])
+                        data[key] = list(set(data[key]))
                         changed = True
                     except (AttributeError, TypeError):
                         data[key] = [data[key], seed[key]]
