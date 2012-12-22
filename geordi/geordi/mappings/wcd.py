@@ -156,7 +156,9 @@ class wcd():
             title_candidates = collect_text(data['meta_xml']['metadata']['album'])
         except KeyError:
             title_candidates = []
-        title_candidates.append(re.split(' / ', data['meta_xml']['metadata']['title']['text'], maxsplit=1)[0])
+        try:
+            title_candidates.append(re.split(' / ', data['meta_xml']['metadata']['title']['text'], maxsplit=1)[0])
+        except TypeError: pass
         seen = []
         release['title'] = [c for c in title_candidates if not (c in seen or seen.append(c))]
 
