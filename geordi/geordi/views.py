@@ -204,9 +204,6 @@ def get_subitem(index, subitem, create=False, seed={}):
                     except (AttributeError, TypeError):
                         data[key] = list(flatten([data[key], seed[key]]))
                         changed = True
-                    try:
-                        data[key] = [i for i in data[key] if len(i) > 1]
-                    except: pass
                     if isinstance(data[key], collections.Iterable) and not isinstance(data[key], basestring):
                         data[key] = list(set(flatten(data[key])))
             if changed:
