@@ -146,19 +146,6 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
 </span>
 {%- endmacro -%}
 
-{%- macro match_span(matching, show_timestamp) -%}
-  &lt;{{ matching.type }}
-  {% for mbid in matching.mbid %}<a href="https://musicbrainz.org/{{ matching.type }}/{{ mbid }}">{{ mbid[:4] }}…{{ mbid[-4:] }}</a>{% if not loop.last %}, {% endif %}{% endfor %}
-  [{% if not matching.auto -%}
-     <a href="https://musicbrainz.org/user/{{ matching.user }}">{{ matching.user }}</a>
-   {%- else -%}
-     <span title="{{ matching.ip }}">{{ matching.user }}</span>
-   {%- endif %}]
-   {%- if show_timestamp %}
-     {{ matching.timestamp }}
-   {%- endif -%}&gt;
-{%- endmacro -%}
-
 {%- macro link_opener(linker_type, id, data, verbose) -%}
 <a class="{{ linker_type }}-linker{% if verbose %} verbose{% endif %}" {% if id %}data-{{linker_type}}="{{id}}" {% endif %}href="#">
   {%- if verbose %}<small>{% if data and data._source._geordi and data._source._geordi.matchings.current_matching %}re{% endif %}link</small> {% endif -%}

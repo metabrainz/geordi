@@ -43,13 +43,20 @@ We found {{ data.hits.total }} results; starting at {{ start_from }}.
            {%- if mapping[loop.index0].release.tracks | length > 0 %} ({{ mapping[loop.index0].release.tracks | length }} tracks){% endif %}
          </big>
        {% endif -%}
-       <small>(<a href="/{{ result._index}}/{{ result._id }}">{{ result._index }}/{{ result._id }}</a>) ({{ result._score }})</small>
+       <small>(<a href="/{{ result._index}}/{{ result._id }}">{{ result._index }}/{{ result._id }}</a>)</small>
      {%- elif result._type == 'subitem' -%}
-     <small>{%- for (k, v) in result._source.iteritems() if k != '_geordi' -%}
-              {{k}}: {% if v is iterable and v is not string %}{{ g.comma_list(v) }}{% else %}{{v}}{% endif %}{% if not loop.last %}; {% endif %}{%endfor%}
-              (<a href="/?type=sub&subitem_index={{result._index}}&subitem_type={{mapping[loop.index0][0]}}&query={{mapping[loop.index0][1]}}">{{ result._index }}/{{ result._id }}</a>) ({{ result._score }})
-      </small>
+       <small>
+         {%- for (k, v) in result._source.iteritems() if k != '_geordi' -%}
+               {{k}}: {% if v is iterable and v is not string %}{{ g.comma_list(v) }}{% else %}{{v}}{% endif %}{% if not loop.last %}; {% endif %}
+         {%- endfor %}
+       </small>
+       <small>(<a href="/?type=sub&subitem_index={{result._index}}&subitem_type={{mapping[loop.index0][0]}}&query={{mapping[loop.index0][1]}}">{{ result._index }}/{{ result._id }}</a>)</small>
      {%- endif -%}
+
+     {%- if result._source._geordi and result._source._geordi.matchings.current_matching %}
+       <small>{{ match_span(result._source._geordi.matchings.current_matching, true) }}</small>
+     {%- endif %}
+     <small>({{ result._score }})</small>
   </span>
 </li>
 {% endfor %}
