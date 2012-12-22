@@ -29,6 +29,7 @@ import uuid
 import urllib2
 import re
 import copy
+import collections
 from datetime import datetime
 
 from pyelasticsearch import ElasticHttpNotFoundError
@@ -173,6 +174,14 @@ def matchitem(index, item):
         mbids = re.split(',\s*', request.args.get('mbids'))
     return register_match(index, item, 'item', matchtype, mbids, auto, user)
 
+def flatten(l):
+    for el in l:
+        if isinstance(el, collections.Iterable) and not isinstance(el, basestring):
+            for sub in flatten(el):
+                yield sub
+        else:
+            yield el
+
 def get_subitem(index, subitem, create=False, seed={}):
     try:
         document = es.get(index, 'subitem', subitem)
@@ -187,14 +196,18 @@ def get_subitem(index, subitem, create=False, seed={}):
                     data[key] = seed[key]
                     changed = True
                 elif key in data:
+                    changed = True
                     try:
                         if unicode(seed[key]) not in [unicode(i) for i in data[key]]:
                             data[key].append(seed[key])
-                        data[key] = [i for i in data[key] if len(i) > 1]
                         changed = True
                     except (AttributeError, TypeError):
-                        data[key] = [data[key], seed[key]]
+                        data[key] = list(flatten([data[key], seed[key]]))
                         changed = True
+                    try:
+                        data[key] = [i for i in data[key] if len(i) > 1]
+                    except: pass
+                    data[key] = list(flatten(list(set(data[key]))))
             if changed:
                 es.index(index, 'subitem', data, id=subitem)
                 document = es.get(index, 'subitem', subitem)
