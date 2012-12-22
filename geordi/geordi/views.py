@@ -207,7 +207,8 @@ def get_subitem(index, subitem, create=False, seed={}):
                     try:
                         data[key] = [i for i in data[key] if len(i) > 1]
                     except: pass
-                    data[key] = list(flatten(list(set(data[key]))))
+                    if isinstance(data[key], collections.Iterable) and not isinstance(data[key], basestring):
+                        data[key] = list(set(flatten(data[key])))
             if changed:
                 es.index(index, 'subitem', data, id=subitem)
                 document = es.get(index, 'subitem', subitem)
