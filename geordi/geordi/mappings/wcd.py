@@ -34,13 +34,13 @@ class wcd():
         files = []
         if 'what_cd_json' in data:
             try:
-                main_artists = [self._extract_artist(artist) for artist in data['what_cd_json']['response']['group']['musicInfo']['artists']]
-                extra_artists = [self._extract_artist(artist) for artist in data['what_cd_json']['response']['group']['musicInfo']['with']]
-                remixers = [self._extract_artist(artist) for artist in data['what_cd_json']['response']['group']['musicInfo']['remixedBy']]
-                producers = [self._extract_artist(artist) for artist in data['what_cd_json']['response']['group']['musicInfo']['producer']]
-                composers = [self._extract_artist(artist) for artist in data['what_cd_json']['response']['group']['musicInfo']['composers']]
-                conductors = [self._extract_artist(artist) for artist in data['what_cd_json']['response']['group']['musicInfo']['conductor']]
-                djs = [self._extract_artist(artist) for artist in data['what_cd_json']['response']['group']['musicInfo']['dj']]
+                main_artists = [self._extract_artist(artist, 'artist') for artist in data['what_cd_json']['response']['group']['musicInfo']['artists']]
+                extra_artists = [self._extract_artist(artist, 'with') for artist in data['what_cd_json']['response']['group']['musicInfo']['with']]
+                remixers = [self._extract_artist(artist, 'remixer') for artist in data['what_cd_json']['response']['group']['musicInfo']['remixedBy']]
+                producers = [self._extract_artist(artist, 'producer') for artist in data['what_cd_json']['response']['group']['musicInfo']['producer']]
+                composers = [self._extract_artist(artist, 'composer') for artist in data['what_cd_json']['response']['group']['musicInfo']['composers']]
+                conductors = [self._extract_artist(artist, 'conductor') for artist in data['what_cd_json']['response']['group']['musicInfo']['conductor']]
+                djs = [self._extract_artist(artist, 'dj') for artist in data['what_cd_json']['response']['group']['musicInfo']['dj']]
                 seen = []
                 all_artists = [c for c in main_artists if not (c in seen or seen.append(c))]
                 all_artists.extend([c for c in extra_artists if not (c in seen or seen.append(c))])
@@ -54,7 +54,7 @@ class wcd():
             try:
                 files = [self._extract_file(x) for x in self._linkable_files(data)]
             except: pass
-        return {u'artist_id': all_artists, u'file': files, 'version': 1}
+        return {u'artist_id': all_artists, u'file': files, 'version': 2}
 
     def automatic_item_matches(self, data):
         matches = {}
@@ -80,8 +80,8 @@ class wcd():
     def _acceptable_formats(self):
         return ['Flac', '24bit Flac', 'VBR MP3', 'Ogg Vorbis', 'Apple Lossless Audio']
 
-    def _extract_artist(self, artist):
-        return {u'name': unicode(artist['name']), u'wcd_artist_id': int(artist['id'])}
+    def _extract_artist(self, artist, atype):
+        return {u'name': unicode(artist['name']), u'wcd_artist_id': int(artist['id']), u'type': atype}
 
     def _extract_file(self, x):
         f = {
