@@ -65,6 +65,7 @@ li.block-expander.open:hover { background-color: #D1EEEE; }
 }
 
 select#id-index { width: 200px }
+.actions textarea { vertical-align: text-top; }
 
 ul.flashes { list-style-type: none; padding: 0; float: right; }
 ul.flashes li { display: inline-block; background-color: papayawhip; border: 1px solid gray; margin: 2px; padding: 2px; border-radius: 2px;}
