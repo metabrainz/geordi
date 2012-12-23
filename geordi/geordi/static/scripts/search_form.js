@@ -26,6 +26,8 @@ $('#id-type').change(function() {
           var subitem_type = $('#id-subitem_type').val();
           var subitem_key = geordi.link_types[$('#id-subitem_index').val()][subitem_type]['key'];
           var query = '{"query":\n  {"match":\n   {"_geordi.links.links.' + subitem_type + '.' + subitem_key + '": "' + $('#id-query input').val() + '"}\n  }\n}';
+      } else if ($query.attr('data-searchtype') == 'raw-subitem') {
+          var query = $('#id-query').val();
       } else {
           var query = '{"query":\n  {}\n}';
       }
@@ -36,6 +38,8 @@ $('#id-type').change(function() {
       if ($query.attr('data-searchtype') == 'raw') {
           var jsonquery = $.parseJSON($('#id-query').val());
           var query = jsonquery.query.query_string ? jsonquery.query.query_string.query : '';
+      } else if ($query.attr('data-searchtype') == 'subitem') {
+          var query = $('#id-query').val();
       } else {
           var query = ''
       }
@@ -57,6 +61,8 @@ $('#id-type').change(function() {
       if ($query.attr('data-searchtype') == 'raw-subitem') {
           var jsonquery = $.parseJSON($('#id-query').val());
           var query = jsonquery.query.query_string ? jsonquery.query.query_string.query : '';
+      } else if ($query.attr('data-searchtype') == 'item') {
+          var query = $('#id-query').val();
       } else {
           var query = ''
       }
@@ -66,6 +72,8 @@ $('#id-type').change(function() {
     else if ($this.val() == 'raw-subitem') {
       if ($query.attr('data-searchtype') == 'subitem') {
           var query = '{"query":\n  {"query_string": {"query": "' + $('#id-query').val() + '"}}\n}';
+      } else if ($query.attr('data-searchtype') == 'raw') {
+          var query = $('#id-query').val();
       } else {
           var query = '{"query":\n  {}\n}';
       }
