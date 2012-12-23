@@ -16,8 +16,7 @@ We found {{ data.hits.total }} results; starting at {{ start_from }}.
 </p>
 
 {%- if start_from | int > 9 -%}
-  <a href="{{ build_search_url(0) }}">[&laquo;]</a>
-  <a href="{{ build_search_url(start_from | int - 10) }}">[&lsaquo;]</a>
+  <a href="{{ build_search_url(0) }}">[&laquo;]</a><a href="{{ build_search_url(start_from | int - 10) }}">[&lsaquo;]</a>
 {%- endif -%}
 {%- if start_from | int < 100 -%}{% set start_page = 0 %}{%- else -%}{% set start_page = start_from | int - 100 %}{%- endif -%}
 {%- if data.hits.total | int > (start_from | int + 100) -%}{% set end_page = start_from | int + 100 %}{%- else -%}{% set end_page = data.hits.total %}{%- endif -%}
@@ -27,8 +26,7 @@ We found {{ data.hits.total }} results; starting at {{ start_from }}.
   {%- if start_from | int == page_start -%}</b>{%- else -%}</a>{%- endif -%}
 {%- endfor -%}
 {%- if data.hits.total > start_from | int + 10 -%}
-  <a href="{{ build_search_url(start_from | int + 10) }}">[&rsaquo;]</a>
-  <a href="{{ build_search_url((data.hits.total // 10) * 10) }}">[&raquo;]</a>
+  <a href="{{ build_search_url(start_from | int + 10) }}">[&rsaquo;]</a><a href="{{ build_search_url((data.hits.total // 10) * 10) }}">[&raquo;]</a>
 {%- endif -%}
 
 <ul>
