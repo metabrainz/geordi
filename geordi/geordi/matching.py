@@ -39,12 +39,16 @@ def make_match_definition(user, matchtype, mbids, auto=False, ip=False):
 
 def register_match(index, item, itemtype, matchtype, mbids, auto=False, user=None, ip=False):
     if len(mbids) < 1:
-        return Response(json.dumps({'code': 400, 'error': 'You must provide at least one MBID for a match.'}), 400, mimetype="application/json")
+        response = Response(json.dumps({'code': 400, 'error': 'You must provide at least one MBID for a match.'}), 400, mimetype="application/json")
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
     # Check MBID formatting
     try:
         [uuid.UUID('{{{uuid}}}'.format(uuid=mbid)) for mbid in mbids]
     except ValueError:
-        return Response(json.dumps({'code': 400, 'error': 'A provided MBID is ill-formed'}), 400, mimetype="application/json")
+        response = Response(json.dumps({'code': 400, 'error': 'A provided MBID is ill-formed'}), 400, mimetype="application/json")
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
     # Retrieve document (or blank empty document for subitems)
     try:
         document = es.get(index, itemtype, item)
@@ -52,7 +56,9 @@ def register_match(index, item, itemtype, matchtype, mbids, auto=False, user=Non
         version = document['_version']
     except ElasticHttpNotFoundError:
         if itemtype == 'item':
-            return Response(json.dumps({'code': 404, 'error': 'The provided item could not be found.'}), 404, mimetype="application/json")
+            response = Response(json.dumps({'code': 404, 'error': 'The provided item could not be found.'}), 404, mimetype="application/json")
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            return response
         else:
             data = {}
             version = None
@@ -61,7 +67,9 @@ def register_match(index, item, itemtype, matchtype, mbids, auto=False, user=Non
 
     if auto:
         if not user:
-            return Response(json.dumps({'code': 400, 'error': 'Automatic matches must provide a name.'}), 400, mimetype="application/json")
+            response = Response(json.dumps({'code': 400, 'error': 'Automatic matches must provide a name.'}), 400, mimetype="application/json")
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            return response
         if not ip:
             try:
                 ip = request.environ['HTTP_X_FORWARDED_FOR'].split(',')[-1].strip()
@@ -86,6 +94,10 @@ def register_match(index, item, itemtype, matchtype, mbids, auto=False, user=Non
             es.index(index, itemtype, data, id=item, es_version=version)
         else:
             es.index(index, itemtype, data, id=item)
-        return Response(json.dumps({'code': 200}), 200, mimetype="application/json")
+        response = Response(json.dumps({'code': 200}), 200, mimetype="application/json")
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
     except:
-        return Response(json.dumps({'code': 500, 'error': 'An unknown error happened while pushing to elasticsearch.'}), 500, mimetype="application/json")
+        response = Response(json.dumps({'code': 500, 'error': 'An unknown error happened while pushing to elasticsearch.'}), 500, mimetype="application/json")
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response

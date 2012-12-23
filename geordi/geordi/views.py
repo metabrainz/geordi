@@ -138,8 +138,11 @@ def apisearch():
     "Perform a search, returning JSON"
     params = get_search_params()
     if 'error' in params:
-        return Response(json.dumps({'code': 400, 'error': params['error']}), 400, mimetype="application/json")
-    return Response(json.dumps({'code': 200, 'result': params.get('data'), 'mapping': params.get('mapping')}), 200, mimetype="application/json");
+        response = Response(json.dumps({'code': 400, 'error': params['error']}), 400, mimetype="application/json")
+    else:
+        response= Response(json.dumps({'code': 200, 'result': params.get('data'), 'mapping': params.get('mapping')}), 200, mimetype="application/json");
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
 
 @app.route('/api/item/<index>/<item>')
 def item(index, item):
@@ -153,9 +156,11 @@ def item(index, item):
                     for link in links:
                         subitem = "{}-{}".format(link_type, link[link_types[link_type]['key']])
                         get_subitem(index, subitem, create=True, seed=copy.deepcopy(link))
-        return Response(json.dumps({'code': 200, 'document': document}), 200, mimetype="application/json");
+        response = Response(json.dumps({'code': 200, 'document': document}), 200, mimetype="application/json");
     except ElasticHttpNotFoundError:
-        return Response(json.dumps({'code': 404, 'error': 'The provided item could not be found.'}), 404, mimetype="application/json")
+        response =  Response(json.dumps({'code': 404, 'error': 'The provided item could not be found.'}), 404, mimetype="application/json")
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
 
 @app.route('/api/matchitem/<index>/<item>')
 def matchitem(index, item):
@@ -221,9 +226,11 @@ def subitem(index, subitem):
     "Get information for a subitem's matching"
     subitem = get_subitem(index, subitem)
     if subitem:
-        return Response(json.dumps({'code': 200, 'document': subitem}), 200, mimetype="application/json");
+        response = Response(json.dumps({'code': 200, 'document': subitem}), 200, mimetype="application/json");
     else:
-        return Response(json.dumps({'code': 404, 'error': 'The provided item could not be found.'}), 404, mimetype="application/json")
+        response = Response(json.dumps({'code': 404, 'error': 'The provided item could not be found.'}), 404, mimetype="application/json")
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
 
 @app.route('/api/matchsubitem/<index>/<subitem>')
 def matchsubitem(index, subitem):
