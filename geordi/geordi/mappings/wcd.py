@@ -148,7 +148,7 @@ class wcd():
 
     def map(self, data):
         target = base_mapping()
-        target['version'] = 3
+        target['version'] = 4
         release = target['release']
 
         # Release Title
@@ -157,7 +157,11 @@ class wcd():
         except KeyError:
             title_candidates = []
         try:
-            title_candidates.append(re.split(' / ', data['meta_xml']['metadata']['title']['text'], maxsplit=1)[0])
+            title_list = re.split(' / ', data['meta_xml']['metadata']['title']['text'], maxsplit=2)
+            if title_list[0] != 'Various Artists':
+                title_candidates.append(title_list[0])
+            else:
+                title_candidates.append(title_list[1])
         except TypeError: pass
         seen = []
         release['title'] = [c for c in title_candidates if not (c in seen or seen.append(c))]
