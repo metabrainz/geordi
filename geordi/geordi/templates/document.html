@@ -147,9 +147,17 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
 {%- endmacro -%}
 
 {%- macro link_opener(linker_type, id, data, verbose) -%}
-<a class="{{ linker_type }}-linker{% if verbose %} verbose{% endif %}" {% if id %}data-{{linker_type}}="{{id}}" {% endif %}href="#">
-  {%- if verbose %}<small>{% if data and data._source._geordi and data._source._geordi.matchings.current_matching %}re{% endif %}link</small> {% endif -%}
-  <img src="/static/images/link.png" alt="{% if data and data._source._geordi and data._source._geordi.matchings.current_matching %}re{% endif %}link" /></a>
+{%- if data and data._source._geordi and data._source._geordi.matchings.current_matching -%}
+  {%- set matched = true -%}
+  {%- set auto = data._source._geordi.matchings.current_matching.auto -%}
+{%- endif -%}
+<a class="{{ linker_type }}-linker
+          {%- if verbose %} verbose{% endif %}
+          {%- if matched %} matched{% endif %}
+          {%- if auto %} auto{% endif %}"
+      {% if id %}data-{{linker_type}}="{{id}}" {% endif %}href="#">
+      {%- if verbose %}<small>{% if matched %}re{% endif %}link</small> {% endif -%}
+  <img src="/static/images/link.png" alt="{% if matched %}re{% endif %}link" /></a>
 {%- endmacro -%}
 
 {%- macro linker_content(class, id, title, json, type, item, index, matches_json) -%}

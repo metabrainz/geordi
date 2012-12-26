@@ -128,14 +128,14 @@ table td, table th {
 
 .item-linker, .subitem-linker {
     display: inline-block;
+    padding: 0px 2px;
+    border-radius: 2px;
 }
 
 .item-linker.verbose, .subitem-linker.verbose {
     border: 1px solid #444;
-    border-radius: 2px;
     text-decoration: none;
     color: inherit;
-    padding: 0px 2px;
 }
 
 .item-linker img, .subitem-linker img {
@@ -144,4 +144,12 @@ table td, table th {
 
 .item-linker:hover, .subitem-linker:hover {
     border-color: #666;
+}
+
+.item-linker.matched, .subitem-linker.matched {
+    background-color: #4CBB17;
+}
+
+.item-linker.matched.auto, .subitem-linker.matched.auto {
+    background-color: #FFDB58;
 }
