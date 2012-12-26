@@ -89,7 +89,7 @@ def update_linked_by_index(index, item, data):
         same = True
 
         try:
-            if (not currentlinks['version'] == links['version'] or
+            if (currentlinks['version'] != links['version'] or
                 len(links.keys()) != len(currentlinks.keys()) or
                 [len(link[1]) for link in links.iteritems() if link[0] != 'version'] != [len(link[1]) for link in currentlinks.iteritems() if link[0] != 'version']):
                 same = False
