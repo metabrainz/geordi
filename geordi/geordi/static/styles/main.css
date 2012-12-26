@@ -20,7 +20,7 @@
     font-style: normal;
 }
 
-body, input, select { font-family: 'Museo Sans', sans-serif; }
+body, input, select, button { font-family: 'Museo Sans', sans-serif; }
 h1, h2, h3, h4 { font-family: 'Museo Slab', sans-serif; }
 dl { margin: 0px; }
 ul { margin-bottom: 0px; margin-top: 0px; }
@@ -98,6 +98,10 @@ table td, table th {
 
 .match-dd {
     width: 560px;
+}
+
+.unmatch-form {
+    display: inline-block;
 }
 
 .error {

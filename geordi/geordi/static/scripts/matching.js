@@ -28,14 +28,36 @@ $('form.match-form').submit(function (e) {
        context: this
   });
 
-  $(this).next('div').addClass('loading').removeClass('error');
+  $(this).siblings('div.response').addClass('loading').removeClass('error');
 
   promise.done(function() {
-       $(this).next('div').text('Successfully matched. Please refresh the page to see this change.').removeClass('error loading');
+       $(this).siblings('div.response').text('Successfully matched. Please refresh the page to see this change.').removeClass('error loading');
   })
   .fail(function(jqXHR) {
-       $(this).next('div')
+       $(this).siblings('div.response')
            .text('Error matching: ' + $.parseJSON(jqXHR.responseText).error)
+           .addClass('error').removeClass('loading');
+  });
+});
+
+$('form.unmatch-form').submit(function (e) {
+  e.preventDefault();
+  var promise = $.ajax({
+       type: "GET",
+       url: $(this).attr('action'),
+       data: $(this).serialize(),
+       dataType: 'json',
+       context: this
+  });
+
+  $(this).parent('div').siblings('div.response').addClass('loading').removeClass('error');
+
+  promise.done(function() {
+       $(this).parent('div').siblings('div.response').text('Successfully unmatched. Please refresh the page to see this change.').removeClass('error loading');
+  })
+  .fail(function(jqXHR) {
+       $(this).parent('div').siblings('div.response')
+           .text('Error unmatching: ' + $.parseJSON(jqXHR.responseText).error)
            .addClass('error').removeClass('loading');
   });
 });

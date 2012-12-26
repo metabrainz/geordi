@@ -197,8 +197,10 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
           </textarea>
           <input type="submit" class="btn primary" value="Match" />
         </form>
+        {% if current_matching -%}<div class="current-match">Current match: {{ match_span(current_matching) }}
+          <form class="unmatch-form" action="/api/match{{type}}/{{index}}/{{item}}" method="get"><input type="submit" value="Unmatch" /><input type="hidden" name="unmatch" value="true" /></form></div>
+        {%- endif %}
         <div class="response"></div>
-        {% if current_matching -%}<div class="current-match">Current match: {{ match_span(current_matching) }}</div>{%- endif %}
       </div></dd>
   </dl>
 </div>

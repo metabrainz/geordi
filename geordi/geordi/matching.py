@@ -50,29 +50,30 @@ def check_type(mbid):
         return {"error": "failed", "code": e}
 
 def register_match(index, item, itemtype, matchtype, mbids, auto=False, user=None, ip=False):
-    if len(mbids) < 1:
-        response = Response(json.dumps({'code': 400, 'error': 'You must provide at least one MBID for a match.'}), 400, mimetype="application/json")
-        response.headers.add('Access-Control-Allow-Origin', '*')
-        return response
-    # Check MBID formatting
-    try:
-        [uuid.UUID('{{{uuid}}}'.format(uuid=mbid)) for mbid in mbids]
-    except ValueError:
-        response = Response(json.dumps({'code': 400, 'error': 'A provided MBID is ill-formed'}), 400, mimetype="application/json")
-        response.headers.add('Access-Control-Allow-Origin', '*')
-        return response
+    if matchtype != 'unmatch':
+        if len(mbids) < 1:
+            response = Response(json.dumps({'code': 400, 'error': 'You must provide at least one MBID for a match.'}), 400, mimetype="application/json")
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            return response
+        # Check MBID formatting
+        try:
+            [uuid.UUID('{{{uuid}}}'.format(uuid=mbid)) for mbid in mbids]
+        except ValueError:
+            response = Response(json.dumps({'code': 400, 'error': 'A provided MBID is ill-formed'}), 400, mimetype="application/json")
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            return response
 
-    for mbid in mbids:
-        check = check_type(mbid)
-        if 'error' in check:
-            response = Response(json.dumps({'code': 400, 'error': 'MBID {} cannot be found in MusicBrainz'.format(mbid)}), 400, mimetype="application/json")
-            response.headers.add('Access-Control-Allow-Origin', '*')
-            return response
-        elif check['type'] != matchtype:
-            response = Response(json.dumps({'code': 400, 'error': 'Provided match type {provided} doesn\'t match type {mbidtype} of {mbid}'.format(provided=matchtype, mbidtype=check['type'], mbid=mbid)}), 400, mimetype="application/json")
-            response.headers.add('Access-Control-Allow-Origin', '*')
-            return response
-        else: continue
+        for mbid in mbids:
+            check = check_type(mbid)
+            if 'error' in check:
+                response = Response(json.dumps({'code': 400, 'error': 'MBID {} cannot be found in MusicBrainz'.format(mbid)}), 400, mimetype="application/json")
+                response.headers.add('Access-Control-Allow-Origin', '*')
+                return response
+            elif check['type'] != matchtype:
+                response = Response(json.dumps({'code': 400, 'error': 'Provided match type {provided} doesn\'t match type {mbidtype} of {mbid}'.format(provided=matchtype, mbidtype=check['type'], mbid=mbid)}), 400, mimetype="application/json")
+                response.headers.add('Access-Control-Allow-Origin', '*')
+                return response
+            else: continue
 
     # Retrieve document (or blank empty document for subitems)
     try:
@@ -105,14 +106,18 @@ def register_match(index, item, itemtype, matchtype, mbids, auto=False, user=Non
         ip = False
 
     match = make_match_definition(user, matchtype, mbids, auto, ip)
-    if (not auto or
+    if ((not auto or
         len(data['_geordi']['matchings']['matchings']) == 0 or
-        data['_geordi']['matchings']['current_matching']['auto']):
+        data['_geordi']['matchings']['current_matching']['auto'])
+          and matchtype != 'unmatch'):
         data['_geordi']['matchings']['current_matching'] = match
     if not auto:
         data['_geordi']['matchings']['matchings'].append(match)
     else:
         data['_geordi']['matchings']['auto_matchings'].append(match)
+
+    if matchtype == 'unmatch':
+        data['_geordi']['matchings']['current_matching'] = {}
 
     try:
         if version:

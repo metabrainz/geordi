@@ -168,6 +168,8 @@ def matchitem(index, item):
     if current_user.is_authenticated():
         auto = False
         user = None
+        if request.args.get('unmatch', False):
+            return register_match(index, item, 'item', 'unmatch', [], auto, user)
     else:
         auto = True
         user = request.args.get('user')
@@ -238,6 +240,8 @@ def matchsubitem(index, subitem):
     if current_user.is_authenticated():
         auto = False
         user = None
+        if request.args.get('unmatch', False):
+            return register_match(index, subitem, 'subitem', 'unmatch', [], auto, user)
     else:
         auto = True
         user = request.args.get('user')
