@@ -22,6 +22,7 @@ from geordi.utils import check_data_format
 
 import json
 import uuid
+import urllib2
 from datetime import datetime
 
 from pyelasticsearch import ElasticHttpNotFoundError
@@ -37,6 +38,17 @@ def make_match_definition(user, matchtype, mbids, auto=False, ip=False):
         match['ip'] = ip
     return match
 
+def check_type(mbid):
+    req = urllib2.Request('http://musicbrainz.org/ws/js/entity/{mbid}'.format(mbid=mbid))
+    req.add_header('User-Agent', 'Geordi +http://geordi.musicbrainz.org/')
+    req.add_header('Accept', 'application/json')
+    try:
+        res = urllib2.urlopen(req)
+        j = json.load(res)
+        return {"type": j['type']}
+    except urllib2.HTTPError, e:
+        return {"error": "failed", "code": e}
+
 def register_match(index, item, itemtype, matchtype, mbids, auto=False, user=None, ip=False):
     if len(mbids) < 1:
         response = Response(json.dumps({'code': 400, 'error': 'You must provide at least one MBID for a match.'}), 400, mimetype="application/json")
@@ -49,6 +61,19 @@ def register_match(index, item, itemtype, matchtype, mbids, auto=False, user=Non
         response = Response(json.dumps({'code': 400, 'error': 'A provided MBID is ill-formed'}), 400, mimetype="application/json")
         response.headers.add('Access-Control-Allow-Origin', '*')
         return response
+
+    for mbid in mbids:
+        check = check_type(mbid)
+        if 'error' in check:
+            response = Response(json.dumps({'code': 400, 'error': 'MBID {} cannot be found in MusicBrainz'.format(mbid)}), 400, mimetype="application/json")
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            return response
+        elif check['type'] != matchtype:
+            response = Response(json.dumps({'code': 400, 'error': 'Provided match type {provided} doesn\'t match type {mbidtype} of {mbid}'.format(provided=matchtype, mbidtype=check['type'], mbid=mbid)}), 400, mimetype="application/json")
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            return response
+        else: continue
+
     # Retrieve document (or blank empty document for subitems)
     try:
         document = es.get(index, itemtype, item)

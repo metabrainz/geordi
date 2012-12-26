@@ -19,7 +19,7 @@ from flask import render_template, request, redirect, url_for, flash, Response, 
 from flask.ext.login import login_required, login_user, logout_user, current_user
 from geordi import app, login_manager, User, es
 from geordi.search import do_search, do_search_raw, do_subitem_search, make_filters
-from geordi.matching import register_match
+from geordi.matching import register_match, check_type
 from geordi.mappings import map_search_data, update_map_by_index, update_linked_by_index, get_link_types_by_index, update_automatic_item_matches_by_index, update_automatic_subitem_matches_by_index, get_mapoptions, get_code_url_by_index
 from geordi.mappings.util import comma_list, comma_only_list
 from geordi.utils import check_data_format
@@ -246,6 +246,14 @@ def matchsubitem(index, subitem):
     if not mbids:
         mbids = re.split(',\s*', request.args.get('mbids'))
     return register_match(index, subitem, 'subitem', matchtype, mbids, auto, user)
+
+@app.route('/internal/mbidtype/<mbid>')
+def internal_mbid_type(mbid):
+    check = check_type(mbid)
+    if 'error' in check:
+        return Response(json.dumps({"error": "failed to fetch"}), e.code, mimetype="application/json")
+    else:
+        return Response(json.dumps({"type": check['type']}), 200, mimetype="application/json")
 
 # Login/logout-related views
 @app.route('/login', methods=["GET", "POST"])
