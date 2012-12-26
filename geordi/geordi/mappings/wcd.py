@@ -134,8 +134,8 @@ class wcd():
                         f['totaltracks'].append(num)
 
 
-        if re.search('cd\s*\d+', track['_name'], re.IGNORECASE):
-            f['medium'] = [re.search('cd\s*(\d+)', track['_name'], re.IGNORECASE).group(1)]
+        if re.search('(cd|dis[ck])\s*\d+', track['_name'], re.IGNORECASE):
+            f['medium'] = [re.search('(cd|dis[ck])\s*(\d+)', track['_name'], re.IGNORECASE).group(2)]
         else:
             f['medium'] = []
 
@@ -148,7 +148,7 @@ class wcd():
 
     def map(self, data):
         target = base_mapping()
-        target['version'] = 4
+        target['version'] = 5
         release = target['release']
 
         # Release Title
