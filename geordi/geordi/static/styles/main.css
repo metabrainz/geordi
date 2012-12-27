@@ -119,7 +119,7 @@ table td, table th {
 .subitem-linker-content { display:none; }
 
 /* Overlay */
-#simplemodal-overlay { background-color:#000; cursor:wait; }
+#simplemodal-overlay { background-color:#000; }
 
 /* Container */
 #simplemodal-container { height:360px; width:600px; background-color:#FFF; border:4px solid black; padding:12px; }
@@ -158,8 +158,39 @@ table td, table th {
     background-color: #FFDB58;
 }
 
+ul.search-results {
+    padding: 0px 5px;
+}
+
 .result {
     min-width: 1055px;
+    display: block;
+}
+
+.result-box {
+    border: 1px solid #bbb;
+    padding: 2px 5px 2px 5px;
+    margin-top: 4px;
+}
+
+li:nth-child(odd) .result-box {
+    background-color: #f9f9f9;
+}
+
+.result-box:hover {
+    background-color: whitesmoke;
+}
+
+.result-box .left {
+    float: left;
+}
+
+.result-box .right {
+    float: right;
+}
+
+.result-box small.left {
+    clear: both;
 }
 
 .actions {

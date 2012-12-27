@@ -29,12 +29,12 @@ We found {{ data.hits.total }} results; starting at {{ start_from }}.
   <a href="{{ build_search_url(start_from | int + 10) }}">[&rsaquo;]</a><a href="{{ build_search_url((data.hits.total // 10) * 10) }}">[&raquo;]</a>
 {%- endif -%}
 
-<ul>
+<ul class="search-results">
 {% for result in data.hits.hits %}
-<li style="clear: left; display: block;" class="result">
-  <div style="border: 2px solid black; margin-bottom: 2px;" class="clearfix">
+<li class="result">
+  <div class="clearfix result-box">
      {% if result._type == 'item' -%}
-       <big style="float: left;">
+       <big class="left">
          {%- if mapping[loop.index0] and mapping[loop.index0].release -%}
          {{ mapping[loop.index0].release.title[0] }}
            {%- if mapping[loop.index0].release.combined_artist %} by {{ mapping[loop.index0].release.combined_artist }}{% endif %}
@@ -44,19 +44,19 @@ We found {{ data.hits.total }} results; starting at {{ start_from }}.
        </big>
        {%- set link = '/' + result._index + '/' + result._id -%}
      {%- elif result._type == 'subitem' -%}
-       <big style="float: left"></big>
-       <small style="float: left;">
+       <big class="left"></big>
+       <small class="left">
          {%- for (k, v) in result._source.iteritems() if k != '_geordi' -%}
                {{k}}: {% if v is iterable and v is not string %}{{ g.comma_list(v) }}{% else %}{{v}}{% endif %}{% if not loop.last %}; {% endif %}
          {%- endfor %}
        </small>
        {%- set link = '/?type=sub&subitem_index=' + result._index + '&subitem_type=' + mapping[loop.index0][0] + '&query=' + mapping[loop.index0][1] -%}
      {%- endif -%}
-     <big style="float: right">({{ result._score }})</big>
-     <small style="float: left; clear: both;">(<a href="{{ link }}">{{ result._index }}/{{ result._id }}</a>)</small>
+     <big class="right">({{ result._score }})</big>
+     <small class="left">(<a href="{{ link }}">{{ result._index }}/{{ result._id }}</a>)</small>
 
      {%- if result._source._geordi and result._source._geordi.matchings.current_matching %}
-       <small style="float: right">{{ match_span(result._source._geordi.matchings.current_matching, true) }}</small>
+       <small class="right">{{ match_span(result._source._geordi.matchings.current_matching, true) }}</small>
      {%- endif %}
   </div>
 </li>
