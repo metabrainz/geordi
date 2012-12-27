@@ -16,7 +16,7 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
 <h3>Summary</h3>
 <table class="zebra"><tbody>
     {% for title in mapping.release.title -%}
-    <tr><th>Title{% if mapping.release.title | length > 1 %} (alternate){% endif %}:</th><td>{{ title }}</td></tr>
+    <tr><th>Title{% if mapping.release.title | length > 1 %} (alternate){% endif %}:</th><td>{{ title }}{%- if loop.first %} {{ link_opener('item', data._id, data) }}{%- endif-%}</td></tr>
     {%- endfor %}
     <tr><th>Artist:</th>
         <td>{% for artist in mapping.release.artist -%}
