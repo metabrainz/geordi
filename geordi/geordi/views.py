@@ -42,6 +42,7 @@ def before_request():
     g.all_indices = app.config['AVAILABLE_INDICES']
     g.link_types = dict([(index, get_link_types_by_index(index)) for index in app.config['AVAILABLE_INDICES']])
     g.json = json
+    g.re = re
     g.comma_list = comma_list
     g.comma_only_list = comma_only_list
     g.dictarray = dictarray
