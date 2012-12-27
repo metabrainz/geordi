@@ -168,7 +168,7 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
 {%- endmacro -%}
 
 {%- macro subitem_search(id, type) -%}
-<a class="subitem-search" href="/?type=sub&query={{ id }}&subitem_type={{ type }}&subitem_index={{ data._index }}&auto=on&un=on&s=1"><img src="/static/images/search.png" alt="Search" /></a>
+<a class="subitem-search" href="/?type=sub&query={{ id }}&subitem_type={{ type }}&subitem_index={{ data._index }}&auto=on&un=on&human=on&s=1"><img src="/static/images/search.png" alt="Search" /></a>
 {%- endmacro -%}
 
 {%- macro linker_content(class, id, title, json, type, item, index, matches_json) -%}
