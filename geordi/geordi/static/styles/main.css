@@ -98,6 +98,7 @@ table td, table th {
 
 .match-dd {
     width: 560px;
+    padding: 0px;
 }
 
 .unmatch-form {
