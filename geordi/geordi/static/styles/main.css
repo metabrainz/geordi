@@ -195,3 +195,9 @@ li:nth-child(odd) .result-box {
 .actions {
     min-width: 1095px;
 }
+
+.match {
+    border: 1px solid #bbb;
+    padding: 0px 2px;
+    display: inline-block;
+}

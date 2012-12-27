@@ -75,7 +75,7 @@
 {% endblock %}
 
 {%- macro match_span(matching, show_timestamp) -%}
-  &lt;{{ matching.type }}
+<div class="match">{{ matching.type }}
   {% for mbid in matching.mbid %}<a href="https://musicbrainz.org/{{ matching.type }}/{{ mbid }}">{{ mbid[:4] }}…{{ mbid[-4:] }}</a>{% if not loop.last %}, {% endif %}{% endfor %}
   [{% if not matching.auto -%}
      <a href="https://musicbrainz.org/user/{{ matching.user }}">{{ matching.user }}</a>
@@ -84,7 +84,8 @@
    {%- endif %}]
    {%- if show_timestamp %}
      {{ matching.timestamp }}
-   {%- endif -%}&gt;
+   {%- endif -%}
+</div>
 {%- endmacro -%}
 
 {%- macro subitem_search(index, type, id) -%}

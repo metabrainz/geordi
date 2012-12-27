@@ -22,8 +22,8 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
         <td>{% for artist in mapping.release.artist -%}
               {%- if artist.subitem -%}
               <a class="subitem-opener" data-subitem="{{artist.subitem}}" href="#li-subitem-{{artist.subitem}}">{{artist.name}}</a>
-              {{ subitem_search(data._index, g.re.split('-', artist.subitem)[0], g.re.split('-', artist.subitem)[1]) }}
               {{ link_opener('subitem', artist.subitem, subitems[artist.subitem]) }}
+              {{ subitem_search(data._index, g.re.split('-', artist.subitem)[0], g.re.split('-', artist.subitem)[1]) }}
               {%- else -%}{{artist.name}}{%- endif -%}
               {% if loop.revindex > 2 %}, {% elif loop.revindex == 2 %} and {% endif -%}
             {%- endfor %}{% if mapping.release.artist | length > 1 %} <small>({{mapping.release.artist | length}} artists)</small>{% endif -%}
@@ -35,8 +35,8 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
     <tr><th>Label:</th>
         <td>{%- if label.subitem -%}
               <a class="subitem-opener" data-subitem="{{label.subitem}}" href="#li-subitem-{{label.subitem}}">{{label.name}}</a>
-              {{ subitem_search(data._index, g.re.split('-', label.subitem)[0], g.re.split('-', label.subitem)[1]) }}
               {{ link_opener('subitem', label.subitem, subitems[label.subitem]) }}
+              {{ subitem_search(data._index, g.re.split('-', label.subitem)[0], g.re.split('-', label.subitem)[1]) }}
               {%- else -%}{{label.name}}{%- endif -%}
     </td></tr>
     {%- endfor %}
@@ -81,8 +81,8 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
   <td>{% for artist in track.artist -%}
               {%- if artist.subitem -%}
               <a class="subitem-opener" data-subitem="{{artist.subitem}}" href="#li-subitem-{{artist.subitem}}">{{artist.name}}</a>
-              {{ subitem_search(data._index, g.re.split('-', artist.subitem)[0], g.re.split('-', artist.subitem)[1]) }}
               {{ link_opener('subitem', artist.subitem, subitems[artist.subitem]) }}
+              {{ subitem_search(data._index, g.re.split('-', artist.subitem)[0], g.re.split('-', artist.subitem)[1]) }}
               {%- else -%}{{artist.name}}{%- endif -%}
               {% if loop.revindex > 2 %}, {% elif loop.revindex == 2 %} and {% endif -%}
             {%- endfor %}{% if track.artist | length > 1 %} <small>({{track.artist | length}} artists)</small>{% endif -%}
@@ -94,8 +94,9 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
   </td>
   {%- endif -%}
   <td>{% if track.subitem %} <small>(<a class="subitem-opener" data-subitem="{{ track.subitem }}" href="#li-subitem-{{ track.subitem }}">subitem</a>) 
-    {{ subitem_search(data._index, g.re.split('-', track.subitem)[0], g.re.split('-', track.subitem)[1]) }}
-    {{ link_opener('subitem', track.subitem, subitems[track.subitem]) }}</small>{% endif %}
+      {{ link_opener('subitem', track.subitem, subitems[track.subitem]) }}
+      {{ subitem_search(data._index, g.re.split('-', track.subitem)[0], g.re.split('-', track.subitem)[1]) }}
+    </small>{% endif %}
   </td>
 </tr>
 {%- endfor -%}
@@ -116,8 +117,8 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
 {%- for link in data._source._geordi.links.links[link_type_id] %}
   {%- set subitem_id = link_id | string + '-' + link[link_type.key] | string -%}
   <li style="clear:both" class="expander block-expander closed" id="li-subitem-{{ subitem_id }}"><span class="clicker"><code>[{{ link[link_type.key] }}]</code></span>
-    {{ subitem_search(data._index, link[link_type.key], link_id) }}
     {{ current_match_span(subitems[subitem_id], 'subitem', subitem_id) }}
+    {{ subitem_search(data._index, link[link_type.key], link_id) }}
     {{ linker_content('subitem-linker-content', 'subitem-linker-content-' + subitem_id | string, 'Match ' + subitem_id | string, link, 'subitem', subitem_id, data._index, subitems[subitem_id]) }}
     <div class="li collapse">
     {{ json_pp(link, g.dictarray) }}
