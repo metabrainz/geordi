@@ -31,31 +31,34 @@ We found {{ data.hits.total }} results; starting at {{ start_from }}.
 
 <ul>
 {% for result in data.hits.hits %}
-<li style="clear: left" class="result">
-  <span>
+<li style="clear: left; display: block;" class="result">
+  <div style="border: 2px solid black; margin-bottom: 2px;" class="clearfix">
      {% if result._type == 'item' -%}
-       {%- if mapping[loop.index0] and mapping[loop.index0].release -%}
-         <big>{{ mapping[loop.index0].release.title[0] }}
+       <big style="float: left;">
+         {%- if mapping[loop.index0] and mapping[loop.index0].release -%}
+         {{ mapping[loop.index0].release.title[0] }}
            {%- if mapping[loop.index0].release.combined_artist %} by {{ mapping[loop.index0].release.combined_artist }}{% endif %}
            {%- if mapping[loop.index0].release.date | length > 0 %} ({{ mapping[loop.index0].release.date[0]}}){% endif %}
            {%- if mapping[loop.index0].release.tracks | length > 0 %} ({{ mapping[loop.index0].release.tracks | length }} tracks){% endif %}
-         </big>
-       {% endif -%}
-       <small>(<a href="/{{ result._index}}/{{ result._id }}">{{ result._index }}/{{ result._id }}</a>)</small>
+         {% endif -%}
+       </big>
+       {%- set link = '/' + result._index + '/' + result._id -%}
      {%- elif result._type == 'subitem' -%}
-       <small>
+       <big style="float: left"></big>
+       <small style="float: left;">
          {%- for (k, v) in result._source.iteritems() if k != '_geordi' -%}
                {{k}}: {% if v is iterable and v is not string %}{{ g.comma_list(v) }}{% else %}{{v}}{% endif %}{% if not loop.last %}; {% endif %}
          {%- endfor %}
        </small>
-       <small>(<a href="/?type=sub&subitem_index={{result._index}}&subitem_type={{mapping[loop.index0][0]}}&query={{mapping[loop.index0][1]}}">{{ result._index }}/{{ result._id }}</a>)</small>
+       {%- set link = '/?type=sub&subitem_index=' + result._index + '&subitem_type=' + mapping[loop.index0][0] + '&query=' + mapping[loop.index0][1] -%}
      {%- endif -%}
+     <big style="float: right">({{ result._score }})</big>
+     <small style="float: left; clear: both;">(<a href="{{ link }}">{{ result._index }}/{{ result._id }}</a>)</small>
 
      {%- if result._source._geordi and result._source._geordi.matchings.current_matching %}
-       <small>{{ match_span(result._source._geordi.matchings.current_matching, true) }}</small>
+       <small style="float: right">{{ match_span(result._source._geordi.matchings.current_matching, true) }}</small>
      {%- endif %}
-     <small>({{ result._score }})</small>
-  </span>
+  </div>
 </li>
 {% endfor %}
 </ul>

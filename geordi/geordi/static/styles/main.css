@@ -157,3 +157,11 @@ table td, table th {
 .item-linker.matched.auto, .subitem-linker.matched.auto {
     background-color: #FFDB58;
 }
+
+.result {
+    min-width: 1055px;
+}
+
+.actions {
+    min-width: 1095px;
+}

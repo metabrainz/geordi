@@ -22,7 +22,7 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
         <td>{% for artist in mapping.release.artist -%}
               {%- if artist.subitem -%}
               <a class="subitem-opener" data-subitem="{{artist.subitem}}" href="#li-subitem-{{artist.subitem}}">{{artist.name}}</a>
-              {{ subitem_search(g.re.split('-', artist.subitem)[1], g.re.split('-', artist.subitem)[0]) }}
+              {{ subitem_search(data._index, g.re.split('-', artist.subitem)[0], g.re.split('-', artist.subitem)[1]) }}
               {{ link_opener('subitem', artist.subitem, subitems[artist.subitem]) }}
               {%- else -%}{{artist.name}}{%- endif -%}
               {% if loop.revindex > 2 %}, {% elif loop.revindex == 2 %} and {% endif -%}
@@ -35,7 +35,7 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
     <tr><th>Label:</th>
         <td>{%- if label.subitem -%}
               <a class="subitem-opener" data-subitem="{{label.subitem}}" href="#li-subitem-{{label.subitem}}">{{label.name}}</a>
-              {{ subitem_search(g.re.split('-', label.subitem)[1], g.re.split('-', label.subitem)[0]) }}
+              {{ subitem_search(data._index, g.re.split('-', label.subitem)[0], g.re.split('-', label.subitem)[1]) }}
               {{ link_opener('subitem', label.subitem, subitems[label.subitem]) }}
               {%- else -%}{{label.name}}{%- endif -%}
     </td></tr>
@@ -81,7 +81,7 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
   <td>{% for artist in track.artist -%}
               {%- if artist.subitem -%}
               <a class="subitem-opener" data-subitem="{{artist.subitem}}" href="#li-subitem-{{artist.subitem}}">{{artist.name}}</a>
-              {{ subitem_search(g.re.split('-', artist.subitem)[1], g.re.split('-', artist.subitem)[0]) }}
+              {{ subitem_search(data._index, g.re.split('-', artist.subitem)[0], g.re.split('-', artist.subitem)[1]) }}
               {{ link_opener('subitem', artist.subitem, subitems[artist.subitem]) }}
               {%- else -%}{{artist.name}}{%- endif -%}
               {% if loop.revindex > 2 %}, {% elif loop.revindex == 2 %} and {% endif -%}
@@ -94,7 +94,7 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
   </td>
   {%- endif -%}
   <td>{% if track.subitem %} <small>(<a class="subitem-opener" data-subitem="{{ track.subitem }}" href="#li-subitem-{{ track.subitem }}">subitem</a>) 
-    {{ subitem_search(g.re.split('-', track.subitem)[1], g.re.split('-', track.subitem)[0]) }}
+    {{ subitem_search(data._index, g.re.split('-', track.subitem)[0], g.re.split('-', track.subitem)[1]) }}
     {{ link_opener('subitem', track.subitem, subitems[track.subitem]) }}</small>{% endif %}
   </td>
 </tr>
@@ -116,7 +116,7 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
 {%- for link in data._source._geordi.links.links[link_type_id] %}
   {%- set subitem_id = link_id | string + '-' + link[link_type.key] | string -%}
   <li style="clear:both" class="expander block-expander closed" id="li-subitem-{{ subitem_id }}"><span class="clicker"><code>[{{ link[link_type.key] }}]</code></span>
-    {{ subitem_search(link[link_type.key], link_id) }}
+    {{ subitem_search(data._index, link[link_type.key], link_id) }}
     {{ current_match_span(subitems[subitem_id], 'subitem', subitem_id) }}
     {{ linker_content('subitem-linker-content', 'subitem-linker-content-' + subitem_id | string, 'Match ' + subitem_id | string, link, 'subitem', subitem_id, data._index, subitems[subitem_id]) }}
     <div class="li collapse">
@@ -165,10 +165,6 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
       {% if id %}data-{{linker_type}}="{{id}}" {% endif %}href="#">
       {%- if verbose %}<small>{% if matched %}re{% endif %}link</small> {% endif -%}
   <img src="/static/images/link.png" alt="{% if matched %}re{% endif %}link" /></a>
-{%- endmacro -%}
-
-{%- macro subitem_search(id, type) -%}
-<a class="subitem-search" href="/?type=sub&query={{ id }}&subitem_type={{ type }}&subitem_index={{ data._index }}&auto=on&un=on&human=on&s=1"><img src="/static/images/search.png" alt="Search" /></a>
 {%- endmacro -%}
 
 {%- macro linker_content(class, id, title, json, type, item, index, matches_json) -%}

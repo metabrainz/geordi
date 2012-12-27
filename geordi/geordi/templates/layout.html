@@ -86,3 +86,7 @@
      {{ matching.timestamp }}
    {%- endif -%}&gt;
 {%- endmacro -%}
+
+{%- macro subitem_search(index, type, id) -%}
+<a class="subitem-search" href="/?type=sub&query={{ id }}&subitem_type={{ type }}&subitem_index={{ index }}&auto=on&un=on&human=on&s=1"><img src="/static/images/search.png" alt="Search" /></a>
+{%- endmacro -%}
