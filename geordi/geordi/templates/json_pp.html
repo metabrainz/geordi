@@ -1,12 +1,12 @@
-{%- macro json_pp(json_data, dictarray) -%}
+{%- macro json_pp(json_data, dictarray, open) -%}
     <dl>
     {%- for item in dictarray(json_data) recursive -%}
         {%- if item is mapping and item.keys() == ['k', 'v'] %}
-            <dt class="expander block-expander closed"><i class="icon"></i> <span class="clicker">{{ item.k }}</span></dt>
-            <dd class="collapse">{{ json_looper(item.v, loop, dictarray) }}</dd>
+          <dt class="expander block-expander {% if open %}open{% else %}closed{% endif %}"><i class="icon"></i> <span class="clicker">{{ item.k }}</span></dt>
+          <dd{%- if not open %} class="collapse"{%- endif -%}>{{ json_looper(item.v, loop, dictarray) }}</dd>
         {%- else %}
-            <li class="expander block-expander closed" style="clear: left"><span class="clicker"><code>[{{ loop.index0 }}]</code></span>
-                <div class="collapse li">{{ json_looper(item, loop, dictarray) }}</div>
+            <li class="expander block-expander {% if open %}open{% else %}closed{% endif %}" style="clear: left"><span class="clicker"><code>[{{ loop.index0 }}]</code></span>
+            <div class="{% if not open %}collapse {% endif %}li">{{ json_looper(item, loop, dictarray) }}</div>
             </li>
         {%- endif -%}
     {%- endfor -%}
