@@ -67,7 +67,7 @@ div.li:after, .expander:after, .clearfix:after { content: '.'; display: block; v
 select#id-index { width: 200px }
 .actions textarea { vertical-align: text-top; }
 
-ul.flashes { list-style-type: none; padding: 0; float: right; }
+ul.flashes { list-style-type: none; padding: 0; float: right; clear: right; }
 ul.flashes li { display: inline-block; background-color: papayawhip; border: 1px solid #bbb; margin: 2px; padding: 2px; border-radius: 2px; }
 
 h1 { margin: 0 }

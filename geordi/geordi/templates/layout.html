@@ -1,11 +1,12 @@
 {% extends "layout-basic.html" %}
 
-{% block furtherlayout %}
+{% block header %}
   {% if current_user.is_authenticated() %}
-    <p>Currently logged in as <code>{{ current_user.id }}</code> <a href="/logout">(log out)</a></p>
-  {% else %}
-    <p>Not logged in. <a href="/login">(log in)</a></p>
+    <a href="https://musicbrainz.org/user/{{current_user.id}}">{{ current_user.id }}</a> <a href="/logout">(log out)</a>
   {% endif %}
+{% endblock %}
+
+{% block furtherlayout %}
   <form action="/" method="get">
     <div class="actions">
       <select name="type" id="id-type">
