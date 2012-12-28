@@ -24,7 +24,7 @@
 body, input, select, button { font-family: 'Museo Sans', sans-serif; color: #111; }
 input:disabled, button:disabled { color: #666 }
 h1, h2, h3, h4 { font-family: 'Museo Slab', sans-serif; }
-a  { color: #352222; text-decoration: none; border-bottom: 1px dotted #352222; }
+a  { color: #442C2C; }
 dl { margin: 0px; }
 ul { margin-bottom: 0px; margin-top: 0px; }
 dt::after { content: ': ' }
@@ -98,7 +98,7 @@ i.icon {
 div.li:after, .expander:after, .clearfix:after { content: '.'; display: block; visibility: hidden; height: 0; clear: both; }
 
 .plain-text { display: block; }
-.expander > span.clicker { cursor: pointer; position: relative; color: #352222; border-bottom: 1px dotted #352222; }
+.expander > span.clicker { cursor: pointer; position: relative; color: #442C2C; text-decoration: underline; }
 .expander > span.clicker:hover { background-color: #E1D0D0; }
 
 /* Match Dialog */
