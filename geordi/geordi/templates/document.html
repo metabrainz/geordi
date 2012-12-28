@@ -91,7 +91,7 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
               {% if loop.revindex > 2 %}, {% elif loop.revindex == 2 %} and {% endif -%}
             {%- endfor %}{% if track.artist | length > 1 %} <small>({{track.artist | length}} artists)</small>{% endif -%}
   </td>
-  <td>{% for length in track.length_formatted %}{{ length }}{% if not loop.last %}<br />{% endif %}{% endfor %}</td>
+  <td>{% for length in track.length_formatted %}<span title="{{track.length[loop.index0] }} ms">{{ length }}</span>{% if not loop.last %}<br />{% endif %}{% endfor %}</td>
   {%- if mapoptions.acoustid -%}
   <td>
     {%- for acoustid in track.acoustid %}<a href="https://acoustid.org/track/{{ acoustid }}">{{ acoustid[:4] }}…{{ acoustid[-4:]}}</a>{% if not loop.last %}<br />{% endif %}{% endfor -%}
