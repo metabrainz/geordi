@@ -8,7 +8,7 @@
 <h2 id="mapping">Extracted Information</h2>
 <p>This is <code>{{ data._id }}</code>. This mapping was generated using version <code>{{ mapping.version }}</code> of the <code>{{ data._index }}</code> mapping. For further details, or to make suggestions, please see <a href="{{code_url}}">the mapping code</a>.</p>
 {%- if 'release' in mapping -%}
-  <h3>Summary</h3>
+  <h3>Release Summary</h3>
   <table class="zebra"><tbody>
       {% for title in mapping.release.title -%}
       <tr><th>Title{% if mapping.release.title | length > 1 %} (alternate){% endif %}:</th><td>{{ title }}{%- if loop.first %} {{ current_match_span(data, 'item', none, 1) }}{%- endif-%} {{ search_mb_link('release', title) }}</td></tr>
