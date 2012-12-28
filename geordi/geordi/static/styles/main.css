@@ -78,7 +78,7 @@ table {
 }
 
 table td, table th {
-     border-top: 1px solid #DDD;
+     border-top: 1px solid #bbb;
      padding: 4px;
      text-align: left;
 }
@@ -205,8 +205,12 @@ ul.search-results {
 }
 
 .result-box {
-    border: 1px solid #bbb;
+    border-top: 1px solid #bbb;
     padding: 2px 5px 2px 5px;
+}
+
+li:last-child .result-box {
+    border-bottom: 1px solid #bbb;
 }
 
 li:nth-child(odd) .result-box {
