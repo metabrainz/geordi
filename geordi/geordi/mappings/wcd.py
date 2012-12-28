@@ -198,11 +198,13 @@ class wcd():
 
         # Tracks
         links = self.extract_linked(data)
-        release['tracks'] = sorted([self._extract_track(x, links)
+        try:
+            release['tracks'] = sorted([self._extract_track(x, links)
                       for x
                       in data['files_xml']['files']['file']
                       if (x['_source'] == 'original' and x['format']['text'] in self._acceptable_formats())],
                   key=self._track_sorter)
+        except: pass
 
         return target
 
