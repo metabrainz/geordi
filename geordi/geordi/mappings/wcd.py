@@ -147,7 +147,7 @@ class wcd():
         return f
 
     def map(self, data):
-        target = base_mapping()
+        target = base_mapping('release')
         target['version'] = 5
         release = target['release']
 
@@ -162,7 +162,7 @@ class wcd():
                 title_candidates.append(title_list[0])
             else:
                 title_candidates.append(title_list[1])
-        except TypeError: pass
+        except (KeyError, TypeError): pass
         seen = []
         release['title'] = [c for c in title_candidates if not (c in seen or seen.append(c))]
 

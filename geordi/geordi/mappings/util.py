@@ -46,18 +46,23 @@ def collect_text(block, regex='.*'):
 def concatenate_text(block, regex='.*', combiner=comma_list):
     return combiner(collect_text(block, regex))
 
-def base_mapping():
-    return {
-        'release': {
-            'title': [],
-            'date': [],
-            'artist': [],
-            'label': [],
-            'catalog_number': [],
-            'combined_artist': '',
-            'tracks': []
-        }
-    }
+def base_mapping(maptype):
+    mapping = {'version': 0}
+    if maptype == 'release':
+        mapping.update({
+            'release': {
+                'title': [],
+                'date': [],
+                'artist': [],
+                'label': [],
+                'catalog_number': [],
+                'combined_artist': '',
+                'tracks': []
+            }
+        })
+    else:
+        raise Exception('unimplemented')
+    return mapping
 
 def format_track_length(ms):
     if ms is None:
