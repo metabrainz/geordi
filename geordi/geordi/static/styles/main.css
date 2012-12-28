@@ -177,6 +177,7 @@ div.li:after, .expander:after, .clearfix:after { content: '.'; display: block; v
 .action-icon {
     display: inline-block;
     border-bottom: none;
+    text-decoration: none;
 }
 
 .action-icon, .item-linker.verbose, .subitem-linker.verbose {
