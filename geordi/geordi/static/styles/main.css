@@ -83,6 +83,10 @@ table td, table th {
      text-align: left;
 }
 
+table tr:last-child td, table tr:last-child th {
+    border-bottom: 1px solid #bbb;
+}
+
 .zebra tbody tr:nth-child(odd) td, .zebra tbody tr:nth-child(odd) th {
     background-color: #F9F9F9;
 }
