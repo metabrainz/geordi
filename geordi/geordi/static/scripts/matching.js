@@ -19,7 +19,10 @@ function get_mbid_type(mbid) {
 
 // AJAX form submission
 $('form.match-form').submit(function (e) {
+  $(this).siblings('div.response').addClass('loading').removeClass('error');
+
   e.preventDefault();
+
   var promise = $.ajax({
        type: "GET",
        url: $(this).attr('action'),
@@ -27,8 +30,6 @@ $('form.match-form').submit(function (e) {
        dataType: 'json',
        context: this
   });
-
-  $(this).siblings('div.response').addClass('loading').removeClass('error');
 
   promise.done(function() {
        $(this).siblings('div.response').text('Successfully matched. Please refresh the page to see this change.').removeClass('error loading');
@@ -41,7 +42,10 @@ $('form.match-form').submit(function (e) {
 });
 
 $('form.unmatch-form').submit(function (e) {
+  $(this).parent('div').siblings('div.response').addClass('loading').removeClass('error');
+
   e.preventDefault();
+
   var promise = $.ajax({
        type: "GET",
        url: $(this).attr('action'),
@@ -49,8 +53,6 @@ $('form.unmatch-form').submit(function (e) {
        dataType: 'json',
        context: this
   });
-
-  $(this).parent('div').siblings('div.response').addClass('loading').removeClass('error');
 
   promise.done(function() {
        $(this).parent('div').siblings('div.response').text('Successfully unmatched. Please refresh the page to see this change.').removeClass('error loading');
@@ -64,6 +66,8 @@ $('form.unmatch-form').submit(function (e) {
 
 $('form.match-form textarea').bind('change keyup input propertychange', function(event) {
     var $this = $(this);
+    if ($this.data('content') == $this.val()) { return }
+
     var matches = $this.val().match(/^(.*?),?\s*([^,]*)$/);
 
     var rewrite = null;
@@ -85,6 +89,8 @@ $('form.match-form textarea').bind('change keyup input propertychange', function
     var types = [];
     var error = [];
     if (mbids !== null || last) {
+        $this.parent('form').siblings('div.response').addClass('loading').removeClass('error');
+
         var all_mbids = [];
         if (mbids !== null) {
             $.each(mbids, function(idx, elem) {
@@ -107,11 +113,23 @@ $('form.match-form textarea').bind('change keyup input propertychange', function
                 error.push([elem, null]);
             });
         });
+
         set_when_done = function () {
             if (types.length != all_mbids.length) {
                  window.setTimeout(set_when_done, 200)
             } else if (error.length == 0 && type !== null) {
-                 $this.siblings('select').val(type);
+                 $this.siblings('input[name="type"]').val(type);
+                 $this.siblings('span.match-type').text(type).removeClass('artist label release release-group work recording').addClass(type);
+                 $this.parent('form').siblings('div.response').removeClass('error loading').text('')
+                 $this.siblings('input[type="submit"]').removeAttr('disabled');
+            } else {
+                 var text;
+                 if (type === null) {
+                     text = 'Could not find an entity type'
+                 } else {
+                     text = 'Not all MBIDs are entities of the same type';
+                 }
+                 $this.parent('form').siblings('div.response').addClass('error').removeClass('loading').text('Error: ' + text)
             }
         }
         window.setTimeout(set_when_done, 200);
@@ -119,5 +137,6 @@ $('form.match-form textarea').bind('change keyup input propertychange', function
 
     if (rewrite) {
         $this.val(rewrite)
+        $this.data('content', rewrite);
     }
 });

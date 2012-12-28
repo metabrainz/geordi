@@ -21,6 +21,7 @@
 }
 
 body, input, select, button { font-family: 'Museo Sans', sans-serif; color: #111; }
+input:disabled, button:disabled { color: #666 }
 h1, h2, h3, h4 { font-family: 'Museo Slab', sans-serif; }
 a  { color: #352222; text-decoration: none; border-bottom: 1px dotted #352222; }
 dl { margin: 0px; }
@@ -92,8 +93,37 @@ table td, table th {
 
 /* Match Dialog */
 .matcher {
-    width: 560px;
+    width: 600px;
     padding: 0px;
+}
+
+.match-type {
+    padding-left: 20px;
+    background-repeat: no-repeat;
+}
+
+.match-type.artist {
+    background-image: url('/static/images/entity/artist.png');
+}
+
+.match-type.label {
+    background-image: url('/static/images/entity/label.png');
+}
+
+.match-type.work {
+    background-image: url('/static/images/entity/work.png');
+}
+
+.match-type.recording {
+    background-image: url('/static/images/entity/recording.png');
+}
+
+.match-type.release {
+    background-image: url('/static/images/entity/release.png');
+}
+
+.match-type.release-group {
+    background-image: url('/static/images/entity/release-group.png');
 }
 
 .match-form textarea {

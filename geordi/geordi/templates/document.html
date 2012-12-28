@@ -187,18 +187,12 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
   <h4>Match</h4>
   <div class="matcher">
     <form class="match-form" id="match-{{type}}-{{item}}" action="/api/match{{type}}/{{ index }}/{{ item }}" method="get">
-      <select name="type">
-        <option{% if current_matching and current_matching.type == 'release' %} selected="selected"{% endif %}>release</option>
-        <option{% if current_matching and current_matching.type == 'release-group' %} selected="selected"{% endif %}>release-group</option>
-        <option{% if current_matching and current_matching.type == 'recording' %} selected="selected"{% endif %}>recording</option>
-        <option{% if current_matching and current_matching.type == 'work' %} selected="selected"{% endif %}>work</option>
-        <option{% if current_matching and current_matching.type == 'artist' %} selected="selected"{% endif %}>artist</option>
-        <option{% if current_matching and current_matching.type == 'label' %} selected="selected"{% endif %}>label</option>
-      </select>
+      <span class="match-type{% if current_matching %} {{current_matching.type}}{%- endif -%}">{% if current_matching %}{{current_matching.type}}{%- endif -%}</span>
+      <input type="hidden" name="type" {% if current_matching %}value="{{current_matching.type}}"{%- endif -%} />
       <textarea name="mbids" placeholder="MBIDs, comma separated">
       {%- if current_matching and current_matching.mbid | length > 0 -%}{{ g.comma_only_list(current_matching.mbid) }}{%- endif -%}
       </textarea>
-      <input type="submit" class="btn primary" value="Match" />
+      <input type="submit" class="btn primary" value="Match"{%- if not (current_matching and current_matching.mbid | length > 0) -%} disabled="disabled"{%- endif -%} />
     </form>
     {% if current_matching -%}<div class="current-match">Current match: {{ match_span(current_matching) }}
       <form class="unmatch-form" action="/api/match{{type}}/{{index}}/{{item}}" method="get"><input type="submit" value="Unmatch" /><input type="hidden" name="unmatch" value="true" /></form></div>
