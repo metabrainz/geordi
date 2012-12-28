@@ -93,6 +93,12 @@
 </div>
 {%- endmacro -%}
 
-{%- macro subitem_search(index, type, id) -%}
-<a class="subitem-search action-icon" href="/?type=sub&query={{ id }}&subitem_type={{ type }}&subitem_index={{ index }}&auto=on&un=on&human=on&s=1"><img src="/static/images/search.png" title="View other items using this subitem" /></a>
+{%- macro subitem_search(index, type, id, text) -%}
+<a class="subitem-search{% if not text %} action-icon{% endif %}" href="/?type=sub&query={{ id }}&subitem_type={{ type }}&subitem_index={{ index }}&auto=on&un=on&human=on&s=1" title="View other items using this subitem">
+{%- if text -%}
+  {{ text }}
+{%- else -%}
+  <img src="/static/images/search.png" title="View other items using this subitem" />
+{%- endif -%}
+</a>
 {%- endmacro -%}
