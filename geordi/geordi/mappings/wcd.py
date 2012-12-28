@@ -181,7 +181,9 @@ class wcd():
             try:
                 release['artist'] = [{'name': name} for name in collect_text(data['meta_xml']['metadata']['artist'])]
             except KeyError:
-                release['artist'] = [{'name': name} for name in collect_text(data['meta_xml']['metadata']['creator'])]
+                try:
+                    release['artist'] = [{'name': name} for name in collect_text(data['meta_xml']['metadata']['creator'])]
+                except: release['artist'] = []
         release['combined_artist'] = comma_list([artist['name'] for artist in release['artist']])
 
         try:
