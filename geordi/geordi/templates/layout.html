@@ -76,7 +76,7 @@
 
 {%- macro match_span(matching, show_timestamp, sparse) -%}
 <div class="match{% if sparse %} sparse{%- endif -%}">
-{%- if not sparse -%}<img src="/static/images/mb.png" /> {{ matching.type }}
+{%- if not sparse -%}<img src="/static/images/entity/{{matching.type}}.png" /> {{ matching.type }}
   {% for mbid in matching.mbid %}<a href="https://musicbrainz.org/{{ matching.type }}/{{ mbid }}">{{ mbid[:4] }}…{{ mbid[-4:] }}</a>{% if not loop.last %}, {% endif %}{% endfor %}
   [{% if not matching.auto -%}
      <a href="https://musicbrainz.org/user/{{ matching.user }}">{{ matching.user }}</a>
@@ -87,7 +87,7 @@
     {{ matching.timestamp }}
   {%- endif -%}
 {%- else -%}
-{% for mbid in matching.mbid %}<a class="action-icon" href="https://musicbrainz.org/{{ matching.type }}/{{ mbid }}"><img title="View matched entity on MusicBrainz" src="/static/images/mb.png" /></a> {% endfor -%}
+{% for mbid in matching.mbid %}<a class="action-icon" href="https://musicbrainz.org/{{ matching.type }}/{{ mbid }}"><img title="View matched {{ matching.type }} on MusicBrainz" src="/static/images/entity/{{ matching.type }}.png" /></a> {% endfor -%}
 {%- endif -%}
 </div>
 {%- endmacro -%}
