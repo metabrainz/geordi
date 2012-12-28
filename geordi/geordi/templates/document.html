@@ -125,7 +125,7 @@
   {%- set subitem_id = link_id | string + '-' + link[link_type.key] | string -%}
   <li style="clear:both" class="expander block-expander closed" id="li-subitem-{{ subitem_id }}"><span class="clicker"><code>[{{ link[link_type.key] }}]</code></span>
     {{ current_match_span(subitems[subitem_id], 'subitem', subitem_id) }}
-    {{ subitem_search(data._index, link[link_type.key], link_id) }}
+    {{ subitem_search(data._index, link_id, link[link_type.key]) }}
     {{ linker_content('subitem-linker-content', 'subitem-linker-content-' + subitem_id | string, 'Match ' + subitem_id | string, link, 'subitem', subitem_id, data._index, subitems[subitem_id]) }}
     <div class="li collapse">
     {{ json_pp(link, g.dictarray, 1) }}
