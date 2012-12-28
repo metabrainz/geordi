@@ -97,7 +97,7 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
     {%- for acoustid in track.acoustid %}<a href="https://acoustid.org/track/{{ acoustid }}">{{ acoustid[:4] }}…{{ acoustid[-4:]}}</a>{% if not loop.last %}<br />{% endif %}{% endfor -%}
   </td>
   {%- endif -%}
-  <td>{%- if track.subitem %}<a class="subitem-opener action-icon" data-subitem="{{ track.subitem }}" href="#li-subitem-{{ track.subitem }}"><img src="/static/images/arrow-down.png" /></a> 
+  <td>{%- if track.subitem %}<a class="subitem-opener action-icon" data-subitem="{{ track.subitem }}" href="#li-subitem-{{ track.subitem }}"><img title="Jump to subitem" src="/static/images/arrow-down.png" /></a> 
       {{ current_match_span(subitems[track.subitem], 'subitem', track.subitem, 1) }}
       {{ subitem_search(data._index, g.re.split('-', track.subitem)[0], g.re.split('-', track.subitem)[1]) }}
       {%- endif -%}
@@ -148,7 +148,7 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
 {%- endmacro -%}
 
 {%- macro search_mb_link(search_type, text) -%}
-<a class="action-icon" href="https://musicbrainz.org/search?query={{ g.quote(text) }}&type={{ search_type }}&limit=25&method=indexed"><img src="/static/images/search-mb.png" /></a>
+<a class="action-icon" href="https://musicbrainz.org/search?query={{ g.quote(text) }}&type={{ search_type }}&limit=25&method=indexed"><img title="Search MusicBrainz" src="/static/images/search-mb.png" /></a>
 {%- endmacro -%}
 
 {%- macro current_match_span(data, linker_type, id, sparse) -%}
@@ -174,7 +174,7 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
           {%- if auto %} auto{% endif %}"
       {% if id %}data-{{linker_type}}="{{id}}" {% endif %}href="#">
       {%- if verbose %}<small>{% if matched %}re{% endif %}link</small> {% endif -%}
-  <img src="/static/images/link.png" alt="{% if matched %}re{% endif %}link" /></a>
+  <img src="/static/images/link.png" title="{% if matched %}re{% endif %}link to MusicBrainz" /></a>
 {%- endmacro -%}
 
 {%- macro linker_content(class, id, title, json, type, item, index, matches_json) -%}
