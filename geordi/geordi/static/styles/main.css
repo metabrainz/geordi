@@ -150,6 +150,7 @@ table td, table th {
 .item-linker.verbose, .subitem-linker.verbose {
     border: 1px solid #444;
     text-decoration: none;
+    color: #000;
 }
 
 .item-linker.verbose:hover, .subitem-linker.verbose:hover {
