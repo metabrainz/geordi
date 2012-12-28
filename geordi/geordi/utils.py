@@ -33,3 +33,6 @@ def check_data_format(data):
 
     return data
 
+def uniq(list):
+    seen = []
+    return [c for c in list if not (c in seen or seen.append(c))]
