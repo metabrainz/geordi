@@ -41,6 +41,8 @@ def do_search_raw(query, indices, start_from=None, filters=None, doc_type='item'
         indices = app.config['AVAILABLE_INDICES']
     if start_from:
         query['from'] = start_from
+    if int(query.get('size', 10)) > 10000:
+        query['size'] = 10000;
     if filters:
         query['filter'] = filters
     return es.search(query, index = indices, doc_type = doc_type)
