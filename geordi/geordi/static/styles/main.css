@@ -87,6 +87,18 @@ select#id-index { width: 200px }
 ul.flashes { list-style-type: none; padding: 0; float: right; clear: right; }
 ul.flashes li { display: inline-block; background-color: papayawhip; border: 1px solid #bbb; margin: 2px; padding: 2px; border-radius: 2px; }
 
+input#id-query, textarea#id-query {
+    width: 60em;
+}
+
+div#id-query {
+    display: inline-block;
+}
+
+div#id-query input, div#id-query select {
+    width: 20em;
+}
+
 /* JSON pretty-printer */
 li.closed { list-style-image: url('/static/images/closed.png') }
 li.open { list-style-image: url('/static/images/open.png') }
@@ -103,6 +115,7 @@ i.icon {
 .closed > i.icon { background-image: url('/static/images/closed.png'); }
 .open > i.icon { background-image: url('/static/images/open.png'); }
 
+li.expander { clear: left; }
 div.li:after, .expander:after, .clearfix:after { content: '.'; display: block; visibility: hidden; height: 0; clear: both; }
 
 .plain-text { display: block; }

@@ -17,28 +17,28 @@
         <option value="raw-subitem"{% if request.args.get('type') == 'raw-subitem' %} selected="selected"{% endif %}>Search subitems by JSON query</option>
       </select>
       {%- if request.args.get('type', 'item') == 'item' -%}
-        <input type="text" data-searchtype="item" style="width: 60em" name="query" id="id-query" placeholder="Query" {% if query %}value="{{ query }}" {% endif %}/>
+        <input type="text" data-searchtype="item" name="query" id="id-query" placeholder="Query" {% if query %}value="{{ query }}" {% endif %}/>
       {%- elif request.args.get('type', 'item') == 'raw' -%}
-        <textarea name="query" data-searchtype="raw" style="width: 60em" id="id-query" placeholder="Query" cols=60 rows=8>{% if query %}{{ query }}{% endif %}</textarea>
+        <textarea name="query" data-searchtype="raw" id="id-query" placeholder="Query" cols=60 rows=8>{% if query %}{{ query }}{% endif %}</textarea>
       {%- elif request.args.get('type', 'item') == 'sub' -%}
-        <div id="id-query" data-searchtype="sub" style="display: inline-block;">
-          <input type="text" name="query" placeholder="ID" style="width: 20em" {% if query %}value="{{ query }}" {% endif %}/>
+        <div data-searchtype="sub" id="id-query">
+          <input type="text" name="query" placeholder="ID" {% if query %}value="{{ query }}" {% endif %}/>
           {%- if request.args.get('subitem_index') -%}
             {%- set selected_subitem_index = request.args.get('subitem_index') -%}
           {%- else -%}
             {%- set selected_subitem_index = g.all_indices[0] -%}
           {%- endif -%}
-          <select name="subitem_type" style="width: 20em">
+          <select name="subitem_type">
           {%- for (subitem_type, opts) in g.link_types[selected_subitem_index].iteritems() if subitem_type != "version" -%}
             <option{% if subitem_type == request.args.get('subitem_type') %} selected=selected{% endif %} value="{{ subitem_type }}">{{ opts.name }}</option>
           {%- endfor -%}
           </select>
-          <select name="subitem_index" style="width: 20em">{% for index in g.all_indices %}<option{% if index == request.args.get('subitem_index') %} selected=selected{% endif %}>{{index}}</option>{% endfor %}</select>
+          <select name="subitem_index">{% for index in g.all_indices %}<option{% if index == request.args.get('subitem_index') %} selected=selected{% endif %}>{{index}}</option>{% endfor %}</select>
         </div>
       {%- elif request.args.get('type', 'item') == 'subitem' -%}
-        <input type="text" data-searchtype="subitem" style="width: 60em" name="query" id="id-query" placeholder="Query" {% if query %}value="{{ query }}" {% endif %}/>
+        <input type="text" data-searchtype="subitem" name="query" id="id-query" placeholder="Query" {% if query %}value="{{ query }}" {% endif %}/>
       {%- elif request.args.get('type', 'item') == 'raw-subitem' -%}
-        <textarea name="query" data-searchtype="raw-subitem" style="width: 60em" id="id-query" placeholder="Query" cols=60 rows=8>{% if query %}{{ query }}{% endif %}</textarea>
+        <textarea name="query" data-searchtype="raw-subitem" id="id-query" placeholder="Query" cols=60 rows=8>{% if query %}{{ query }}{% endif %}</textarea>
       {%- endif -%}
       <input type="submit" class="btn primary" value="Search" />
     </div>
@@ -69,7 +69,7 @@
 {% block layoutjs %}
   <script>
     geordi.subtype_options = { {% for (index, link_types) in g.link_types.iteritems() %}"{{index}}": [{% for (subitem_type, opts) in link_types.iteritems() if subitem_type != "version" %}["{{subitem_type}}", "{{opts.name}}"]{% if not loop.last %}, {% endif %}{% endfor %}]{% endfor %} };
-    geordi.index_options_html = '<select id="id-subitem_index" name="subitem_index" style="width: 20em">{% for index in g.all_indices %}<option>{{index}}</option>{% endfor %}</select>';
+    geordi.index_options_html = '<select id="id-subitem_index" name="subitem_index">{% for index in g.all_indices %}<option>{{index}}</option>{% endfor %}</select>';
     geordi.link_types = {{ g.json.dumps(g.link_types) | safe }}
   </script>
   <script src="/static/scripts/search_form.js"></script>

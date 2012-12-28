@@ -10,10 +10,10 @@ function add_subitem_type_listener() {
 add_subitem_type_listener()
 
 function raw_query(type, query) {
-    return '<textarea name="query" data-searchtype="' + type + '" style="width: 60em" id="id-query" placeholder="Query" cols=60 rows=8>' + query + '</textarea>'
+    return '<textarea name="query" data-searchtype="' + type + '" id="id-query" placeholder="Query" cols=60 rows=8>' + query + '</textarea>'
 }
 function text_query(type, query) {
-   return '<input type="text" data-searchtype="' + type + '" style="width: 60em" name="query" id="id-query" placeholder="Query" value="' + query + '" />'
+   return '<input type="text" data-searchtype="' + type + '" name="query" id="id-query" placeholder="Query" value="' + query + '" />'
 }
 
 $('#id-type').change(function() {
@@ -47,9 +47,9 @@ $('#id-type').change(function() {
     }
 
     else if ($this.val() == 'sub') {
-      $('#id-query').replaceWith('<div id="id-query" data-searchtype="sub" style="display: inline-block;">' +
-        '<input type="text" name="query" placeholder="ID" style="width: 20em" />' +
-        '<select id="id-subitem_type" name="subitem_type" style="width: 20em">' +
+      $('#id-query').replaceWith('<div id="id-query" data-searchtype="sub">' +
+        '<input type="text" name="query" placeholder="ID" />' +
+        '<select id="id-subitem_type" name="subitem_type">' +
         '</select>' +
         geordi.index_options_html +
         '</div>');
