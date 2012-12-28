@@ -87,7 +87,7 @@
     {{ matching.timestamp }}
   {%- endif -%}
 {%- else -%}
-{% for mbid in matching.mbid %}<a href="https://musicbrainz.org/{{ matching.type }}/{{ mbid }}"><img src="/static/images/mb.png" /></a> {% endfor -%}
+{% for mbid in matching.mbid %}<a class="action-icon" href="https://musicbrainz.org/{{ matching.type }}/{{ mbid }}"><img src="/static/images/mb.png" /></a> {% endfor -%}
 {%- endif -%}
 </div>
 {%- endmacro -%}
