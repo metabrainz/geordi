@@ -74,20 +74,24 @@
   <script src="/static/scripts/search_form.js"></script>
 {% endblock %}
 
-{%- macro match_span(matching, show_timestamp) -%}
-<div class="match">{{ matching.type }}
+{%- macro match_span(matching, show_timestamp, sparse) -%}
+<div class="match{% if sparse %} sparse{%- endif -%}">
+{%- if not sparse -%}<img src="/static/images/mb.png" /> {{ matching.type }}
   {% for mbid in matching.mbid %}<a href="https://musicbrainz.org/{{ matching.type }}/{{ mbid }}">{{ mbid[:4] }}…{{ mbid[-4:] }}</a>{% if not loop.last %}, {% endif %}{% endfor %}
   [{% if not matching.auto -%}
      <a href="https://musicbrainz.org/user/{{ matching.user }}">{{ matching.user }}</a>
    {%- else -%}
      <span title="{{ matching.ip }}">{{ matching.user }}</span>
    {%- endif %}]
-   {%- if show_timestamp %}
-     {{ matching.timestamp }}
-   {%- endif -%}
+  {%- if show_timestamp %}
+    {{ matching.timestamp }}
+  {%- endif -%}
+{%- else -%}
+{% for mbid in matching.mbid %}<a href="https://musicbrainz.org/{{ matching.type }}/{{ mbid }}"><img src="/static/images/mb.png" /></a> {% endfor -%}
+{%- endif -%}
 </div>
 {%- endmacro -%}
 
 {%- macro subitem_search(index, type, id) -%}
-<a class="subitem-search" href="/?type=sub&query={{ id }}&subitem_type={{ type }}&subitem_index={{ index }}&auto=on&un=on&human=on&s=1"><img src="/static/images/search.png" alt="Search" /></a>
+<a class="subitem-search action-icon" href="/?type=sub&query={{ id }}&subitem_type={{ type }}&subitem_index={{ index }}&auto=on&un=on&human=on&s=1"><img src="/static/images/search.png" alt="Search" /></a>
 {%- endmacro -%}

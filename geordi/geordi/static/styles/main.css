@@ -91,14 +91,16 @@ table td, table th {
     background-color: whitesmoke;
 }
 
+/* Match Dialog */
+.matcher {
+    width: 560px;
+    padding: 0px;
+}
+
 .match-form textarea {
     height: 60px;
     width: 50%;
-}
-
-.match-dd {
-    width: 560px;
-    padding: 0px;
+    vertical-align: text-top;
 }
 
 .unmatch-form {
@@ -119,10 +121,10 @@ table td, table th {
 .item-linker-content { display:none; }
 .subitem-linker-content { display:none; }
 
-/* Overlay */
+/* Modal Overlay */
 #simplemodal-overlay { background-color:#000; }
 
-/* Container */
+/* Modal Container */
 #simplemodal-container { height:360px; width:600px; background-color:#FFF; border:4px solid black; padding:12px; }
 #simplemodal-container a.modalCloseImg {background:url('/static/images/x.png') no-repeat; width:32px; height:32px; display:inline; z-index:3200; position:absolute; top:-18px; right:-18px; cursor:pointer;}
 
@@ -131,10 +133,18 @@ table td, table th {
     margin-top: 1em;
 }
 
-.item-linker, .subitem-linker {
+.action-icon {
     display: inline-block;
+}
+
+.action-icon, .item-linker.verbose, .subitem-linker.verbose {
     padding: 0px 2px;
     border-radius: 2px;
+}
+
+.action-icon img, .item-linker.verbose img, .subitem-linker.verbose img {
+    vertical-align: -2px;
+    margin-top: 2px;
 }
 
 .item-linker.verbose, .subitem-linker.verbose {
@@ -143,11 +153,7 @@ table td, table th {
     color: inherit;
 }
 
-.item-linker img, .subitem-linker img {
-    vertical-align: -2px;
-}
-
-.item-linker:hover, .subitem-linker:hover {
+.item-linker.verbose:hover, .subitem-linker.verbose:hover {
     border-color: #666;
 }
 
@@ -201,4 +207,12 @@ li:nth-child(odd) .result-box {
     border: 1px solid #bbb;
     padding: 0px 2px;
     display: inline-block;
+}
+
+.match.sparse {
+    border: none;
+}
+
+.match img {
+    vertical-align: -2px;
 }

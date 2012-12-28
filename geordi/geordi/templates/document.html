@@ -16,13 +16,13 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
 <h3>Summary</h3>
 <table class="zebra"><tbody>
     {% for title in mapping.release.title -%}
-    <tr><th>Title{% if mapping.release.title | length > 1 %} (alternate){% endif %}:</th><td>{{ title }}{%- if loop.first %} {{ link_opener('item', data._id, data) }}{%- endif-%}</td></tr>
+    <tr><th>Title{% if mapping.release.title | length > 1 %} (alternate){% endif %}:</th><td>{{ title }}{%- if loop.first %} {{ current_match_span(data, 'item', none, 1) }}{%- endif-%}</td></tr>
     {%- endfor %}
     <tr><th>Artist:</th>
         <td>{% for artist in mapping.release.artist -%}
               {%- if artist.subitem -%}
               <a class="subitem-opener" data-subitem="{{artist.subitem}}" href="#li-subitem-{{artist.subitem}}">{{artist.name}}</a>
-              {{ link_opener('subitem', artist.subitem, subitems[artist.subitem]) }}
+              {{ current_match_span(subitems[artist.subitem], 'subitem', artist.subitem, true) }}
               {{ subitem_search(data._index, g.re.split('-', artist.subitem)[0], g.re.split('-', artist.subitem)[1]) }}
               {%- else -%}{{artist.name}}{%- endif -%}
               {% if loop.revindex > 2 %}, {% elif loop.revindex == 2 %} and {% endif -%}
@@ -35,7 +35,7 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
     <tr><th>Label:</th>
         <td>{%- if label.subitem -%}
               <a class="subitem-opener" data-subitem="{{label.subitem}}" href="#li-subitem-{{label.subitem}}">{{label.name}}</a>
-              {{ link_opener('subitem', label.subitem, subitems[label.subitem]) }}
+              {{ current_match_span(subitems[label.subitem], 'subitem', label.subitem, true) }}
               {{ subitem_search(data._index, g.re.split('-', label.subitem)[0], g.re.split('-', label.subitem)[1]) }}
               {%- else -%}{{label.name}}{%- endif -%}
     </td></tr>
@@ -81,7 +81,7 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
   <td>{% for artist in track.artist -%}
               {%- if artist.subitem -%}
               <a class="subitem-opener" data-subitem="{{artist.subitem}}" href="#li-subitem-{{artist.subitem}}">{{artist.name}}</a>
-              {{ link_opener('subitem', artist.subitem, subitems[artist.subitem]) }}
+              {{ current_match_span(subitems[artist.subitem], 'subitem', artist.subitem, 1) }}
               {{ subitem_search(data._index, g.re.split('-', artist.subitem)[0], g.re.split('-', artist.subitem)[1]) }}
               {%- else -%}{{artist.name}}{%- endif -%}
               {% if loop.revindex > 2 %}, {% elif loop.revindex == 2 %} and {% endif -%}
@@ -93,18 +93,22 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
     {%- for acoustid in track.acoustid %}<a href="https://acoustid.org/track/{{ acoustid }}">{{ acoustid[:4] }}…{{ acoustid[-4:]}}</a>{% if not loop.last %}<br />{% endif %}{% endfor -%}
   </td>
   {%- endif -%}
-  <td>{% if track.subitem %} <small>(<a class="subitem-opener" data-subitem="{{ track.subitem }}" href="#li-subitem-{{ track.subitem }}">subitem</a>) 
-      {{ link_opener('subitem', track.subitem, subitems[track.subitem]) }}
+  <td>{% if track.subitem %}<a class="subitem-opener action-icon" data-subitem="{{ track.subitem }}" href="#li-subitem-{{ track.subitem }}"><img src="/static/images/arrow-down.png" /></a> 
+      {{ current_match_span(subitems[track.subitem], 'subitem', track.subitem, 1) }}
       {{ subitem_search(data._index, g.re.split('-', track.subitem)[0], g.re.split('-', track.subitem)[1]) }}
-    </small>{% endif %}
+    {% endif %}
   </td>
 </tr>
 {%- endfor -%}
 </tbody></table>
 {% endif %}
 
+{{ section_links('json-source') }}
+<h2 id="json-source">JSON Source</h2>
+<div>{{ json_pp(data._source, g.dictarray) }}</div>
+
 {{ section_links('link') }}
-<h2 id="link">Link to MusicBrainz</h2>
+<h2 style="clear: both" id="link">Link to MusicBrainz</h2>
 <dl class="clearfix">
 <dt>Whole Item</dt>
 <dd>{{ current_match_span(data, 'item') }}
@@ -128,29 +132,25 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
 </ul></dd>
 {%- endfor -%}
 </dl>
-
-{{ section_links('json-source') }}
-<h2 id="json-source">JSON Source</h2>
-<div>{{ json_pp(data._source, g.dictarray) }}</div>
 {% endblock %}
 
 {%- macro section_links(section) -%}
 <div class="section-links"><small>Other sections:
   {% if section != 'mapping' %}<a href="#mapping">[Extracted Information]</a>{% endif %}
+  {% if section != 'json-source' %}<a href="#json-source">[JSON Source]</a>{% endif %}
   {% if section != 'link' %}<a href="#link">[Link to MusicBrainz]</a>{% endif %}
-  {% if section != 'json-source' %}<a href="#json-source">[JSON Source]</a></small>{% endif %}
-</div>
+</small></div>
 {%- endmacro -%}
 
-{%- macro current_match_span(data, linker_type, id) -%}
+{%- macro current_match_span(data, linker_type, id, sparse) -%}
 {%- if data and data._source._geordi and data._source._geordi.matchings.current_matching %}
 {%- set current_matching = data._source._geordi.matchings.current_matching -%}
 {%- endif %}
 <span class="current-match{% if current_matching and current_matching.auto %} auto{% endif %}">
     {%- if current_matching %}
-      {{ match_span(current_matching) }}
+      {{ match_span(current_matching, none, sparse) }}
     {%- endif %}
-    {{ link_opener(linker_type, id, data, 1) }}
+    {{ link_opener(linker_type, id, data, not sparse) }}
 </span>
 {%- endmacro -%}
 
@@ -160,7 +160,7 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
   {%- set auto = data._source._geordi.matchings.current_matching.auto -%}
 {%- endif -%}
 <a class="{{ linker_type }}-linker
-          {%- if verbose %} verbose{% endif %}
+          {%- if verbose %} verbose{% else %} action-icon{% endif %}
           {%- if matched %} matched{% endif %}
           {%- if auto %} auto{% endif %}"
       {% if id %}data-{{linker_type}}="{{id}}" {% endif %}href="#">
@@ -169,11 +169,39 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
 {%- endmacro -%}
 
 {%- macro linker_content(class, id, title, json, type, item, index, matches_json) -%}
+{%- if matches_json and matches_json._source._geordi -%}
+  {%- set matchings = matches_json._source._geordi.matchings -%}
+  {%- set current_matching = matchings.current_matching -%}
+{%- endif -%}
 <div id="{{ id }}" class="{{ class }}">
   <h3>{{ title }}</h3>
+  <h4>Match</h4>
+  <div class="matcher">
+    <form class="match-form" id="match-{{type}}-{{item}}" action="/api/match{{type}}/{{ index }}/{{ item }}" method="get">
+      <select name="type">
+        <option{% if current_matching.type == 'release' %} selected="selected"{% endif %}>release</option>
+        <option{% if current_matching.type == 'release-group' %} selected="selected"{% endif %}>release-group</option>
+        <option{% if current_matching.type == 'recording' %} selected="selected"{% endif %}>recording</option>
+        <option{% if current_matching.type == 'work' %} selected="selected"{% endif %}>work</option>
+        <option{% if current_matching.type == 'artist' %} selected="selected"{% endif %}>artist</option>
+        <option{% if current_matching.type == 'label' %} selected="selected"{% endif %}>label</option>
+      </select>
+      <textarea name="mbids" placeholder="MBIDs, comma separated">
+      {%- if current_matching.mbid | length > 0 -%}{{ g.comma_only_list(current_matching.mbid) }}{%- endif -%}
+      </textarea>
+      <input type="submit" class="btn primary" value="Match" />
+    </form>
+    {% if current_matching -%}<div class="current-match">Current match: {{ match_span(current_matching) }}
+      <form class="unmatch-form" action="/api/match{{type}}/{{index}}/{{item}}" method="get"><input type="submit" value="Unmatch" /><input type="hidden" name="unmatch" value="true" /></form></div>
+    {%- endif %}
+    <div class="response"></div>
+  </div>
+
+  {# Only show if there's anything to display #}
+  {%- if (matchings and (matchings.matchings | length > 0 or matchings.auto_matchings | length > 0))
+          or json -%}
+  <h4>Additional Information</h4>
   <dl>{%- if matches_json and matches_json._source._geordi -%}
-        {%- set matchings = matches_json._source._geordi.matchings -%}
-        {%- set current_matching = matchings.current_matching -%}
         {%- if matchings.matchings | length > 0 -%}
           <dt class="expander block-expander closed"><i class="icon"></i><span class="clicker">Human Matches</span></dt>
           <dd class="collapse">{% for match in matchings.matchings %}{{ match_span(match, true) }}{% if not loop.last %}<br />{% endif %}{% endfor %}</dd>
@@ -182,35 +210,13 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
           <dt class="expander block-expander closed"><i class="icon"></i><span class="clicker">Automatic Matches</span></dt>
           <dd class="collapse">{% for match in matchings.auto_matchings %}{{ match_span(match, true) }}{% if not loop.last %}<br />{% endif %}{% endfor %}</dd>
         {%- endif -%}
-      {%- else -%}{%- set current_matching = none -%}
       {%- endif -%}
       {%- if json -%}
         <dt class="expander block-expander closed"><i class="icon"></i><span class="clicker">JSON</span></dt>
         <dd class="collapse">{{ json_pp(json, g.dictarray) }}</dd>
       {%- endif -%}
-
-      <dt class="expander block-expander open"><i class="icon"></i><span class="clicker">Match</span></dt>
-      <dd class="match-dd"><div>
-        <form class="match-form" id="match-{{type}}-{{item}}" action="/api/match{{type}}/{{ index }}/{{ item }}" method="get">
-          <select name="type">
-            <option{% if current_matching.type == 'release' %} selected="selected"{% endif %}>release</option>
-            <option{% if current_matching.type == 'release-group' %} selected="selected"{% endif %}>release-group</option>
-            <option{% if current_matching.type == 'recording' %} selected="selected"{% endif %}>recording</option>
-            <option{% if current_matching.type == 'work' %} selected="selected"{% endif %}>work</option>
-            <option{% if current_matching.type == 'artist' %} selected="selected"{% endif %}>artist</option>
-            <option{% if current_matching.type == 'label' %} selected="selected"{% endif %}>label</option>
-          </select>
-          <textarea name="mbids" placeholder="MBIDs, comma separated">
-          {%- if current_matching.mbid | length > 0 -%}{{ g.comma_only_list(current_matching.mbid) }}{%- endif -%}
-          </textarea>
-          <input type="submit" class="btn primary" value="Match" />
-        </form>
-        {% if current_matching -%}<div class="current-match">Current match: {{ match_span(current_matching) }}
-          <form class="unmatch-form" action="/api/match{{type}}/{{index}}/{{item}}" method="get"><input type="submit" value="Unmatch" /><input type="hidden" name="unmatch" value="true" /></form></div>
-        {%- endif %}
-        <div class="response"></div>
-      </div></dd>
   </dl>
+  {%- endif -%}
 </div>
 {%- endmacro -%}
 
