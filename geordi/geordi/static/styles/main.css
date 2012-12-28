@@ -33,6 +33,13 @@ dt, dd { float: left; }
 dt { clear: left; line-height: 20px; }
 dd { line-height: 20px; padding-right: 3px; }
 h1 { margin: 0 }
+hr {
+    margin: 0;
+    color: #bbb;
+    background-color: #bbb;
+    border: 0px;
+    padding: 1px;
+}
 
 table {
     border-collapse: collapse;
@@ -207,6 +214,8 @@ div.li:after, .expander:after, .clearfix:after { content: '.'; display: block; v
 .item-linker.matched.auto, .subitem-linker.matched.auto {
     background-color: #FFDB58;
 }
+
+.mediumheader { padding: 0; }
 
 /* Search Page */
 ul.search-results {
