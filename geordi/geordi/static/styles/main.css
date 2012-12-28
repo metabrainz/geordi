@@ -195,6 +195,8 @@ div.li:after, .expander:after, .clearfix:after { content: '.'; display: block; v
 .action-icon img, .item-linker.verbose img, .subitem-linker.verbose img {
     vertical-align: -2px;
     margin-top: 2px;
+    height: 16px;
+    width: 16px;
 }
 
 .item-linker.verbose, .subitem-linker.verbose {

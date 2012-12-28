@@ -77,7 +77,7 @@
 
 {%- macro match_span(matching, show_timestamp, sparse) -%}
 <div class="match{% if sparse %} sparse{%- endif -%}">
-{%- if not sparse -%}<img src="/static/images/entity/{{matching.type}}.png" />
+{%- if not sparse -%}<img height="16px" width="16px" src="/static/images/entity/{{matching.type}}.png" />
   {% for mbid in matching.mbid %}<a href="https://musicbrainz.org/{{ matching.type }}/{{ mbid }}">{{ mbid[:4] }}…{{ mbid[-4:] }}</a>{% if not loop.last %}, {% endif %}{% endfor %}
   [{% if not matching.auto -%}
      <a href="https://musicbrainz.org/user/{{ matching.user }}">{{ matching.user }}</a>
