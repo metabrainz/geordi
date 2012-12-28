@@ -16,7 +16,7 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
 <h3>Summary</h3>
 <table class="zebra"><tbody>
     {% for title in mapping.release.title -%}
-    <tr><th>Title{% if mapping.release.title | length > 1 %} (alternate){% endif %}:</th><td>{{ title }}{%- if loop.first %} {{ current_match_span(data, 'item', none, 1) }}{%- endif-%}</td></tr>
+    <tr><th>Title{% if mapping.release.title | length > 1 %} (alternate){% endif %}:</th><td>{{ title }}{%- if loop.first %} {{ current_match_span(data, 'item', none, 1) }}{%- endif-%} {{ search_mb_link('release', title) }}</td></tr>
     {%- endfor %}
     <tr><th>Artist:</th>
         <td>{% for artist in mapping.release.artist -%}
@@ -25,6 +25,7 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
               {{ current_match_span(subitems[artist.subitem], 'subitem', artist.subitem, true) }}
               {{ subitem_search(data._index, g.re.split('-', artist.subitem)[0], g.re.split('-', artist.subitem)[1]) }}
               {%- else -%}{{artist.name}}{%- endif -%}
+              {{ search_mb_link('artist', artist.name) }}
               {% if loop.revindex > 2 %}, {% elif loop.revindex == 2 %} and {% endif -%}
             {%- endfor %}{% if mapping.release.artist | length > 1 %} <small>({{mapping.release.artist | length}} artists)</small>{% endif -%}
     </td></tr>
@@ -38,6 +39,7 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
               {{ current_match_span(subitems[label.subitem], 'subitem', label.subitem, true) }}
               {{ subitem_search(data._index, g.re.split('-', label.subitem)[0], g.re.split('-', label.subitem)[1]) }}
               {%- else -%}{{label.name}}{%- endif -%}
+              {{ search_mb_link('label', label.name) }}
     </td></tr>
     {%- endfor %}
     {% for catalog_number in mapping.release.catalog_number -%}
@@ -77,13 +79,15 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
     {%- for totaltracks in track.totaltracks %}{{ totaltracks }}{% if not loop.last %}<br />{% endif %}{% endfor -%}
   </td>
   {%- endif -%}
-  <td>{% for title in track.title %}{{ title }}{% if not loop.last %}<br />{% endif %}{% endfor %}</td>
+  {%- if track.title | length > 1 -%}{%- set inline_titles = true -%}{%- endif -%}
+  <td>{% for title in track.title %}{{ title }}{%- if inline_titles %} {{ search_mb_link('recording', title) }}{%- endif -%}{% if not loop.last %}<br />{% endif %}{% endfor %}</td>
   <td>{% for artist in track.artist -%}
               {%- if artist.subitem -%}
               <a class="subitem-opener" data-subitem="{{artist.subitem}}" href="#li-subitem-{{artist.subitem}}">{{artist.name}}</a>
               {{ current_match_span(subitems[artist.subitem], 'subitem', artist.subitem, 1) }}
               {{ subitem_search(data._index, g.re.split('-', artist.subitem)[0], g.re.split('-', artist.subitem)[1]) }}
-              {%- else -%}{{artist.name}}{%- endif -%}
+              {%- else -%}{{artist.name}}{%- endif %}
+              {{ search_mb_link('artist', artist.name) }}
               {% if loop.revindex > 2 %}, {% elif loop.revindex == 2 %} and {% endif -%}
             {%- endfor %}{% if track.artist | length > 1 %} <small>({{track.artist | length}} artists)</small>{% endif -%}
   </td>
@@ -93,10 +97,11 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
     {%- for acoustid in track.acoustid %}<a href="https://acoustid.org/track/{{ acoustid }}">{{ acoustid[:4] }}…{{ acoustid[-4:]}}</a>{% if not loop.last %}<br />{% endif %}{% endfor -%}
   </td>
   {%- endif -%}
-  <td>{% if track.subitem %}<a class="subitem-opener action-icon" data-subitem="{{ track.subitem }}" href="#li-subitem-{{ track.subitem }}"><img src="/static/images/arrow-down.png" /></a> 
+  <td>{%- if track.subitem %}<a class="subitem-opener action-icon" data-subitem="{{ track.subitem }}" href="#li-subitem-{{ track.subitem }}"><img src="/static/images/arrow-down.png" /></a> 
       {{ current_match_span(subitems[track.subitem], 'subitem', track.subitem, 1) }}
       {{ subitem_search(data._index, g.re.split('-', track.subitem)[0], g.re.split('-', track.subitem)[1]) }}
-    {% endif %}
+      {%- endif -%}
+      {%- if not inline_titles and track.title | length > 0 %} {{ search_mb_link('recording', track.title[0]) }}{%- endif -%}
   </td>
 </tr>
 {%- endfor -%}
@@ -140,6 +145,10 @@ This is <code>{{ data._id }}</code> from the index <code>{{ data._index }}</code
   {% if section != 'json-source' %}<a href="#json-source">[JSON Source]</a>{% endif %}
   {% if section != 'link' %}<a href="#link">[Link to MusicBrainz]</a>{% endif %}
 </small></div>
+{%- endmacro -%}
+
+{%- macro search_mb_link(search_type, text) -%}
+<a class="action-icon" href="https://musicbrainz.org/search?query={{ g.quote(text) }}&type={{ search_type }}&limit=25&method=indexed"><img src="/static/images/search-mb.png" /></a>
 {%- endmacro -%}
 
 {%- macro current_match_span(data, linker_type, id, sparse) -%}

@@ -27,6 +27,7 @@ from geordi.utils import check_data_format
 import json
 import uuid
 import urllib2
+import urllib
 import re
 import copy
 import collections
@@ -37,12 +38,16 @@ from pyelasticsearch import ElasticHttpNotFoundError
 def dictarray(dictionary):
     return [{'k': i[0], 'v': i[1]} for i in dictionary.iteritems()]
 
+def quote(text):
+    return urllib.quote_plus(text.encode('utf-8'))
+
 @app.before_request
 def before_request():
     g.all_indices = app.config['AVAILABLE_INDICES']
     g.link_types = dict([(index, get_link_types_by_index(index)) for index in app.config['AVAILABLE_INDICES']])
     g.json = json
     g.re = re
+    g.quote = quote
     g.comma_list = comma_list
     g.comma_only_list = comma_only_list
     g.dictarray = dictarray
