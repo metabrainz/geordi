@@ -15,6 +15,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division, absolute_import
+import re
+from htmlentitydefs import name2codepoint
+name2codepoint['#39'] = 39
+
 def check_data_format(data):
     "Initialize or correct the special _geordi key in the document"
     data.setdefault('_geordi', {
@@ -36,3 +40,8 @@ def check_data_format(data):
 def uniq(list):
     seen = []
     return [c for c in list if not (c in seen or seen.append(c))]
+
+def htmlunescape(text):
+    "unescape HTML code refs; c.f. http://wiki.python.org/moin/EscapingHtml"
+    return re.sub('&({});'.format('|'.join(name2codepoint)),
+                          lambda m: unichr(name2codepoint[m.group(1)]), text)

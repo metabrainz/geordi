@@ -17,7 +17,7 @@
 from __future__ import division, absolute_import, unicode_literals
 
 from geordi.mappings.util import concatenate_text, collect_text, comma_list, base_mapping, format_track_length
-from geordi.utils import uniq
+from geordi.utils import uniq, htmlunescape
 
 import re
 
@@ -80,35 +80,40 @@ class wcd():
             u'format': unicode(x['format']['text']),
             u'filename': unicode(x['_name'])
             }
-        if 'title' in x and x['title'] and 'text' in x['title']:
+        try:
             f[u'title'] = unicode(x['title']['text'])
-        if 'artist' in x and x['artist'] and 'text' in x['artist']:
+        except: pass
+        try:
             f[u'artist'] = unicode(x['artist']['text'])
-        if 'length' in x and x['length'] and 'text' in x['length']:
+        except: pass
+        try:
             f[u'length'] = int(float(x['length']['text']) * 1000)
-        if 'track' in x and x['track'] and 'text' in x['track']:
+        except: pass
+        try:
             f[u'number'] = unicode(x['track']['text'])
-        if 'external-identifier' in x:
-            f[u'acoustid'] = [re.sub('^urn:acoustid:', '', acoustid) for acoustid in collect_text(x['external-identifier'], 'urn:acoustid') if acoustid != 'urn:acoustid:unknown']
+        except: pass
+        try:
+            f[u'acoustid'] = [re.sub('^urn:acoustid:', '', acoustid) for acoustid in collect_text(x['external-identifier'], 'urn:acoustid(?!:unknown)')]
+        except: pass
         return f
 
     def _extract_track(self, track, links):
-        f = {'title': [], 'artist': [], 'length': [], 'length_formatted': [], 'number': [], 'totaltracks': []}
+        f = base_mapping('track')
         f['subitem'] = 'file-{}'.format(track['sha1']['text'])
         try:
             f['title'] = [track['title']['text']]
-        except (KeyError, TypeError): pass
+        except: pass
         try:
             f['artist'] = [{'name': track['artist']['text']}]
             for artist in links['artist_id']:
                 if artist['name'] == f['artist'][0]['name']:
                     f['artist'][0]['subitem'] = 'artist_id-{}'.format(artist['wcd_artist_id'])
-        except (KeyError, TypeError): pass
+        except: pass
         try:
             f['length'] = [int(float(track['length']['text']) * 1000)]
             f['length_formatted'] = [format_track_length(length) for length in f['length']]
-        except (KeyError, TypeError): pass
-        if 'track' in track and track['track'] and 'text' in track['track']:
+        except: pass
+        try:
             numbers = [re.split('/', track['track']['text'])[0]]
             for num in numbers:
                 try:
@@ -123,6 +128,7 @@ class wcd():
                         f['totaltracks'].append(str(int(num)))
                     except ValueError:
                         f['totaltracks'].append(num)
+        except: pass
 
 
         disk_re = re.compile('(cd|dis[ck])\s*(\d+)', re.IGNORECASE)
@@ -132,7 +138,7 @@ class wcd():
             f['medium'] = []
 
         if 'external-identifier' in track:
-            f[u'acoustid'] = [re.sub('^urn:acoustid:', '', acoustid) for acoustid in collect_text(track['external-identifier'], 'urn:acoustid') if acoustid != 'urn:acoustid:unknown']
+            f[u'acoustid'] = [re.sub('^urn:acoustid:', '', acoustid) for acoustid in collect_text(track['external-identifier'], 'urn:acoustid(?!:unknown)')]
         else:
             f[u'acoustid'] = []
 
@@ -140,26 +146,29 @@ class wcd():
 
     def map(self, data):
         target = base_mapping('release')
-        target['version'] = 5
+        target['version'] = 6
         release = target['release']
 
         # Release Title
         try:
-            title_candidates = collect_text(data['meta_xml']['metadata']['album'])
-        except KeyError:
+            title_candidates = [htmlunescape(data['what_cd_json']['response']['group']['name'])]
+        except:
             title_candidates = []
+        try:
+            title_candidates.extend(collect_text(data['meta_xml']['metadata']['album']))
+        except: pass
         try:
             title_list = re.split(' / ', data['meta_xml']['metadata']['title']['text'], maxsplit=2)
             if title_list[0] != 'Various Artists':
                 title_candidates.append(title_list[0])
             else:
                 title_candidates.append(title_list[1])
-        except (KeyError, TypeError): pass
+        except: pass
         release['title'] = uniq(title_candidates)
 
         # Release Date
         try:
-            release['date'] = [data['meta_xml']['metadata']['year']['text']]
+            release['date'] = collect_text(data['meta_xml']['metadata']['year'])
         except: pass
 
         # Release Artists

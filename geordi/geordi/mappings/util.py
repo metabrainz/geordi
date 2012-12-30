@@ -30,18 +30,19 @@ def comma_only_list(lst):
     return ", ".join(lst)
 
 def collect_text(block, regex='.*'):
+    match = re.compile(regex)
     if block is None:
         return []
     try:
         text = unicode(block['text'])
-        if re.search(regex, text):
+        if match.search(text):
             return [text]
         else:
             return []
     except KeyError:
         return []
     except TypeError:
-        return [unicode(entry['text']) for entry in block if (entry and 'text' in entry and re.search(regex, entry['text']))]
+        return [unicode(entry['text']) for entry in block if (entry and 'text' in entry and match.search(entry['text']))]
 
 def concatenate_text(block, regex='.*', combiner=comma_list):
     return combiner(collect_text(block, regex))
@@ -60,6 +61,8 @@ def base_mapping(maptype):
                 'tracks': []
             }
         })
+    elif maptype == 'track': # yes, this will only happen as part of other things. recording is different.
+        mapping = {'title': [], 'artist': [], 'length': [], 'length_formatted': [], 'number': [], 'totaltracks': []}
     else:
         raise Exception('unimplemented')
     return mapping
