@@ -146,7 +146,7 @@ class wcd():
 
     def map(self, data):
         target = base_mapping('release')
-        target['version'] = 6
+        target['version'] = 7
         release = target['release']
 
         # Release Title
@@ -205,6 +205,14 @@ class wcd():
                       in data['files_xml']['files']['file']
                       if (x['_source'] == 'original' and x['format']['text'] in self._acceptable_formats())],
                   key=self._track_sorter)
+        except: pass
+
+        # URLs
+        try:
+            release['urls'].append(
+                {"url": data['what_cd_json']['response']['group']['wikiImage'],
+                 "type": "cover art"}
+            )
         except: pass
 
         return target

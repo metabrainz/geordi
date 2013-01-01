@@ -40,6 +40,9 @@
       {% for catalog_number in mapping.release.catalog_number -%}
       <tr><th>Catalog Number:</th><td>{{ catalog_number }}</td></tr>
       {%- endfor %}
+      {% for url in mapping.release.urls if url.type == "cover art" -%}
+      <tr><th>Cover Art:</th><td>{{ url.url | urlize(40) }}</td></tr>
+      {%- endfor %}
       <tr><th>Tracks:</th><td>{{ mapping.release.tracks | length }}</td></tr>
   </tbody></table>
   <h3>Tracklist</h3>

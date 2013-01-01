@@ -58,7 +58,8 @@ def base_mapping(maptype):
                 'label': [],
                 'catalog_number': [],
                 'combined_artist': '',
-                'tracks': []
+                'tracks': [],
+                'urls': [],
             }
         })
     elif maptype == 'track': # yes, this will only happen as part of other things. recording is different.
