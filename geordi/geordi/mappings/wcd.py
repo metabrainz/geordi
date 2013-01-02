@@ -146,7 +146,7 @@ class wcd():
 
     def map(self, data):
         target = base_mapping('release')
-        target['version'] = 7
+        target['version'] = 8
         release = target['release']
 
         # Release Title
