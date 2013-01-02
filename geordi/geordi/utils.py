@@ -41,7 +41,13 @@ def uniq(list):
     seen = []
     return [c for c in list if not (c in seen or seen.append(c))]
 
+def htmldefchar(code):
+    if code[0] == '#':
+        return unichr(int(code[1:]))
+    else:
+        return unichr(name2codepoint[code])
+
 def htmlunescape(text):
     "unescape HTML code refs; c.f. http://wiki.python.org/moin/EscapingHtml"
-    return re.sub('&({});'.format('|'.join(name2codepoint)),
-                          lambda m: unichr(name2codepoint[m.group(1)]), text)
+    return re.sub(r'&({}|#\d+);'.format('|'.join(name2codepoint)),
+                          lambda m: htmldefchar(m.group(1)), text)
