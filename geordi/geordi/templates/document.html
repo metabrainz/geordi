@@ -38,7 +38,7 @@
       </td></tr>
       {%- endfor %}
       {% for catalog_number in mapping.release.catalog_number -%}
-      <tr><th>Catalog Number:</th><td>{{ catalog_number }}</td></tr>
+      <tr><th>Catalog Number:</th><td>{{ catalog_number }} {{ search_mb_link('release', 'catno:"' + catalog_number + '"', 1) }}</td></tr>
       {%- endfor %}
       {% for url in mapping.release.urls if url.type == "cover art" -%}
       <tr><th>Cover Art:</th><td>{{ url.url | urlize(40) }}</td></tr>
@@ -148,8 +148,8 @@
 </small></div>
 {%- endmacro -%}
 
-{%- macro search_mb_link(search_type, text) -%}
-<a class="action-icon" href="https://musicbrainz.org/search?query={{ g.quote(text) }}&type={{ search_type }}&limit=25&method=indexed"><img title="Search MusicBrainz" src="/static/images/search-mb.png" /></a>
+{%- macro search_mb_link(search_type, text, advanced) -%}
+<a class="action-icon" href="https://musicbrainz.org/search?query={{ g.quote(text) }}&type={{ search_type }}&limit=25&method={%- if advanced -%}advanced{%- else -%}indexed{%- endif -%}"><img title="Search MusicBrainz" src="/static/images/search-mb.png" /></a>
 {%- endmacro -%}
 
 {%- macro current_match_span(data, linker_type, id, sparse) -%}
