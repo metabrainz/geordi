@@ -10,17 +10,15 @@
   <form action="/" method="get">
     <div class="actions">
       <select name="type" id="id-type">
-        <option value="item"{% if request.args.get('type') == 'item' %} selected="selected"{% endif %}>Search items by query string</option>
-        <option value="raw"{% if request.args.get('type') == 'raw' %} selected="selected"{% endif %}>Search items by JSON query</option>
+        <option value="query"{% if request.args.get('type') == 'query' %} selected="selected"{% endif %}>Query string</option>
+        <option value="raw"{% if request.args.get('type') == 'raw' %} selected="selected"{% endif %}>JSON query</option>
         <option value="sub"{% if request.args.get('type') == 'sub' %} selected="selected"{% endif %}>Search items by linked subitem</option>
-        <option value="subitem"{% if request.args.get('type') == 'subitem' %} selected="selected"{% endif %}>Search subitems by query string</option>
-        <option value="raw-subitem"{% if request.args.get('type') == 'raw-subitem' %} selected="selected"{% endif %}>Search subitems by JSON query</option>
       </select>
-      {%- if request.args.get('type', 'item') == 'item' -%}
-        <input type="text" data-searchtype="item" name="query" id="id-query" placeholder="Query" {% if query %}value="{{ query }}" {% endif %}/>
-      {%- elif request.args.get('type', 'item') == 'raw' -%}
+      {%- if request.args.get('type', 'query') == 'query' -%}
+        <input type="text" data-searchtype="query" name="query" id="id-query" placeholder="Query" {% if query %}value="{{ query }}" {% endif %}/>
+      {%- elif request.args.get('type', 'query') == 'raw' -%}
         <textarea name="query" data-searchtype="raw" id="id-query" placeholder="Query" cols=60 rows=8>{% if query %}{{ query }}{% endif %}</textarea>
-      {%- elif request.args.get('type', 'item') == 'sub' -%}
+      {%- elif request.args.get('type', 'query') == 'sub' -%}
         <div data-searchtype="sub" id="id-query">
           <input type="text" name="query" placeholder="ID" {% if query %}value="{{ query }}" {% endif %}/>
           {%- if request.args.get('subitem_index') -%}
@@ -35,10 +33,6 @@
           </select>
           <select name="subitem_index">{% for index in g.all_indices %}<option{% if index == request.args.get('subitem_index') %} selected=selected{% endif %}>{{index}}</option>{% endfor %}</select>
         </div>
-      {%- elif request.args.get('type', 'item') == 'subitem' -%}
-        <input type="text" data-searchtype="subitem" name="query" id="id-query" placeholder="Query" {% if query %}value="{{ query }}" {% endif %}/>
-      {%- elif request.args.get('type', 'item') == 'raw-subitem' -%}
-        <textarea name="query" data-searchtype="raw-subitem" id="id-query" placeholder="Query" cols=60 rows=8>{% if query %}{{ query }}{% endif %}</textarea>
       {%- endif -%}
       <input type="submit" class="btn primary" value="Search" />
     </div>
@@ -56,6 +50,12 @@
       {%- for index in g.all_indices %}
         <option{% if index in request.args.getlist('index') %} selected{% endif %}>{{ index }}</option>
       {% endfor -%}
+      </optgroup>
+      </select>
+      <select multiple name="itemtype" id="id-itemtype">
+      <optgroup label="Item Type">
+        <option{% if 'item' in request.args.getlist('itemtype') or not request.args.get('s', False) %} selected{% endif %}>item</option>
+        <option{% if 'subitem' in request.args.getlist('itemtype') %} selected{% endif %}>subitem</option>
       </optgroup>
       </select>
     </div>

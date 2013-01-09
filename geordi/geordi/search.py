@@ -20,7 +20,7 @@ from geordi.mappings import get_link_types_by_index
 
 from pyelasticsearch import ElasticHttpNotFoundError
 
-def do_search(query_string, indices, start_from=None, filters=None, doc_type='item'):
+def do_search(query_string, indices, start_from=None, filters=None, doc_type=['item']):
     query = {'query':
                {"query_string": {"query": query_string}}
             }
@@ -36,7 +36,7 @@ def do_subitem_search(query_string, index, subtype, start_from=None, filters=Non
             }
     return do_search_raw(query, [index], start_from, filters, 'item')
 
-def do_search_raw(query, indices, start_from=None, filters=None, doc_type='item'):
+def do_search_raw(query, indices, start_from=None, filters=None, doc_type=['item']):
     if indices in [[], ['']]:
         indices = app.config['AVAILABLE_INDICES']
     if start_from:

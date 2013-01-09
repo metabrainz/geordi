@@ -76,7 +76,7 @@ table tr:last-child td, table tr:last-child th {
 }
 
 /* Main search/header styling */
-select#id-index { width: 200px }
+select#id-index, select#id-itemtype { width: 200px }
 
 .actions {
     min-width: 1095px;

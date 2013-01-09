@@ -23,6 +23,8 @@ from pyelasticsearch import ElasticHttpNotFoundError
 
 from geordi.mappings.wcd import wcd
 
+import re
+
 class_map = {
     'wcd': wcd()
 }
@@ -156,10 +158,13 @@ def map_search_data(data):
     maps = []
     try:
         for result in data['hits']['hits']:
-            try:
-                maps.append(get_map_by_index(result['_index'], result['_source']))
-            except:
-                maps.append(None)
+            if result['_type'] == 'item':
+                try:
+                    maps.append(get_map_by_index(result['_index'], result['_source']))
+                except:
+                    maps.append(None)
+            elif result['_type'] == 'subitem':
+                maps.append(re.split('-', result['_id'], maxsplit=0))
         return maps
     except TypeError:
         return None
