@@ -146,7 +146,7 @@ class wcd():
 
     def map(self, data):
         target = base_mapping('release')
-        target['version'] = 8
+        target['version'] = 9
         release = target['release']
 
         # Release Title
@@ -186,16 +186,38 @@ class wcd():
         release['combined_artist'] = comma_list([artist['name'] for artist in release['artist']])
 
         # Release Label
+        label_candidates = []
+        catno_candidates = []
         try:
             if data['what_cd_json']['response']['group']['recordLabel']:
-                release['label'] = [{'name': data['what_cd_json']['response']['group']['recordLabel']}]
+                label_candidates.append(data['what_cd_json']['response']['group']['recordLabel'])
         except: pass
+        try:
+            tor_id = re.split('_', data['meta_xml']['metadata']['identifier']['text'])[-1]
+            for torrent in data['what_cd_json']['response']['torrents']:
+                if int(torrent['id']) == int(tor_id):
+                    try:
+                        if torrent['remasterRecordLabel']:
+                            label_candidates.append(torrent['remasterRecordLabel'])
+                    except KeyError: pass
+                    try:
+                        if torrent['remasterCatalogueNumber']:
+                            catno_candidates.append(torrent['remasterCatalogueNumber'])
+                    except KeyError: pass
+                    break
+        except KeyError: pass
+        try:
+            label_candidates.extend(collect_text(data['meta_xml']['metadata']['publisher']))
+        except KeyError: pass
+
+        release['label'] = [{'name': name} for name in uniq(label_candidates)]
 
         # Release Catalog Number
         try:
             if data['what_cd_json']['response']['group']['catalogueNumber']:
-                release['catalog_number'] = [data['what_cd_json']['response']['group']['catalogueNumber']]
+                catno_candidates.append(data['what_cd_json']['response']['group']['catalogueNumber'])
         except: pass
+        release['catalog_number'] = uniq(catno_candidates)
 
         # Tracks
         links = self.extract_linked(data)
