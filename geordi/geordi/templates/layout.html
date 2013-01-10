@@ -15,12 +15,12 @@
         <option value="sub"{% if request.args.get('type') == 'sub' %} selected="selected"{% endif %}>Search items by linked subitem</option>
       </select>
       {%- if request.args.get('type', 'query') == 'query' -%}
-        <input type="text" data-searchtype="query" name="query" id="id-query" placeholder="Query" {% if query %}value="{{ query }}" {% endif %}/>
+        <input type="text" data-searchtype="query" name="query" id="id-query" placeholder="Query" {% if request.args.get('query', false) %}value="{{ request.args.get('query') }}" {% endif %}/>
       {%- elif request.args.get('type', 'query') == 'raw' -%}
-        <textarea name="query" data-searchtype="raw" id="id-query" placeholder="Query" cols=60 rows=8>{% if query %}{{ query }}{% endif %}</textarea>
+        <textarea name="query" data-searchtype="raw" id="id-query" placeholder="Query" cols=60 rows=8>{% if request.args.get('query', false) %}{{ request.args.get('query') }}{% endif %}</textarea>
       {%- elif request.args.get('type', 'query') == 'sub' -%}
         <div data-searchtype="sub" id="id-query">
-          <input type="text" name="query" placeholder="ID" {% if query %}value="{{ query }}" {% endif %}/>
+          <input type="text" name="query" placeholder="ID" {% if request.args.get('query', false) %}value="{{ request.args.get('query') }}" {% endif %}/>
           {%- if request.args.get('subitem_index') -%}
             {%- set selected_subitem_index = request.args.get('subitem_index') -%}
           {%- else -%}

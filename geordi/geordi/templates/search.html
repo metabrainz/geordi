@@ -1,5 +1,13 @@
 {%- macro build_search_url(from_value) -%}
-{{ url_for('search', from=from_value, query=query, type=request.args.get('type'), s=1, index=request.args.getlist('index'), auto=request.args.get('auto'), un=request.args.get('un'), human=request.args.get('human'), all=request.args.get('all'), direct=request.args.get('direct'), user=request.args.getlist('user'), subitem_index=request.args.get('subitem_index'), subitem_type=request.args.get('subitem_type')) }}
+{{ url_with_search('search', from_value, query) }}
+{%- endmacro -%}
+
+{%- macro url_with_search(baseurl, query, from_value, index, item) -%}
+{%- if from_value -%}
+    {{ url_for(baseurl, from=from_value, query=query, type=request.args.get('type'), s=1, itemtype=request.args.getlist('itemtype'), index=request.args.getlist('index'), auto=request.args.get('auto'), un=request.args.get('un'), human=request.args.get('human'), all=request.args.get('all'), direct=request.args.get('direct'), user=request.args.getlist('user'), subitem_index=request.args.get('subitem_index'), subitem_type=request.args.get('subitem_type')) }}
+{%- else -%}
+    {{ url_for(baseurl, itemindex=index, item=item, query=query, type=request.args.get('type'), s=1, itemtype=request.args.getlist('itemtype'), index=request.args.getlist('index'), auto=request.args.get('auto'), un=request.args.get('un'), human=request.args.get('human'), all=request.args.get('all'), direct=request.args.get('direct'), user=request.args.getlist('user'), subitem_index=request.args.get('subitem_index'), subitem_type=request.args.get('subitem_type')) }}
+{%- endif -%}
 {%- endmacro -%}
 {% extends "layout.html" %}
 {% block title %}{% if query %}{{ query }} - Search{% else %}Search{% endif %}{% endblock %}
@@ -42,7 +50,7 @@ We found {{ data.hits.total }} results; starting at {{ start_from }}.
            {%- if mapping[loop.index0].release.tracks | length > 0 %} ({{ mapping[loop.index0].release.tracks | length }} tracks){% endif %}
          {% endif -%}
        </big>
-       {%- set link = '/' + result._index + '/' + result._id -%}
+       {%- set link = url_with_search('document', query, none, result._index, result._id) -%}
      {%- elif result._type == 'subitem' -%}
        <big class="left"></big>
        <small class="left">

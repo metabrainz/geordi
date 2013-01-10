@@ -53,21 +53,21 @@ def before_request():
     g.dictarray = dictarray
 
 # Main user-facing views
-@app.route('/<index>/<item>')
+@app.route('/<itemindex>/<item>')
 @login_required
-def document(index, item):
+def document(itemindex, item):
     try:
-        data = resolve_data(index, item)
+        data = resolve_data(itemindex, item)
         mapoptions = get_mapoptions(data['_source']['_geordi']['mapping'])
         subitems = {}
-        link_types = get_link_types_by_index(index)
-        code_url = get_code_url_by_index(index)
+        link_types = get_link_types_by_index(itemindex)
+        code_url = get_code_url_by_index(itemindex)
         for (link_type, links) in data['_source']['_geordi']['links']['links'].iteritems():
             if link_type != 'version':
                 for link in links:
                     subitem = "{}-{}".format(link_type, link[link_types[link_type]['key']])
-                    subitems[subitem] = get_subitem(index, subitem, create=True, seed=copy.deepcopy(link))
-        return render_template('document.html', item=item, index=index, data = data, mapping = data['_source']['_geordi']['mapping'], mapoptions = mapoptions, subitems=subitems, code_url=code_url)
+                    subitems[subitem] = get_subitem(itemindex, subitem, create=True, seed=copy.deepcopy(link))
+        return render_template('document.html', item=item, index=itemindex, data = data, mapping = data['_source']['_geordi']['mapping'], mapoptions = mapoptions, subitems=subitems, code_url=code_url)
     except ElasticHttpNotFoundError:
         return render_template('notfound.html')
 
