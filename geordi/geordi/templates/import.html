@@ -1,0 +1,130 @@
+{%- from "json_pp.html" import json_pp, expander_js -%}
+{% extends "layout.html" %}
+{% block title %}Import: {{ data._index }} - {{ data._id }}{% endblock %}
+
+{% block content %}
+<h2>Import to MusicBrainz</h2>
+{% if mapping %}
+  {% if 'release' in mapping %}
+    <p>We've provided about as much information here as we can to get you started entering this as a release. Please review it as carefully as you can and then hit submit and you'll be directed to the release editor on MusicBrainz.</p>
+    <form action="//musicbrainz.org/release/add" method="post" id="form-import">
+      <fieldset><legend>Release Title:</legend>
+        {%- if mapping.release.title | length > 1 -%}
+          <input type="text" name="name" id="id-name" value="" />
+          Multiple options: {{ g.comma_list(mapping.release.title) }}<br />
+        {%- else -%}
+         <input type="text" name="name" id="id-name" value="{{ mapping.release.title[0] }}" /><br />
+        {%- endif -%}
+      </fieldset>
+      <fieldset><legend>Release Date:</legend>
+        {% if mapping.release.date | length != 1 %}
+          <input style="width: 4em" placeholder="YYYY" type="text" name="date.year" id="id-year" />-<input style="width: 2em" placeholder="MM" type="text" name="date.month" id="id-month" />-<input style="width: 2em" placeholder="DD" type="text" name="date.day" id="id-day" />
+          {% if mapping.release.date | length > 1 %}
+            Multiple options: {{ g.comma_list(mapping.release.date) }}
+          {%- endif -%}
+        {%- else -%}
+          {%- set dateparts = g.re.split('-', mapping.release.date[0]) -%}
+          <input style="width: 4em" placeholder="YYYY" type="text" name="date.year" id="id-year" value="{{dateparts[0]}}"/>-<input style="width: 2em" placeholder="MM" type="text" name="date.month" id="id-month" value="{{dateparts[1]}}"/>-<input style="width: 2em" placeholder="DD" type="text" name="date.day" id="id-day" value="{{dateparts[2]}}"/>
+        {%- endif -%}
+      </fieldset>
+      <fieldset><legend>Release Artist:</legend>
+        {%- for artist in mapping.release.artist -%}
+          <div class="release-artist">
+          {%- set loopid = loop.index0 -%}
+          {%- if artist.subitem and subitems[artist.subitem] and subitems[artist.subitem]._source._geordi.matchings.current_matching.type and subitems[artist.subitem]._source._geordi.matchings.current_matching.type == 'artist' -%}
+            {%- for mbid in subitems[artist.subitem]._source._geordi.matchings.current_matching.mbid -%}
+              <input name="artist_credit.names.{{loopid}}.name" value="{{artist.name}}" /><br />
+              <input name="artist_credit.names.{{loopid}}.mbid" value="{{ mbid }}" />
+            {%- endfor -%}
+          {%- else -%}
+            <input name="artist_credit.names.{{loopid}}.name" value="{{artist.name}}" />
+          {%- endif -%}
+          {%- if not loop.last -%}<input type="hidden" name="artist_credit.names.{{loopid}}.join_phrase" value=", " />{%- endif -%}
+          </div>
+        {%- endfor -%}
+      </fieldset>
+      <fieldset><legend>Label/Catalog Number</legend>
+        {% if mapping.release.label[0].catalog_number %}
+          {%- for label in mapping.release.label -%}
+             {{ display_label(label, loop.index0) }}<br />
+          {%- endfor -%}
+        {% elif (mapping.release.label | length <= 1 and mapping.release.catalog_number | length <= 1) %}
+          {{ display_label(mapping.release.label[0], 0, mapping.release.catalog_number[0]) }}
+        {%- else -%}
+          <input name="labels.0.name" placeholder="Name" />
+          <input name="labels.0.catalog_number" placeholder="Catalog Number" />
+        {%- endif -%}
+      </fieldset>
+      <fieldset><legend>Tracklist</legend>
+        <table class="zebra">
+        <thead>
+        {%- set col = 5 -%}
+        <tr>
+          {%- if mapoptions.mediums %}<th>Medium</th>{% set col = col + 1 %}{% endif -%}
+          <th>#</th>
+          <th>Title</th><th>Artist</th><th>Length</th>
+          <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        {%- set loopmedium = 0 -%}
+        {%- set count = 0 -%}
+        {%- for track in mapping.release.tracks -%}
+          {%- if track.medium | length == 1 and medium != track.medium[0] | int and not loop.first %}<tr><th class="mediumheader" colspan={{col}}><hr /></th></tr>{% set loopmedium = loopmedium + 1 %}{% set count = 0 %}{% endif -%}
+          {%- if track.medium | length == 1 %}{% set medium = track.medium[0] | int %}{% endif %}
+          {%- set baseid = "mediums." + loopmedium | string + ".track." + count | string -%}
+          {%- set count = count + 1 -%}
+          <tr>
+            {%- if mapoptions.mediums -%}
+            <td>
+              {%- for medium_number in track.medium %}{{ medium_number }}{% if not loop.last %}<br />{% endif %}{% endfor -%}
+            </td>
+           {%- endif -%}
+            <td><input class="tracknumber" name="{{baseid}}.number" value="{{track.number[0]}}" /></td>
+            <td><input name="{{baseid}}.name" value="{{track.title[0]}}" /></td>
+            <td>
+              {%- for artist in track.artist -%}
+                {%- set loopid = loop.index0 -%}
+                {%- if artist.subitem and subitems[artist.subitem] and subitems[artist.subitem]._source._geordi.matchings.current_matching.type and subitems[artist.subitem]._source._geordi.matchings.current_matching.type == 'artist' -%}
+                  {%- for mbid in subitems[artist.subitem]._source._geordi.matchings.current_matching.mbid -%}
+                    <input name="{{baseid}}.artist_credit.names.{{loopid}}.name" value="{{artist.name}}" />
+                    <input name="{{baseid}}.artist_credit.names.{{loopid}}.mbid" value="{{ mbid }}" />
+                  {%- endfor -%}
+                {%- else -%}
+                  <input name="{{baseid}}.artist_credit.names.{{loopid}}.name" value="{{artist.name}}" />
+                {%- endif -%}
+                {%- if not loop.last -%}<input type="hidden" name="artist_credit.names.{{loopid}}.join_phrase" value=", " />{%- endif -%}
+              {%- endfor -%}
+            </td>
+            <td><input class="tracklength" name="{{baseid}}.length" value="{{track.length[0]}}" /></td>
+          </tr>
+        {%- endfor -%}
+        </tbody>
+        </table>
+      </fieldset>
+      <fieldset><legend>Edit Note:</legend>
+        <textarea rows=5 name="edit_note" id="id-editnote">Imported using data from geordi: http://geordi.musicbrainz.org/{{ data._index }}/{{data._id}}</textarea>
+      </fieldset>
+      <input type="submit" />
+    </form>
+  {% else %}
+    <p>We're sorry, but only release importing is supported at this time.</p>
+  {% endif %}
+{% else %}
+  <p>We're sorry, but this item doesn't have a mapping and thus can't be imported.</p>
+{% endif %}
+{% endblock %}
+
+{%- macro display_label(label, loopid, alt_catno) -%}
+  <input name="labels.{{ loopid }}.name" value="{{ label.name }}" />
+  {%- if label.catalog_number -%}
+    <input name="labels.{{ loopid }}.catalog_number" value="{{ label.catalog_number }}" />
+  {%- elif alt_catno -%}
+    <input name="labels.{{ loopid }}.catalog_number" value="{{ alt_catno }}" />
+  {%- endif -%}
+  {%- if label.subitem and subitems[label.subitem] and subitems[label.subitem]._source._geordi.matchings.current_matching.type and subitems[label.subitem]._source._geordi.matchings.current_matching.type == 'label' -%}
+    {%- for mbid in subitems[label.subitem]._source._geordi.matchings.current_matching.mbid -%}
+    <input name="labels.{{ loopid }}.mbid" value="{{ mbid }}" />
+    {%- endfor -%}
+  {%- endif -%}
+{%- endmacro -%}

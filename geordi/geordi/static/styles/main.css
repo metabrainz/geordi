@@ -232,6 +232,17 @@ div.li:after, .expander:after, .clearfix:after { content: '.'; display: block; v
 
 .mediumheader { padding: 0; }
 
+/* Import Page */
+#form-import input { width: 20em; }
+
+#id-editnote { width: 100% }
+
+fieldset { border: 1px solid #bbb }
+
+.release-artist { display: inline-block; border: 1px solid #bbb; margin: 1px 3px; padding: 0 2px; }
+
+.tracknumber, .tracklength { width: 5em }
+
 /* Search Page */
 ul.search-results {
     padding: 0px 5px;

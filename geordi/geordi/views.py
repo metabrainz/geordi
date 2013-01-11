@@ -56,6 +56,10 @@ def before_request():
 @app.route('/<itemindex>/<item>')
 @login_required
 def document(itemindex, item):
+    if request.args.get('import', False):
+        template = 'import.html'
+    else:
+        template = 'document.html'
     try:
         data = resolve_data(itemindex, item)
         mapoptions = get_mapoptions(data['_source']['_geordi']['mapping'])
@@ -67,7 +71,7 @@ def document(itemindex, item):
                 for link in links:
                     subitem = "{}-{}".format(link_type, link[link_types[link_type]['key']])
                     subitems[subitem] = get_subitem(itemindex, subitem, create=True, seed=copy.deepcopy(link))
-        return render_template('document.html', item=item, index=itemindex, data = data, mapping = data['_source']['_geordi']['mapping'], mapoptions = mapoptions, subitems=subitems, code_url=code_url)
+        return render_template(template, item=item, index=itemindex, data = data, mapping = data['_source']['_geordi']['mapping'], mapoptions = mapoptions, subitems=subitems, code_url=code_url)
     except ElasticHttpNotFoundError:
         return render_template('notfound.html')
 
