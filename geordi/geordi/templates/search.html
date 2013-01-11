@@ -1,5 +1,5 @@
 {%- macro build_search_url(from_value) -%}
-{{ url_with_search('search', from_value, query) }}
+{{ url_with_search('search', query, from_value) }}
 {%- endmacro -%}
 
 {%- macro url_with_search(baseurl, query, from_value, index, item) -%}
