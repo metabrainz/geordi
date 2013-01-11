@@ -28,18 +28,20 @@
         {%- endif -%}
       </fieldset>
       <fieldset><legend>Release Artist:</legend>
+        {%- set loopid = 0 -%}
         {%- for artist in mapping.release.artist -%}
           <div class="release-artist">
-          {%- set loopid = loop.index0 -%}
           {%- if artist.subitem and subitems[artist.subitem] and subitems[artist.subitem]._source._geordi.matchings.current_matching.type and subitems[artist.subitem]._source._geordi.matchings.current_matching.type == 'artist' -%}
             {%- for mbid in subitems[artist.subitem]._source._geordi.matchings.current_matching.mbid -%}
               <input name="artist_credit.names.{{loopid}}.name" value="{{artist.name}}" /><br />
               <input name="artist_credit.names.{{loopid}}.mbid" value="{{ mbid }}" />
+              {%- if not loop.last -%}<input type="hidden" name="artist_credit.names.{{loopid}}.join_phrase" value=", " /><br />{%- set loopid = loopid + 1 -%}{%- endif -%}
             {%- endfor -%}
           {%- else -%}
             <input name="artist_credit.names.{{loopid}}.name" value="{{artist.name}}" />
           {%- endif -%}
           {%- if not loop.last -%}<input type="hidden" name="artist_credit.names.{{loopid}}.join_phrase" value=", " />{%- endif -%}
+          {%- set loopid = loopid + 1 -%}
           </div>
         {%- endfor -%}
       </fieldset>
@@ -90,17 +92,19 @@
             <td><input class="tracknumber" name="{{baseid}}.number" value="{{track.number[0]}}" /></td>
             <td><input name="{{baseid}}.name" value="{{track.title[0]}}" /></td>
             <td>
+              {%- set loopid = 0 -%}
               {%- for artist in track.artist -%}
-                {%- set loopid = loop.index0 -%}
                 {%- if artist.subitem and subitems[artist.subitem] and subitems[artist.subitem]._source._geordi.matchings.current_matching.type and subitems[artist.subitem]._source._geordi.matchings.current_matching.type == 'artist' -%}
                   {%- for mbid in subitems[artist.subitem]._source._geordi.matchings.current_matching.mbid -%}
                     <input name="{{baseid}}.artist_credit.names.{{loopid}}.name" value="{{artist.name}}" />
                     <input name="{{baseid}}.artist_credit.names.{{loopid}}.mbid" value="{{ mbid }}" />
+                    {%- if not loop.last -%}<input type="hidden" name="{{baseid}}.artist_credit.names.{{loopid}}.join_phrase" value=", " /><br />{%- set loopid = loopid + 1 -%}{%- endif -%}
                   {%- endfor -%}
                 {%- else -%}
                   <input name="{{baseid}}.artist_credit.names.{{loopid}}.name" value="{{artist.name}}" />
                 {%- endif -%}
                 {%- if not loop.last -%}<input type="hidden" name="artist_credit.names.{{loopid}}.join_phrase" value=", " />{%- endif -%}
+                {%- set loopid = loopid + 1 -%}
               {%- endfor -%}
             </td>
             <td><input class="tracklength" name="{{baseid}}.length" value="{{track.length[0]}}" /></td>
