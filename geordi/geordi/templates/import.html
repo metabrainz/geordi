@@ -44,15 +44,22 @@
         {%- endfor -%}
       </fieldset>
       <fieldset><legend>Label/Catalog Number</legend>
-        {% if mapping.release.label[0].catalog_number %}
+        {% if mapping.release.label | length > 0 and mapping.release.label[0].catalog_number %}
           {%- for label in mapping.release.label -%}
              {{ display_label(label, loop.index0) }}<br />
           {%- endfor -%}
-        {% elif (mapping.release.label | length <= 1 and mapping.release.catalog_number | length <= 1) %}
-          {{ display_label(mapping.release.label[0], 0, mapping.release.catalog_number[0]) }}
         {%- else -%}
-          <input name="labels.0.name" placeholder="Name" />
-          <input name="labels.0.catalog_number" placeholder="Catalog Number" />
+          {% if mapping.release.catalog_number | length == 1 %}
+            {% set alt = mapping.release.catalog_number[0] %}
+          {% else %}
+            {% set alt = none %}
+          {% endif %}
+          {% if mapping.release.label | length == 1 %}
+            {% set label = mapping.release.label[0] %}
+          {% else %}
+            {% set label = none %}
+          {% endif %}
+          {{ display_label(label, 0, alt) }}
         {%- endif -%}
       </fieldset>
       <fieldset><legend>Tracklist</legend>
@@ -116,15 +123,23 @@
 {% endblock %}
 
 {%- macro display_label(label, loopid, alt_catno) -%}
-  <input name="labels.{{ loopid }}.name" value="{{ label.name }}" />
+  {%- if label -%}
+    <input name="labels.{{ loopid }}.name" value="{{ label.name }}" />
+  {%- else -%}
+    <input name="labels.0.name" placeholder="Name" />
+  {%- endif -%}
+
   {%- if label.catalog_number -%}
     <input name="labels.{{ loopid }}.catalog_number" value="{{ label.catalog_number }}" />
   {%- elif alt_catno -%}
     <input name="labels.{{ loopid }}.catalog_number" value="{{ alt_catno }}" />
+  {%- else -%}
+    <input placeholder="Catalog Number" name="labels.{{ loopid }}.catalog_number" />
   {%- endif -%}
+
   {%- if label.subitem and subitems[label.subitem] and subitems[label.subitem]._source._geordi.matchings.current_matching.type and subitems[label.subitem]._source._geordi.matchings.current_matching.type == 'label' -%}
     {%- for mbid in subitems[label.subitem]._source._geordi.matchings.current_matching.mbid -%}
-    <input name="labels.{{ loopid }}.mbid" value="{{ mbid }}" />
+    {%- if loop.first -%}<input name="labels.{{ loopid }}.mbid" value="{{ mbid }}" />{%- endif -%}
     {%- endfor -%}
   {%- endif -%}
 {%- endmacro -%}
