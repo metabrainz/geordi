@@ -71,52 +71,6 @@ def document(itemindex, item):
     except ElasticHttpNotFoundError:
         return render_template('notfound.html')
 
-def resolve_data(index, item):
-    "Shared data-update functionality"
-    data = es.get(index, 'item', item)
-    linked_update = update_linked_by_index(index, item, data['_source'])
-    map_update = update_map_by_index(index, item, data['_source'])
-    match_update = update_automatic_item_matches_by_index(index, item, data['_source'])
-    if linked_update or map_update or match_update:
-        data = es.get(index, 'item', item)
-    update_automatic_subitem_matches_by_index(index, item, data['_source'])
-    return data
-
-def get_search_params():
-    "Shared search functionality"
-    search_type = request.args.get('type', 'query')
-    start_from = request.args.get('from', "0")
-    query = request.args.get('query')
-    indices = request.args.getlist('index')
-    itemtypes = request.args.getlist('itemtype')
-    if len(itemtypes) == 0:
-        itemtypes = ['item']
-
-    filters = make_filters(human=request.args.get('human', False), auto=request.args.get('auto', False), un=request.args.get('un', False))
-
-    if search_type == 'raw':
-        try:
-            data = do_search_raw(json.loads(query), indices, start_from=request.args.get('from', None), filters=filters, doc_type=itemtypes)
-        except ValueError:
-            return {'error': "Malformed or missing JSON."}
-    elif search_type == 'query':
-        if query:
-            data = do_search(query, indices, start_from=request.args.get('from', None), filters=filters, doc_type=itemtypes)
-        else:
-            return {'error': 'You must provide a query.'}
-    elif search_type == 'sub':
-        index = request.args.get('subitem_index')
-        subtype = request.args.get('subitem_type')
-        if subtype not in get_link_types_by_index(index).keys():
-            return {'error': 'Invalid subitem type for index {}'.format(index)}
-        data = do_subitem_search(query, index, subtype, start_from=request.args.get('from', None), filters=filters)
-    else:
-        return {'error': 'Search type {} unimplemented.'.format(search_type)}
-
-    mapping = map_search_data(data)
-
-    return {"start_from": start_from, "query": query, "mapping": mapping, "data": data}
-
 @app.route('/')
 @login_required
 def search():
@@ -173,48 +127,6 @@ def matchitem(index, item):
     if not mbids:
         mbids = re.split(',\s*', request.args.get('mbids'))
     return register_match(index, item, 'item', matchtype, mbids, auto, user)
-
-def flatten(l):
-    for el in l:
-        if isinstance(el, collections.Iterable) and not isinstance(el, basestring):
-            for sub in flatten(el):
-                yield sub
-        else:
-            yield el
-
-def get_subitem(index, subitem, create=False, seed={}):
-    try:
-        document = es.get(index, 'subitem', subitem)
-        if seed == {}:
-            return document
-        else:
-            data = document['_source']
-            data = check_data_format(data)
-            changed = False
-            for key in seed.keys():
-                if key not in data:
-                    data[key] = seed[key]
-                    changed = True
-                elif key in data:
-                    changed = True
-                    try:
-                        if unicode(seed[key]) not in [unicode(i) for i in data[key]]:
-                            data[key].append(seed[key])
-                        changed = True
-                    except (AttributeError, TypeError):
-                        data[key] = list(flatten([data[key], seed[key]]))
-                        changed = True
-                    if isinstance(data[key], collections.Iterable) and not isinstance(data[key], basestring):
-                        data[key] = list(set(flatten(data[key])))
-            if changed:
-                es.index(index, 'subitem', data, id=subitem)
-                document = es.get(index, 'subitem', subitem)
-            return document
-    except ElasticHttpNotFoundError:
-        if create:
-            data = check_data_format(seed)
-            es.index(index, 'subitem', data, id=subitem)
-        return None
 
 @app.route('/api/subitem/<index>/<subitem>')
 def subitem(index, subitem):
@@ -275,6 +187,95 @@ def logout():
     logout_user()
     flash("Logged out.")
     return redirect(url_for("search"))
+
+# Utilities
+def resolve_data(index, item):
+    "Shared data-update functionality"
+    data = es.get(index, 'item', item)
+    linked_update = update_linked_by_index(index, item, data['_source'])
+    map_update = update_map_by_index(index, item, data['_source'])
+    match_update = update_automatic_item_matches_by_index(index, item, data['_source'])
+    if linked_update or map_update or match_update:
+        data = es.get(index, 'item', item)
+    update_automatic_subitem_matches_by_index(index, item, data['_source'])
+    return data
+
+def get_search_params():
+    "Shared search functionality"
+    search_type = request.args.get('type', 'query')
+    start_from = request.args.get('from', "0")
+    query = request.args.get('query')
+    indices = request.args.getlist('index')
+    itemtypes = request.args.getlist('itemtype')
+    if len(itemtypes) == 0:
+        itemtypes = ['item']
+
+    filters = make_filters(human=request.args.get('human', False), auto=request.args.get('auto', False), un=request.args.get('un', False))
+
+    if search_type == 'raw':
+        try:
+            data = do_search_raw(json.loads(query), indices, start_from=request.args.get('from', None), filters=filters, doc_type=itemtypes)
+        except ValueError:
+            return {'error': "Malformed or missing JSON."}
+    elif search_type == 'query':
+        if query:
+            data = do_search(query, indices, start_from=request.args.get('from', None), filters=filters, doc_type=itemtypes)
+        else:
+            return {'error': 'You must provide a query.'}
+    elif search_type == 'sub':
+        index = request.args.get('subitem_index')
+        subtype = request.args.get('subitem_type')
+        if subtype not in get_link_types_by_index(index).keys():
+            return {'error': 'Invalid subitem type for index {}'.format(index)}
+        data = do_subitem_search(query, index, subtype, start_from=request.args.get('from', None), filters=filters)
+    else:
+        return {'error': 'Search type {} unimplemented.'.format(search_type)}
+
+    mapping = map_search_data(data)
+
+    return {"start_from": start_from, "query": query, "mapping": mapping, "data": data}
+
+def flatten(l):
+    for el in l:
+        if isinstance(el, collections.Iterable) and not isinstance(el, basestring):
+            for sub in flatten(el):
+                yield sub
+        else:
+            yield el
+
+def get_subitem(index, subitem, create=False, seed={}):
+    try:
+        document = es.get(index, 'subitem', subitem)
+        if seed == {}:
+            return document
+        else:
+            data = document['_source']
+            data = check_data_format(data)
+            changed = False
+            for key in seed.keys():
+                if key not in data:
+                    data[key] = seed[key]
+                    changed = True
+                elif key in data:
+                    changed = True
+                    try:
+                        if unicode(seed[key]) not in [unicode(i) for i in data[key]]:
+                            data[key].append(seed[key])
+                        changed = True
+                    except (AttributeError, TypeError):
+                        data[key] = list(flatten([data[key], seed[key]]))
+                        changed = True
+                    if isinstance(data[key], collections.Iterable) and not isinstance(data[key], basestring):
+                        data[key] = list(set(flatten(data[key])))
+            if changed:
+                es.index(index, 'subitem', data, id=subitem)
+                document = es.get(index, 'subitem', subitem)
+            return document
+    except ElasticHttpNotFoundError:
+        if create:
+            data = check_data_format(seed)
+            es.index(index, 'subitem', data, id=subitem)
+        return None
 
 # What follows, until the end of the file, is shamelessly cribbed from acoustid-server
 class DigestAuthHandler(urllib2.HTTPDigestAuthHandler):
