@@ -113,9 +113,7 @@
         </tbody>
         </table>
       </fieldset>
-      <fieldset><legend>Edit Note:</legend>
-        <textarea rows=5 name="edit_note" id="id-editnote">Imported using data from geordi: http://geordi.musicbrainz.org/{{ data._index }}/{{data._id}}</textarea>
-      </fieldset>
+      <input type="hidden" name="edit_note" id="id-editnote" value="Imported using data from geordi: http://geordi.musicbrainz.org/{{ data._index }}/{{data._id}}" />
       <input type="submit" />
     </form>
   {% else %}
