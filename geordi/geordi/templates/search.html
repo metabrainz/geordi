@@ -23,18 +23,19 @@ This is a search for <code>{{ query }}</code>
 We found {{ data.hits.total }} results; starting at {{ start_from }}.
 </p>
 
-{%- if start_from | int > 9 -%}
-  <a href="{{ build_search_url(0) }}">[&laquo;]</a><a href="{{ build_search_url(start_from | int - 10) }}">[&lsaquo;]</a>
+{% if not page_size %}{% set page_size = 10 %}{% endif %}
+{%- if start_from | int > page_size - 1 -%}
+  <a href="{{ build_search_url(0) }}">[&laquo;]</a><a href="{{ build_search_url(start_from | int - page_size) }}">[&lsaquo;]</a>
 {%- endif -%}
-{%- if start_from | int < 100 -%}{% set start_page = 0 %}{%- else -%}{% set start_page = start_from | int - 100 %}{%- endif -%}
-{%- if data.hits.total | int > (start_from | int + 100) -%}{% set end_page = start_from | int + 100 %}{%- else -%}{% set end_page = data.hits.total %}{%- endif -%}
-{%- for page_start in range(start_page, end_page, 10) -%}
+{%- if start_from | int < (page_size * 10) -%}{% set start_page = 0 %}{%- else -%}{% set start_page = start_from | int - (page_size * 10) %}{%- endif -%}
+{%- if data.hits.total | int > (start_from | int + (page_size * 10)) -%}{% set end_page = start_from | int + (page_size * 10) %}{%- else -%}{% set end_page = data.hits.total %}{%- endif -%}
+{%- for page_start in range(start_page, end_page, page_size) -%}
   {%- if start_from | int == page_start -%}<b>{%- else -%}<a href="{{ build_search_url(page_start) }}">{%- endif -%}
-  [{{ page_start // 10 + 1 }}]
+  [{{ page_start // page_size + 1 }}]
   {%- if start_from | int == page_start -%}</b>{%- else -%}</a>{%- endif -%}
 {%- endfor -%}
-{%- if data.hits.total > start_from | int + 10 -%}
-  <a href="{{ build_search_url(start_from | int + 10) }}">[&rsaquo;]</a><a href="{{ build_search_url((data.hits.total // 10) * 10) }}">[&raquo;]</a>
+{%- if data.hits.total > start_from | int + page_size -%}
+  <a href="{{ build_search_url(start_from | int + page_size) }}">[&rsaquo;]</a><a href="{{ build_search_url((data.hits.total // page_size) * page_size) }}">[&raquo;]</a>
 {%- endif -%}
 
 <ul class="search-results">
