@@ -23,8 +23,8 @@ import re
 
 class wcd():
     def link_types(self):
-        return {'artist_id': {'name':"artist id", 'key': 'wcd_artist_id'},
-                'file': {'name':"file sha1", 'key': 'sha1'},
+        return {'artist_id': {'name':"artist id", 'key': 'wcd_artist_id', 'type': ['artist']},
+                'file': {'name':"file sha1", 'key': 'sha1', 'type': ['recording']},
                 'version': 1}
 
     def code_url(self):

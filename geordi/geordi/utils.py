@@ -29,11 +29,11 @@ def check_data_format(data):
 
     data['_geordi'].setdefault('mapping', {'version': 0})
     data['_geordi'].setdefault('links', {'links': [], 'version': 1})
-    data['_geordi'].setdefault('matchings', {'matchings': [], 'auto_matchings': [], 'current_matching': {}, 'version': 2})
+    data['_geordi'].setdefault('matchings', {'matchings': [], 'auto_matchings': [], 'current_matching': {}, 'version': 3})
 
     if 'auto_matchings' not in data['_geordi']['matchings']:
         data['_geordi']['matchings']['auto_matchings'] = []
-        data['_geordi']['matchings']['version'] = 2
+        data['_geordi']['matchings']['version'] = 3
 
     return data
 
