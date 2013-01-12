@@ -172,11 +172,12 @@ def internal_mbid_type(mbid):
 @app.route('/login', methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        username = request.form["username"]
-        password = request.form["password"]
+        username = request.form.get("username", None)
+        password = request.form.get("password", None)
+        remember = request.form.get("remember", False)
         if username and password:
             if check_mb_account(username, password):
-                login_user(User(username))
+                login_user(User(username), remember=remember)
                 flash("Logged in!")
                 return redirect(request.args.get("next") or url_for("search"))
             else:
