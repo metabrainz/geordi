@@ -137,6 +137,9 @@ class wcd():
         else:
             f['medium'] = []
 
+        if disk_re.search(track['album']['text']):
+            f['medium'].append(disk_re.search(track['album']['text']).group(2))
+
         if 'external-identifier' in track:
             f[u'acoustid'] = [re.sub('^urn:acoustid:', '', acoustid) for acoustid in collect_text(track['external-identifier'], 'urn:acoustid(?!:unknown)')]
         else:
@@ -146,7 +149,7 @@ class wcd():
 
     def map(self, data):
         target = base_mapping('release')
-        target['version'] = 9
+        target['version'] = 10
         release = target['release']
 
         # Release Title
