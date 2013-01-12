@@ -87,6 +87,7 @@ $('form.match-form textarea').bind('change keyup input propertychange', function
 
     var type = null;
     var types = [];
+    var names = {};
     var error = [];
     if (mbids !== null || last) {
         $this.parent('form').siblings('div.response').addClass('loading').removeClass('error');
@@ -103,6 +104,7 @@ $('form.match-form textarea').bind('change keyup input propertychange', function
         $.each(all_mbids, function(index, elem) {
             get_mbid_type(elem).done(function(data) {
                 types.push([elem, data.type]);
+                names[elem] = data.name;
                 if (type === null) {
                     type = data.type;
                 } else if (type !== data.type) {
@@ -110,6 +112,7 @@ $('form.match-form textarea').bind('change keyup input propertychange', function
                 }
             }).fail(function() {
                 types.push([elem, null]);
+                names[elem] = null;
                 error.push([elem, null]);
             });
         });
@@ -120,6 +123,11 @@ $('form.match-form textarea').bind('change keyup input propertychange', function
             } else if (error.length == 0 && type !== null) {
                  $this.siblings('input[name="type"]').val(type);
                  $this.siblings('span.match-type').text(type).removeClass('artist label release release-group work recording').addClass(type);
+                 var previewhtml = 'New matches: ';
+                 $.each(all_mbids, function(index, mbid) {
+                     previewhtml = previewhtml + '<a href="//musicbrainz.org/' + type + '/' + mbid + '">' + names[mbid] + '</a> '
+                 });
+                 $this.parent('form').siblings('div.preview').html(previewhtml);
                  $this.parent('form').siblings('div.response').removeClass('error loading').text('')
                  $this.siblings('input[type="submit"]').removeAttr('disabled');
             } else {
@@ -130,6 +138,7 @@ $('form.match-form textarea').bind('change keyup input propertychange', function
                      text = 'Not all MBIDs are entities of the same type';
                  }
                  $this.parent('form').siblings('div.response').addClass('error').removeClass('loading').text('Error: ' + text)
+                 $this.parent('form').siblings('div.preview').html('');
             }
         }
         window.setTimeout(set_when_done, 200);

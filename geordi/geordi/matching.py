@@ -45,7 +45,7 @@ def check_type(mbid):
     try:
         res = urllib2.urlopen(req)
         j = json.load(res)
-        return {"type": j['type']}
+        return {"type": j['type'], "name": j['name']}
     except urllib2.HTTPError, e:
         return {"error": "failed", "code": e}
 

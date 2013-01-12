@@ -166,7 +166,7 @@ def internal_mbid_type(mbid):
     if 'error' in check:
         return Response(json.dumps({"error": "failed to fetch"}), e.code, mimetype="application/json")
     else:
-        return Response(json.dumps({"type": check['type']}), 200, mimetype="application/json")
+        return Response(json.dumps(check), 200, mimetype="application/json")
 
 # Login/logout-related views
 @app.route('/login', methods=["GET", "POST"])
