@@ -133,12 +133,13 @@ class wcd():
 
         disk_re = re.compile('(cd|dis[ck])\s*(\d+)', re.IGNORECASE)
         if disk_re.search(track['_name']):
-            f['medium'] = [disk_re.search(track['_name']).group(2)]
+            medium_candidates = [disk_re.search(track['_name']).group(2)]
         else:
-            f['medium'] = []
+            medium_candidates = []
 
         if disk_re.search(track['album']['text']):
-            f['medium'].append(disk_re.search(track['album']['text']).group(2))
+            medium_candidates.append(disk_re.search(track['album']['text']).group(2))
+        f['medium'] = uniq(medium_candidates);
 
         if 'external-identifier' in track:
             f[u'acoustid'] = [re.sub('^urn:acoustid:', '', acoustid) for acoustid in collect_text(track['external-identifier'], 'urn:acoustid(?!:unknown)')]
@@ -149,7 +150,7 @@ class wcd():
 
     def map(self, data):
         target = base_mapping('release')
-        target['version'] = 10
+        target['version'] = 11
         release = target['release']
 
         # Release Title
