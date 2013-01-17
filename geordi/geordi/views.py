@@ -81,7 +81,7 @@ def search():
     params = get_search_params()
     if 'error' in params and params['error'] != 'You must provide a query.':
         flash(params["error"])
-    return render_template('search.html', query=params.get('query'), data = params.get('data'), mapping = params.get('mapping'), start_from= params.get('start_from'))
+    return render_template('search.html', query=params.get('query'), data = params.get('data'), mapping = params.get('mapping'), start_from= params.get('start_from'), page_size=params.get('page_size'))
 
 # Internal API urls for matching etc.
 @app.route('/api/search')
@@ -212,19 +212,30 @@ def get_search_params():
     query = request.args.get('query')
     indices = request.args.getlist('index')
     itemtypes = request.args.getlist('itemtype')
+    size = request.args.get('size', None)
+    if size is not None:
+        size = int(size)
+    if size is not None and size == 10:
+        size = None
+
     if len(itemtypes) == 0:
         itemtypes = ['item']
 
     filters = make_filters(human=request.args.get('human', False), auto=request.args.get('auto', False), un=request.args.get('un', False))
 
     if search_type == 'raw':
+        json_query = json.loads(query)
+        if size is None and 'size' in json_query:
+            try:
+                size = int(json_query['size'])
+            except: pass
         try:
-            data = do_search_raw(json.loads(query), indices, start_from=request.args.get('from', None), filters=filters, doc_type=itemtypes)
+            data = do_search_raw(json_query, indices, start_from=request.args.get('from', None), filters=filters, doc_type=itemtypes, size=size)
         except ValueError:
             return {'error': "Malformed or missing JSON."}
     elif search_type == 'query':
         if query:
-            data = do_search(query, indices, start_from=request.args.get('from', None), filters=filters, doc_type=itemtypes)
+            data = do_search(query, indices, start_from=request.args.get('from', None), filters=filters, doc_type=itemtypes, size=size)
         else:
             return {'error': 'You must provide a query.'}
     elif search_type == 'sub':
@@ -232,13 +243,13 @@ def get_search_params():
         subtype = request.args.get('subitem_type')
         if subtype not in get_link_types_by_index(index).keys():
             return {'error': 'Invalid subitem type for index {}'.format(index)}
-        data = do_subitem_search(query, index, subtype, start_from=request.args.get('from', None), filters=filters)
+        data = do_subitem_search(query, index, subtype, start_from=request.args.get('from', None), filters=filters, size=size)
     else:
         return {'error': 'Search type {} unimplemented.'.format(search_type)}
 
     mapping = map_search_data(data)
 
-    return {"start_from": start_from, "query": query, "mapping": mapping, "data": data}
+    return {"start_from": start_from, "query": query, "mapping": mapping, "data": data, "page_size": size}
 
 def flatten(l):
     for el in l:
