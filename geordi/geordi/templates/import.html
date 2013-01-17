@@ -24,7 +24,7 @@
     <p>We've provided about as much information here as we can to get you started entering this as a release. Please review it as carefully as you can and then hit submit and you'll be directed to the release editor on MusicBrainz.</p>
     <form action="//musicbrainz.org/release/add" method="post" id="form-import">
       <fieldset><legend>Release Title:</legend>
-        Select one:
+        {%- if mapping.release.title | length > 1 -%}Select one: {% endif -%}
         {%- for title in mapping.release.title -%}
           <input type="hidden" name="name" id="id-name-{{ loop.index0 }}" value="{{ title }}"{% if not loop.first %}disabled="disabled" {% endif %}/>
           <div class="import-clicker exclusive{% if loop.first %} selected{% endif %}" data-for="id-name-{{ loop.index0 }}">{{ title }}</div>
