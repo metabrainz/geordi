@@ -2,6 +2,21 @@
 {% extends "layout.html" %}
 {% block title %}Import: {{ data._index }} - {{ data._id }}{% endblock %}
 
+{% block js %}
+<script>
+  $('.import-clicker').click(function() {
+    var $this = $(this);
+    var $for = $('#' + $this.attr('data-for'));
+    if ($this.hasClass('exclusive')) {
+      $this.siblings('input').attr('disabled', 'disabled');
+      $this.siblings('div.import-clicker').removeClass('selected');
+    }
+    $for.removeAttr('disabled');
+    $this.addClass('selected');
+  });
+</script>
+{% endblock %}
+
 {% block content %}
 <h2>Import to MusicBrainz</h2>
 {% if mapping %}
@@ -9,11 +24,14 @@
     <p>We've provided about as much information here as we can to get you started entering this as a release. Please review it as carefully as you can and then hit submit and you'll be directed to the release editor on MusicBrainz.</p>
     <form action="//musicbrainz.org/release/add" method="post" id="form-import">
       <fieldset><legend>Release Title:</legend>
-        {%- if mapping.release.title | length > 1 -%}
-          <input type="text" name="name" id="id-name" value="" />
-          Multiple options: {{ g.comma_list(mapping.release.title) }}<br />
-        {%- else -%}
-         <input type="text" name="name" id="id-name" value="{{ mapping.release.title[0] }}" /><br />
+        Select one:
+        {%- for title in mapping.release.title -%}
+          <input type="hidden" name="name" id="id-name-{{ loop.index0 }}" value="{{ title }}"{% if not loop.first %}disabled="disabled" {% endif %}/>
+          <div class="import-clicker exclusive{% if loop.first %} selected{% endif %}" data-for="id-name-{{ loop.index0 }}">{{ title }}</div>
+        {%- endfor -%}
+        {%- if mapping.release.title | length == 0 -%}
+          <input type="hidden" name="name" id="id-name-dummy" value="(placeholder title)"/>
+          <div class="import-clicker exclusive selected" data-for="id-name-dummy">(placeholder title)</div>
         {%- endif -%}
       </fieldset>
       <fieldset><legend>Release Date:</legend>

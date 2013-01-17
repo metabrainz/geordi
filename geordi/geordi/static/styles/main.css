@@ -243,6 +243,17 @@ fieldset { border: 1px solid #bbb }
 
 .tracknumber, .tracklength { width: 5em }
 
+.import-clicker {
+    display: inline-block;
+    padding: 2px;
+    font-size: larger;
+    border: 1px solid #888;
+}
+
+.import-clicker.selected {
+    background-color: rgba(255, 0, 255, 0.4);
+}
+
 /* Search Page */
 ul.search-results {
     padding: 0px 5px;
