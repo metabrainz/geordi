@@ -107,8 +107,18 @@
               {%- for medium_number in track.medium %}{{ medium_number }}{% if not loop.last %}<br />{% endif %}{% endfor -%}
             </td>
            {%- endif -%}
-            <td><input class="tracknumber" name="{{baseid}}.number" value="{{track.number[0]}}" /></td>
-            <td><input name="{{baseid}}.name" value="{{track.title[0]}}" /></td>
+            <td>
+              {%- for number in track.number -%}
+                <input type="hidden" name="{{baseid}}.number" id="id-{{baseid}}.number-{{ loop.index0 }}" value="{{ number }}"{% if not loop.first %}disabled="disabled" {% endif %}/>
+                <div class="import-clicker exclusive{% if loop.first %} selected{% endif %}" data-for="id-{{baseid}}.number-{{ loop.index0 }}">{{ number }}</div>
+              {%- endfor -%}
+            </td>
+            <td>
+              {%- for title in track.title -%}
+                <input type="hidden" name="{{baseid}}.name" id="id-{{baseid}}.name-{{ loop.index0 }}" value="{{ title }}"{% if not loop.first %}disabled="disabled" {% endif %}/>
+                <div class="import-clicker exclusive{% if loop.first %} selected{% endif %}" data-for="id-{{baseid}}.name-{{ loop.index0 }}">{{ title }}</div>
+              {%- endfor -%}
+            </td>
             <td>
               {%- set loopid = 0 -%}
               {%- for artist in track.artist -%}
@@ -125,7 +135,12 @@
                 {%- set loopid = loopid + 1 -%}
               {%- endfor -%}
             </td>
-            <td><input class="tracklength" name="{{baseid}}.length" value="{{track.length[0]}}" /></td>
+            <td>
+              {%- for length in track.length -%}
+                <input type="hidden" name="{{baseid}}.length" id="id-{{baseid}}.length-{{ loop.index0 }}" value="{{ length }}"{% if not loop.first %}disabled="disabled" {% endif %}/>
+                <div class="import-clicker exclusive{% if loop.first %} selected{% endif %}" data-for="id-{{baseid}}.length-{{ loop.index0 }}">{{ length }}</div>
+              {%- endfor -%}
+            </td>
           </tr>
         {%- endfor -%}
         </tbody>

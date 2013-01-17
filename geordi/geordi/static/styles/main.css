@@ -248,6 +248,7 @@ fieldset { border: 1px solid #bbb }
     padding: 2px;
     font-size: larger;
     border: 1px solid #888;
+    cursor: pointer;
 }
 
 .import-clicker.selected {
