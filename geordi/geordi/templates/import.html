@@ -4,14 +4,17 @@
 
 {% block js %}
 <script>
+  function jq( myid ) {
+    return "#" + myid.replace( /(:|\.)/g, "\\$1" );
+  }
   $('.import-clicker').click(function() {
     var $this = $(this);
-    var $for = $('#' + $this.attr('data-for'));
+    var for_ids = $this.attr('data-for').split(',');
     if ($this.hasClass('exclusive')) {
       $this.siblings('input').attr('disabled', 'disabled');
       $this.siblings('div.import-clicker').removeClass('selected');
     }
-    $for.removeAttr('disabled');
+    $.each(for_ids, function(i, id) { $(jq(id)).removeAttr('disabled'); });
     $this.addClass('selected');
   });
 </script>
@@ -35,15 +38,13 @@
         {%- endif -%}
       </fieldset>
       <fieldset><legend>Release Date:</legend>
-        {% if mapping.release.date | length != 1 %}
-          <input style="width: 4em" placeholder="YYYY" type="text" name="date.year" id="id-year" />-<input style="width: 2em" placeholder="MM" type="text" name="date.month" id="id-month" />-<input style="width: 2em" placeholder="DD" type="text" name="date.day" id="id-day" />
-          {% if mapping.release.date | length > 1 %}
-            Multiple options: {{ g.comma_list(mapping.release.date) }}
-          {%- endif -%}
-        {%- else -%}
-          {%- set dateparts = g.re.split('-', mapping.release.date[0]) -%}
-          <input style="width: 4em" placeholder="YYYY" type="text" name="date.year" id="id-year" value="{{dateparts[0]}}"/>-<input style="width: 2em" placeholder="MM" type="text" name="date.month" id="id-month" value="{{dateparts[1]}}"/>-<input style="width: 2em" placeholder="DD" type="text" name="date.day" id="id-day" value="{{dateparts[2]}}"/>
-        {%- endif -%}
+        {%- for date in mapping.release.date -%}
+          {%- set dateparts = g.re.split('-', date) -%}
+          <input type="hidden" name="date.year" id="id-date.year-{{loop.index0}}" value="{{ dateparts[0] }}" {% if not loop.first %}disabled="disabled" {% endif %}/>
+          <input type="hidden" name="date.month" id="id-date.month-{{loop.index0}}" value="{{ dateparts[1] }}" {% if not loop.first %}disabled="disabled" {% endif %}/>
+          <input type="hidden" name="date.day" id="id-date.day-{{loop.index0}}" value="{{ dateparts[2] }}" {% if not loop.first %}disabled="disabled" {% endif %}/>
+          <div class="import-clicker exclusive{% if loop.first %} selected{% endif %}" data-for="id-date.year-{{loop.index0}},id-date.month-{{loop.index0}},id-date.day-{{loop.index0}}">{{ date }}</div>
+        {%- endfor -%}
       </fieldset>
       <fieldset><legend>Release Artist:</legend>
         {%- set loopid = 0 -%}
