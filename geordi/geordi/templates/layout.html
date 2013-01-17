@@ -40,7 +40,7 @@
       <input type="checkbox" name="human" id="id-human" {% if request.args.get('human') == 'on' %}checked {% endif %}/> <label for="id-human">Show human-matched items</label>
       <input type="checkbox" name="auto" id="id-auto" {% if request.args.get('auto') == 'on' or not request.args.get('s', False) %}checked {% endif %} /> <label for="id-auto">Show auto-matched items</label>
       <input type="checkbox" name="un" id="id-un" {% if request.args.get('un') == 'on' or not request.args.get('s', False) %}checked {% endif %}/> <label for="id-un">Show unmatched items</label>
-      <label for="id-size">Number of Results:</label> <select name="size" id="id-size"><option>10</option><option>25</option><option>100</option><option>1000</option></select>
+      <select name="size" id="id-size"><option>10</option><option>25</option><option>100</option><option>1000</option></select> <label for="id-size">Number of Results:</label>
       <input type="hidden" name="s" value="1" />
     </div>
     <div class="filters">
