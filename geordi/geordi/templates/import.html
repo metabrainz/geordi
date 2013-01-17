@@ -30,11 +30,11 @@
         {%- if mapping.release.title | length > 1 -%}Select one: {% endif -%}
         {%- for title in mapping.release.title -%}
           <input type="hidden" name="name" id="id-name-{{ loop.index0 }}" value="{{ title }}"{% if not loop.first %}disabled="disabled" {% endif %}/>
-          <div class="import-clicker exclusive{% if loop.first %} selected{% endif %}" data-for="id-name-{{ loop.index0 }}">{{ title }}</div>
+          <div class="import-clicker release-title exclusive{% if loop.first %} selected{% endif %}" data-for="id-name-{{ loop.index0 }}">{{ title }}</div>
         {%- endfor -%}
         {%- if mapping.release.title | length == 0 -%}
           <input type="hidden" name="name" id="id-name-dummy" value="(placeholder title)"/>
-          <div class="import-clicker exclusive selected" data-for="id-name-dummy">(placeholder title)</div>
+          <div class="import-clicker release-title exclusive selected" data-for="id-name-dummy">(placeholder title)</div>
         {%- endif -%}
       </fieldset>
       <fieldset><legend>Release Date:</legend>

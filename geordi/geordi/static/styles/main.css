@@ -246,9 +246,12 @@ fieldset { border: 1px solid #bbb }
 .import-clicker {
     display: inline-block;
     padding: 2px;
-    font-size: larger;
     border: 1px solid #888;
     cursor: pointer;
+}
+
+.import-clicker.release-title {
+    font-size: larger;
 }
 
 .import-clicker.selected {
