@@ -98,7 +98,7 @@
       </fieldset>
       <fieldset><legend>Release Artist:</legend>
         Select one or more:
-        {%- for artist in mapping.release.artist -%}
+        {% for artist in mapping.release.artist -%}
           {{ artist_selector(artist, 'artist_credit.names', loop.index0) }}
         {%- endfor -%}
         {%- for artist in mapping.release.other_artist -%}
