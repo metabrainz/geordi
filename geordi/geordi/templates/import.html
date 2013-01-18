@@ -7,15 +7,46 @@
   function jq( myid ) {
     return "#" + myid.replace( /(:|\.)/g, "\\$1" );
   }
-  $('.import-clicker').click(function() {
-    var $this = $(this);
+
+  function exclusive($this) {
     var for_ids = $this.attr('data-for').split(',');
-    if ($this.hasClass('exclusive')) {
-      $this.siblings('input').attr('disabled', 'disabled');
-      $this.siblings('div.import-clicker').removeClass('selected');
-    }
+    $this.siblings('input').attr('disabled', 'disabled');
+    $this.siblings('div.import-clicker').removeClass('selected');
     $.each(for_ids, function(i, id) { $(jq(id)).removeAttr('disabled'); });
     $this.addClass('selected');
+  }
+
+  function nonExclusive($this) {
+    var for_ids = $this.attr('data-for').split(',');
+    if ($this.hasClass('selected')) {
+      $.each(for_ids, function(i, id) { $(jq(id)).attr('disabled', 'disabled'); });
+      $this.removeClass('selected');
+    } else {
+      $.each(for_ids, function(i, id) { $(jq(id)).removeAttr('disabled'); });
+      $this.addClass('selected');
+    }
+
+    $this.parent().children('div.import-clicker.selected').each(function (index) {
+      correctName($(this), index);
+    });
+  }
+
+  function correctName($this, index) {
+      var for_ids = $this.attr('data-for').split(',');
+      $.each(for_ids, function(i, id) {
+        var $this = $(jq(id));
+        var newName = $this.attr('data-template').replace(/{}/g, index);
+        $this.attr('name', newName);
+      });
+  }
+
+  $('.import-clicker').click(function() {
+    var $this = $(this);
+    if ($this.hasClass('exclusive')) {
+      exclusive($this);
+    } else {
+      nonExclusive($this);
+    }
   });
 </script>
 {% endblock %}
@@ -121,19 +152,20 @@
               {%- endfor -%}
             </td>
             <td>
-              {%- set loopid = 0 -%}
               {%- for artist in track.artist -%}
+                <input type="hidden" name="{{baseid}}.artist_credit.names.{{loop.index0}}.name" id="id-{{baseid}}.artist_credit.names.name-{{loop.index0}}" data-template="{{baseid}}.artist_credit.names.{}.name" value="{{ artist.name }}" />
                 {%- if artist.subitem and subitems[artist.subitem] and subitems[artist.subitem]._source._geordi.matchings.current_matching.type and subitems[artist.subitem]._source._geordi.matchings.current_matching.type == 'artist' -%}
-                  {%- for mbid in subitems[artist.subitem]._source._geordi.matchings.current_matching.mbid -%}
-                    <input name="{{baseid}}.artist_credit.names.{{loopid}}.name" value="{{artist.name}}" />
-                    <input name="{{baseid}}.artist_credit.names.{{loopid}}.mbid" value="{{ mbid }}" />
-                    {%- if not loop.last -%}<input type="hidden" name="{{baseid}}.artist_credit.names.{{loopid}}.join_phrase" value=", " /><br />{%- set loopid = loopid + 1 -%}{%- endif -%}
-                  {%- endfor -%}
-                {%- else -%}
-                  <input name="{{baseid}}.artist_credit.names.{{loopid}}.name" value="{{artist.name}}" />
+                  {%- set mbids = subitems[artist.subitem]._source._geordi.matchings.current_matching.mbid -%}
+                  <input type="hidden" name="{{baseid}}.artist_credit.names.{{loop.index0}}.mbid" id="id-{{baseid}}.artist_credit.names.mbid-{{loop.index0}}" data-template="{{baseid}}.artist_credit.names.{}.mbid" value="{{ mbids[0] }}" />
                 {%- endif -%}
-                {%- if not loop.last -%}<input type="hidden" name="artist_credit.names.{{loopid}}.join_phrase" value=", " />{%- endif -%}
-                {%- set loopid = loopid + 1 -%}
+                <div class="import-clicker selected" data-for="id-{{baseid}}.artist_credit.names.name-{{ loop.index0 }},id-{{baseid}}.artist_credit.names.mbid-{{ loop.index0 }}">
+                {%- if mbids and mbids | length > 1 -%}
+                  <div class="action-icon">
+                    <img src="/static/images/warning.png" title="This artist has more than one attached MBID, which is not currently supported. Only {{ mbids[0] }} will be passed to the Release Editor." />
+                  </div>
+                {%- endif %}
+                  {{ artist.name }}
+                </div>
               {%- endfor -%}
             </td>
             <td>
