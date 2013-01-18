@@ -26,26 +26,39 @@
       $this.addClass('selected');
     }
 
-    $this.parent().children('div.import-clicker.selected').each(function (index) {
-      correctName($(this), index);
-    });
+    correctNames($this.parent());
   }
 
-  function correctName($this, index) {
+  function correctNames($base) {
+    $base.children('div.import-clicker.selected').each(function (index) {
+      var $this = $(this);
       var for_ids = $this.attr('data-for').split(',');
       $.each(for_ids, function(i, id) {
         var $this = $(jq(id));
-        var newName = $this.attr('data-template').replace(/{}/g, index);
-        $this.attr('name', newName);
+        if ($this.attr('data-template')) {
+          var newName = $this.attr('data-template').replace(/{}/g, index);
+          $this.attr('name', newName);
+        }
       });
+    });
   }
 
-  $('.import-clicker').click(function() {
+  $('.import-clicker:not(.va-clicker)').click(function() {
     var $this = $(this);
     if ($this.hasClass('exclusive')) {
       exclusive($this);
     } else {
       nonExclusive($this);
+    }
+  });
+
+  $('.va-clicker').click(function() {
+    var $this = $(this);
+    if ($this.hasClass('selected')) {
+        nonExclusive($this);
+    } else {
+        exclusive($this);
+        correctNames($this.parent());
     }
   });
 </script>
@@ -78,22 +91,13 @@
         {%- endfor -%}
       </fieldset>
       <fieldset><legend>Release Artist:</legend>
-        {%- set loopid = 0 -%}
+        Select one or more:
         {%- for artist in mapping.release.artist -%}
-          <div class="release-artist">
-          {%- if artist.subitem and subitems[artist.subitem] and subitems[artist.subitem]._source._geordi.matchings.current_matching.type and subitems[artist.subitem]._source._geordi.matchings.current_matching.type == 'artist' -%}
-            {%- for mbid in subitems[artist.subitem]._source._geordi.matchings.current_matching.mbid -%}
-              <input name="artist_credit.names.{{loopid}}.name" value="{{artist.name}}" /><br />
-              <input name="artist_credit.names.{{loopid}}.mbid" value="{{ mbid }}" />
-              {%- if not loop.last -%}<input type="hidden" name="artist_credit.names.{{loopid}}.join_phrase" value=", " /><br />{%- set loopid = loopid + 1 -%}{%- endif -%}
-            {%- endfor -%}
-          {%- else -%}
-            <input name="artist_credit.names.{{loopid}}.name" value="{{artist.name}}" />
-          {%- endif -%}
-          {%- if not loop.last -%}<input type="hidden" name="artist_credit.names.{{loopid}}.join_phrase" value=", " />{%- endif -%}
-          {%- set loopid = loopid + 1 -%}
-          </div>
+          {{ artist_selector(artist, 'artist_credit.names', loop.index0) }}
         {%- endfor -%}
+        <input type="hidden" name="artist_credit.names.{{ mapping.release.artist | length }}.name" id="id-artist_credit.names.name-{{ mapping.release.artist | length }}" data-template="artist_credit.names.{}.name" value="Various Artists" disabled="disabled" />
+        <input type="hidden" name="artist_credit.names.{{ mapping.release.artist | length }}.mbid" id="id-artist_credit.names.mbid-{{ mapping.release.artist | length }}" data-template="artist_credit.names.{}.mbid" value="89ad4ac3-39f7-470e-963a-56509c546377" disabled="disabled" />
+        <div class="import-clicker va-clicker" data-for="id-artist_credit.names.name-{{ mapping.release.artist | length }},id-artist_credit.names.mbid-{{ mapping.release.artist | length }}">Various Artists</div>
       </fieldset>
       <fieldset><legend>Label/Catalog Number</legend>
         {% if mapping.release.label | length > 0 and mapping.release.label[0].catalog_number %}
@@ -153,19 +157,7 @@
             </td>
             <td>
               {%- for artist in track.artist -%}
-                <input type="hidden" name="{{baseid}}.artist_credit.names.{{loop.index0}}.name" id="id-{{baseid}}.artist_credit.names.name-{{loop.index0}}" data-template="{{baseid}}.artist_credit.names.{}.name" value="{{ artist.name }}" />
-                {%- if artist.subitem and subitems[artist.subitem] and subitems[artist.subitem]._source._geordi.matchings.current_matching.type and subitems[artist.subitem]._source._geordi.matchings.current_matching.type == 'artist' -%}
-                  {%- set mbids = subitems[artist.subitem]._source._geordi.matchings.current_matching.mbid -%}
-                  <input type="hidden" name="{{baseid}}.artist_credit.names.{{loop.index0}}.mbid" id="id-{{baseid}}.artist_credit.names.mbid-{{loop.index0}}" data-template="{{baseid}}.artist_credit.names.{}.mbid" value="{{ mbids[0] }}" />
-                {%- endif -%}
-                <div class="import-clicker selected" data-for="id-{{baseid}}.artist_credit.names.name-{{ loop.index0 }},id-{{baseid}}.artist_credit.names.mbid-{{ loop.index0 }}">
-                {%- if mbids and mbids | length > 1 -%}
-                  <div class="action-icon">
-                    <img src="/static/images/warning.png" title="This artist has more than one attached MBID, which is not currently supported. Only {{ mbids[0] }} will be passed to the Release Editor." />
-                  </div>
-                {%- endif %}
-                  {{ artist.name }}
-                </div>
+                {{ artist_selector(artist, baseid + '.artist_credit.names', loop.index0) }}
               {%- endfor -%}
             </td>
             <td>
@@ -189,6 +181,22 @@
   <p>We're sorry, but this item doesn't have a mapping and thus can't be imported.</p>
 {% endif %}
 {% endblock %}
+
+{%- macro artist_selector(artist, base, idx) -%}
+  <input type="hidden" name="{{base}}.{{idx}}.name" id="id-{{base}}.name-{{idx}}" data-template="{{base}}.{}.name" value="{{ artist.name }}" />
+  {%- if artist.subitem and subitems[artist.subitem] and subitems[artist.subitem]._source._geordi.matchings.current_matching.type and subitems[artist.subitem]._source._geordi.matchings.current_matching.type == 'artist' -%}
+    {%- set mbids = subitems[artist.subitem]._source._geordi.matchings.current_matching.mbid -%}
+    <input type="hidden" name="{{base}}.{{idx}}.mbid" id="id-{{base}}.mbid-{{idx}}" data-template="{{base}}.{}.mbid" value="{{ mbids[0] }}" />
+  {%- endif -%}
+  <div class="import-clicker selected" data-for="id-{{base}}.name-{{ idx }},id-{{base}}.mbid-{{ idx }}">
+  {%- if mbids and mbids | length > 1 -%}
+    <div class="action-icon">
+      <img src="/static/images/warning.png" title="This artist has more than one attached MBID, which is not currently supported. Only {{ mbids[0] }} will be passed to the Release Editor." />
+    </div>
+  {%- endif %}
+    {{ artist.name }}
+  </div>
+{%- endmacro -%}
 
 {%- macro display_label(label, loopid, alt_catno) -%}
   {%- if label -%}
