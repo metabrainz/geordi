@@ -150,7 +150,7 @@ class wcd():
 
     def map(self, data):
         target = base_mapping('release')
-        target['version'] = 11
+        target['version'] = 12
         release = target['release']
 
         # Release Title
@@ -179,6 +179,15 @@ class wcd():
         if 'what_cd_json' in data:
             try:
                 release['artist'] = [{'name': artist['name'], 'subitem': "artist_id-{}".format(int(artist['id']))} for artist in data['what_cd_json']['response']['group']['musicInfo']['artists']]
+            except (KeyError, TypeError): pass
+            try:
+                extra_artists = [{'name': artist['name'], 'subitem': "artist_id-{}".format(int(artist['id']))} for artist in data['what_cd_json']['response']['group']['musicInfo']['with']]
+                remixers = [{'name': artist['name'], 'subitem': "artist_id-{}".format(int(artist['id']))} for artist in data['what_cd_json']['response']['group']['musicInfo']['remixedBy']]
+                producers = [{'name': artist['name'], 'subitem': "artist_id-{}".format(int(artist['id']))} for artist in data['what_cd_json']['response']['group']['musicInfo']['producer']]
+                composers = [{'name': artist['name'], 'subitem': "artist_id-{}".format(int(artist['id']))} for artist in data['what_cd_json']['response']['group']['musicInfo']['composers']]
+                conductors = [{'name': artist['name'], 'subitem': "artist_id-{}".format(int(artist['id']))} for artist in data['what_cd_json']['response']['group']['musicInfo']['conductor']]
+                djs = [{'name': artist['name'], 'subitem': "artist_id-{}".format(int(artist['id']))} for artist in data['what_cd_json']['response']['group']['musicInfo']['dj']]
+                release['other_artist'] = uniq(extra_artists + remixers + producers + composers + conductors + djs)
             except (KeyError, TypeError): pass
         if 'artist' not in release or len(release['artist']) < 1:
             try:
