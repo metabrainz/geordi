@@ -69,6 +69,12 @@
 {% if mapping %}
   {% if 'release' in mapping %}
     <p>We've provided about as much information here as we can to get you started entering this as a release. Please review it as carefully as you can and then hit submit and you'll be directed to the release editor on MusicBrainz.</p>
+    {%- if data and data._source._geordi and data._source._geordi.matchings.current_matching and data._source._geordi.matchings.current_matching.type == 'release'%}
+      {%- set current_matching = data._source._geordi.matchings.current_matching -%}
+      <p><strong>Warning:</strong> This release is already matched to release(s)
+      {% for mbid in current_matching.mbid -%}<a href="//musicbrainz.org/release/{{ mbid }}">{{ mbid[:4] }}…{{ mbid[-4:] }}</a>{% if loop.revindex > 2 %}, {% elif loop.revindex == 2 %}, and{% endif %}{% endfor %}.
+      Please make sure you aren't importing in error.</p>
+    {%- endif %}
     <form action="//musicbrainz.org/release/add" method="post" id="form-import">
       <fieldset><legend>Release Title:</legend>
         {%- if mapping.release.title | length > 1 -%}Select one: {% endif -%}
