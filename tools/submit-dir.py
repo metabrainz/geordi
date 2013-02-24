@@ -40,6 +40,7 @@ def process_dir(index, directory):
 
 def read_directory(directory, base):
     data = {}
+    numfiles = len(os.listdir(directory))
     for filename in os.listdir(directory):
         filebase = re.sub(r'\.', '_',
                       re.sub(r'^[\s_-]+|[\s_-]+$', '',
@@ -54,7 +55,10 @@ def read_directory(directory, base):
             processed = content
 
         if processed:
-            data[filebase] = processed
+            if numfiles == 1:
+                data = processed
+            else:
+                data[filebase] = processed
     return data
 
 def process_xml(content):
