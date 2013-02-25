@@ -15,26 +15,30 @@ Shared dependencies: elasticsearch -- install and make available, presumably on 
 ----
 
 Python dependencies:
-virtualenv some-dir
-./some-dir/bin/pip install Flask
+
+`virtualenv geordi`
+
+`./geordi/bin/pip install Flask`
 
 ----
 
-To run the server, from geordi directory:
-/virtualenv/dir/bin/python run.py
+To run the server:
+
+`./geordi/bin/python run.py`
 
 ----
 
 For importing, perl dependencies:
-cpanm XML::XML2JSON LWP::UserAgent HTTP::Request URI::Escape Encode JSON Try::Tiny File::Slurp
+
+`cpanm XML::XML2JSON LWP::UserAgent HTTP::Request URI::Escape Encode JSON Try::Tiny File::Slurp`
 
 ----
 
 To import data, from tools directory:
 
-./submit-dir.pl --index some-index-name /some/directory/\*
+`./submit-dir.pl --index some-index-name /some/directory/*`
 
-Where \* should be a bunch of directories named by identifier, containing XML and JSON files.
+Where * should be a bunch of directories named by identifier, containing XML and JSON files.
 
 Usage
 =====
@@ -47,9 +51,11 @@ Code Layout
 geordi subdir: new python codebase (GPLv3+)
 
 tools subdir:
+
  * submit-dir.pl
-      Submits files to the local elastic search server;
-      requires: XML::XML2JSON LWP::UserAgent HTTP::Request URI::Escape Encode JSON Try::Tiny File::Slurp
+
+    Submits files to the local elastic search server.
+
  * other largely outdated files for historical understanding
 
 ingestr-server-perl subdir: old perl codebase
