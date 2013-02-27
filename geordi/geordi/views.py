@@ -177,10 +177,15 @@ def login():
 def oauth_callback():
     error = request.args.get('error')
     if not error:
-        username = request.args.get('state')
+        state = request.args.getlist('state')
+        username = state[0]
+        if len(state) > 1 and state[1] == 'on':
+            remember = True;
+        else:
+            remember = False;
         code = request.args.get('code')
         if check_mb_account(username, code):
-            login_user(User(username))
+            login_user(User(username), remember=remember)
             flash("Logged in!")
             return redirect(request.args.get("next") or url_for("search"))
         else:
