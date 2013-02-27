@@ -169,22 +169,25 @@ def internal_mbid_type(mbid):
         return Response(json.dumps(check), 200, mimetype="application/json")
 
 # Login/logout-related views
-@app.route('/login', methods=["GET", "POST"])
+@app.route('/login')
 def login():
-    if request.method == "POST":
-        username = request.form.get("username", None)
-        password = request.form.get("password", None)
-        remember = request.form.get("remember", False)
-        if username and password:
-            if check_mb_account(username, password):
-                login_user(User(username), remember=remember)
-                flash("Logged in!")
-                return redirect(request.args.get("next") or url_for("search"))
-            else:
-                flash('Invalid username or password.')
+    return render_template("login.html", client_id = app.config['OAUTH_CLIENT_ID'], redirect_uri = app.config['OAUTH_REDIRECT_URI'])
+
+@app.route('/internal/oauth')
+def oauth_callback():
+    error = request.args.get('error')
+    if not error:
+        username = request.args.get('state')
+        code = request.args.get('code')
+        if check_mb_account(username, code):
+            login_user(User(username))
+            flash("Logged in!")
+            return redirect(request.args.get("next") or url_for("search"))
         else:
-            flash('You must provide a username and password.')
-    return render_template("login.html")
+            flash('Incorrect username, please try again.')
+    else:
+        flash('There was an error: ' + error)
+    return render_template("login.html", client_id = app.config['OAUTH_CLIENT_ID'], redirect_uri = app.config['OAUTH_REDIRECT_URI'])
 
 @app.route("/logout")
 @login_required
@@ -293,29 +296,18 @@ def get_subitem(index, subitem, create=False, seed={}):
             es.index(index, 'subitem', data, id=subitem)
         return None
 
-# What follows, until the end of the file, is shamelessly cribbed from acoustid-server
-class DigestAuthHandler(urllib2.HTTPDigestAuthHandler):
-    """Patched DigestAuthHandler to correctly handle Digest Auth according to RFC 2617.
+def check_mb_account(username, auth_code):
+    url = 'https://beta.musicbrainz.org/oauth2/token'
+    data = urllib.urlencode({'grant_type': 'authorization_code',
+            'code': auth_code,
+            'client_id': app.config['OAUTH_CLIENT_ID'],
+            'client_secret': app.config['OAUTH_CLIENT_SECRET'],
+            'redirect_uri': app.config['OAUTH_REDIRECT_URI']})
+    json_data = json.load(urllib2.urlopen(url, data))
 
-    This will allow multiple qop values in the WWW-Authenticate header (e.g. "auth,auth-int").
-    The only supported qop value is still auth, though.
-    See http://bugs.python.org/issue9714
-
-    @author Kuno Woudt
-    """
-    def get_authorization(self, req, chal):
-        qop = chal.get('qop')
-        if qop and ',' in qop and 'auth' in qop.split(','):
-            chal['qop'] = 'auth'
-        return urllib2.HTTPDigestAuthHandler.get_authorization(self, req, chal)
-
-def check_mb_account(username, password):
-    url = 'https://musicbrainz.org/ws/2/artist/89ad4ac3-39f7-470e-963a-56509c546377?inc=user-tags'
-    auth_handler = DigestAuthHandler()
-    auth_handler.add_password('musicbrainz.org', 'https://musicbrainz.org/',
-                              username.encode('utf8'), password.encode('utf8'))
-    opener = urllib2.build_opener(auth_handler)
-    opener.addheaders = [('User-Agent', 'Geordi-Login +http://geordi.musicbrainz.org/login')]
+    url = 'https://beta.musicbrainz.org/ws/1/user?name=' + username
+    opener = urllib2.build_opener()
+    opener.addheaders = [('Authorization', 'Bearer ' + json_data['access_token'])]
     try:
         opener.open(url, timeout=5)
     except StandardError:

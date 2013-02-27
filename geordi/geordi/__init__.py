@@ -17,13 +17,9 @@
 from __future__ import division, absolute_import
 from flask import Flask
 from flask.ext.login import LoginManager, UserMixin
+from geordi.config import *
 
 from pyelasticsearch import ElasticSearch
-
-# CONFIG
-SECRET_KEY = 'super seekrit'
-ELASTICSEARCH_ENDPOINT = 'http://localhost:9200/'
-AVAILABLE_INDICES = ['wcd']
 
 app = Flask(__name__)
 app.config.from_object(__name__)
