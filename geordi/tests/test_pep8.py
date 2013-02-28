@@ -32,7 +32,7 @@ class CodeStyleTestCase(unittest.TestCase):
         import os
         py_files = []
         # Check if we're in the geordi subdir.
-        if os.path.isfile('run.py') and os.path.isdir('geordi'):
+        if os.path.isfile('fabfile.py') and os.path.isdir('geordi'):
             for node in os.listdir(os.curdir):
                 if os.path.isfile(node) and self.include_file(node):
                     py_files += [os.path.abspath(node)]
