@@ -123,14 +123,22 @@ def update_automatic_item_matches_by_index(index, item, data):
         fakeip = 'internal, matched by index {}'.format(index)
         automatches = data['_geordi']['matchings']['auto_matchings']
         changed = False
-        order = ['work', 'recording', 'label', 'artist', 'release', 'release_group']
-        # Do matches with more linked items first, then supersede with fewer-ID matches
-        for (matchtype, mbids) in sorted(matches.iteritems(), key=lambda x: (len(x[1]), order.index(x[0]) if x[0] in order else 999), reverse=True):
-            if (
-                fakeip not in [match.get('ip') for match in automatches] or
-                ",".join(sorted(mbids)) not in [",".join(sorted(match.get('mbid', []))) for match in automatches]
-            ):
-                register_match(index, item, 'item', matchtype, mbids, auto=True, user='matched by index', ip=fakeip)
+        order = ['work', 'recording', 'label',
+                 'artist', 'release', 'release_group']
+        # Do matches with more linked items first;
+        # then, supersede with fewer-ID matches
+        for (matchtype, mbids) in sorted(matches.iteritems(),
+                                         key=lambda x: (len(x[1]),
+                                                        (order.index(x[0])
+                                                         if x[0] in order
+                                                         else 999)),
+                                         reverse=True):
+            if ((fakeip not in [match.get('ip') for match in automatches]) or
+                (",".join(sorted(mbids)) not in
+                 [",".join(sorted(match.get('mbid', [])))
+                  for match in automatches])):
+                register_match(index, item, 'item', matchtype, mbids,
+                               auto=True, user='matched by index', ip=fakeip)
                 changed = True
             else: continue
         return changed
@@ -140,7 +148,8 @@ def update_automatic_subitem_matches_by_index(index, item, data):
         data = check_data_format(data)
         matches = get_automatic_subitem_matches_by_index(index, data)
         fakeip = 'internal, matched by index {}'.format(index)
-        order = ['work', 'recording', 'label', 'artist', 'release', 'release_group']
+        order = ['work', 'recording', 'label',
+                 'artist', 'release', 'release_group']
         changed = False
         for (subitem_id, subitem_matches) in matches.iteritems():
             try:
@@ -151,13 +160,23 @@ def update_automatic_subitem_matches_by_index(index, item, data):
 
             data = check_data_format(data)
             automatches = data['_geordi']['matchings']['auto_matchings']
-            # Do matches with more linked items first, then supersede with fewer-ID matches
-            for (matchtype, mbids) in sorted(subitem_matches.iteritems(), key=lambda x: (len(x[1]), order.index(x[0]) if x[0] in order else 999), reverse=True):
-                if (
-                    fakeip not in [match.get('ip') for match in automatches] or
-                    ",".join(sorted(mbids)) not in [",".join(sorted(match.get('mbid', []))) for match in automatches]
-                ):
-                    register_match(index, subitem_id, 'subitem', matchtype, mbids, auto=True, user='matched by index', ip=fakeip)
+            # Do matches with more linked items first;
+            # then supersede with fewer-ID matches
+            for (matchtype, mbids) in sorted(subitem_matches.iteritems(),
+                                             key=lambda x: (len(x[1]),
+                                                            (order.index(x[0])
+                                                             if x[0] in order
+                                                             else 999)),
+                                             reverse=True):
+                if ((fakeip not in
+                     [match.get('ip') for match in automatches]) or
+                    (",".join(sorted(mbids)) not in
+                     [",".join(sorted(match.get('mbid', [])))
+                      for match in automatches])):
+                    register_match(index, subitem_id, 'subitem',
+                                   matchtype, mbids,
+                                   auto=True, user='matched by index',
+                                   ip=fakeip)
                     changed = True
                 else: continue
         return changed
@@ -168,7 +187,8 @@ def map_search_data(data):
         for result in data['hits']['hits']:
             if result['_type'] == 'item':
                 try:
-                    maps.append(get_map_by_index(result['_index'], result['_source']))
+                    maps.append(get_map_by_index(result['_index'],
+                                                 result['_source']))
                 except:
                     maps.append(None)
             elif result['_type'] == 'subitem':
@@ -186,6 +206,6 @@ def get_mapoptions(mapping):
             options['totaltracks'] = True
         if len(track['acoustid']) > 0:
             options['acoustid'] = True
-        if options['mediums'] and options['totaltracks'] and options['acoustid']:
+        if False not in options.values():
             break
     return options
