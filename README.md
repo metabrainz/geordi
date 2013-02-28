@@ -18,7 +18,7 @@ Python dependencies:
 
 `virtualenv geordi`
 
-`./geordi/bin/pip install Flask`
+`./geordi/bin/pip install -r requirements.txt`
 
 ----
 
