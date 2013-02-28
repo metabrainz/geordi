@@ -38,5 +38,23 @@ class TestUtils (unittest.TestCase):
 
         self.assertEqual (geordi.utils.htmlunescape (kodakumi), expected)
 
+    def test_check_data_format (self):
+        # Test empty dict ends up correct
+        self.assertEqual(geordi.utils.check_data_format({}),
+                         {'_geordi':
+                             {'mapping': {'version': 0},
+                              'links': {'links': [], 'version': 1},
+                              'matchings': {'matchings': [],
+                                            'auto_matchings': [],
+                                            'current_matching': {},
+                                            'version': 3}}})
 
-
+        # Test dict with _geordi key but nothing else works fine
+        self.assertEqual(geordi.utils.check_data_format({'_geordi': {}}),
+                         {'_geordi':
+                             {'mapping': {'version': 0},
+                              'links': {'links': [], 'version': 1},
+                              'matchings': {'matchings': [],
+                                            'auto_matchings': [],
+                                            'current_matching': {},
+                                            'version': 3}}})
