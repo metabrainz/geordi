@@ -24,7 +24,8 @@ def comma_list(lst):
     elif len(lst) == 1:
         return lst[0]
     else:
-        return ", ".join([unicode(i) for i in lst[:-1]]) + " and " + unicode(lst[-1])
+        return ", ".join([unicode(i) for i in lst[:-1]]) + \
+               " and " + unicode(lst[-1])
 
 def comma_only_list(lst):
     return ", ".join(lst)
@@ -42,7 +43,9 @@ def collect_text(block, regex='.*'):
     except KeyError:
         return []
     except TypeError:
-        return [unicode(entry['text']) for entry in block if (entry and 'text' in entry and match.search(entry['text']))]
+        return [unicode(entry['text'])
+                for entry in block
+                if (entry and 'text' in entry and match.search(entry['text']))]
 
 def concatenate_text(block, regex='.*', combiner=comma_list):
     return combiner(collect_text(block, regex))
@@ -63,7 +66,7 @@ def base_mapping(maptype):
                 'urls': [],
             }
         })
-    elif maptype == 'track':  # only as part of release; recording is different.
+    elif maptype == 'track':  # only as part of release; recording is different
         mapping = {'title': [], 'artist': [],
                    'length': [], 'length_formatted': [],
                    'number': [], 'totaltracks': []}
