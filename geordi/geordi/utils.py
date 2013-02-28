@@ -22,14 +22,21 @@ name2codepoint['#39'] = 39
 def check_data_format(data):
     "Initialize or correct the special _geordi key in the document"
     data.setdefault('_geordi', {
-            'mapping': {'version': 0},
-            'links': {'links': [], 'version': 1},
-            'matchings': {'matchings': [], 'auto_matchings': [], 'current_matching': {}, 'version': 3}
+        'mapping': {'version': 0},
+        'links': {'links': [], 'version': 1},
+        'matchings': {'matchings': [],
+                      'auto_matchings': [],
+                      'current_matching': {},
+                      'version': 3}
     })
 
     data['_geordi'].setdefault('mapping', {'version': 0})
     data['_geordi'].setdefault('links', {'links': [], 'version': 1})
-    data['_geordi'].setdefault('matchings', {'matchings': [], 'auto_matchings': [], 'current_matching': {}, 'version': 3})
+    data['_geordi'].setdefault('matchings',
+                               {'matchings': [],
+                                'auto_matchings': [],
+                                'current_matching': {},
+                                'version': 3})
 
     if 'auto_matchings' not in data['_geordi']['matchings']:
         data['_geordi']['matchings']['auto_matchings'] = []
@@ -50,4 +57,4 @@ def htmldefchar(code):
 def htmlunescape(text):
     "unescape HTML code refs; c.f. http://wiki.python.org/moin/EscapingHtml"
     return re.sub(r'&({0}|#\d+);'.format('|'.join(name2codepoint)),
-                          lambda m: htmldefchar(m.group(1)), text)
+                  lambda m: htmldefchar(m.group(1)), text)
