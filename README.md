@@ -65,13 +65,13 @@ Thus far, only displays data, updates when that's fixed!
 Tests
 =====
 
-To run tests, install nose:
+To run tests, install nose (remember to enable your virtualenv!):
 
-`./geordi/bin/pip install nose`
+`pip install nose`
 
 And then run the tests, you should see something like this:
 
-    $ ./geordi/bin/nosetests
+    $ nosetests
     ..
     ----------------------------------------------------------------------
     Ran 2 tests in 0.121s
