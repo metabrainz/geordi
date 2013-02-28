@@ -73,8 +73,7 @@ def register_match(index, item, itemtype, matchtype, mbids, auto=False, user=Non
                 response = Response(json.dumps({'code': 400, 'error': 'Provided match type {provided} doesn\'t match type {mbidtype} of {mbid}'.format(provided=matchtype, mbidtype=check['type'], mbid=mbid)}), 400, mimetype="application/json")
                 response.headers.add('Access-Control-Allow-Origin', '*')
                 return response
-            else:
-                continue
+            else: continue
 
     # Retrieve document (or blank empty document for subitems)
     try:
