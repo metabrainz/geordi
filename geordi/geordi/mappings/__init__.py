@@ -91,14 +91,18 @@ def update_linked_by_index(index, item, data):
         same = True
 
         try:
-            if (currentlinks['version'] != links['version'] or
-                len(links.keys()) != len(currentlinks.keys()) or
-                [len(link[1]) for link in links.iteritems() if link[0] != 'version'] != [len(link[1]) for link in currentlinks.iteritems() if link[0] != 'version']):
+            if currentlinks['version'] != links['version']:
+                same = False
+            elif len(links.keys()) != len(currentlinks.keys()):
                 same = False
             else:
                 for category in class_map[index].link_types().keys():
-                    if links[category] != currentlinks[category]:
+                    if len(links[category]) != len(currentlinks[category]):
                         same = False
+                    elif links[category] != currentlinks[category]:
+                        same = False
+                    if not same:
+                        break
         except:
             same = False
 
@@ -122,8 +126,10 @@ def update_automatic_item_matches_by_index(index, item, data):
         order = ['work', 'recording', 'label', 'artist', 'release', 'release_group']
         # Do matches with more linked items first, then supersede with fewer-ID matches
         for (matchtype, mbids) in sorted(matches.iteritems(), key=lambda x: (len(x[1]), order.index(x[0]) if x[0] in order else 999), reverse=True):
-            if (fakeip not in [match.get('ip') for match in automatches] or
-                ",".join(sorted(mbids)) not in [",".join(sorted(match.get('mbid', []))) for match in automatches]):
+            if (
+                fakeip not in [match.get('ip') for match in automatches] or
+                ",".join(sorted(mbids)) not in [",".join(sorted(match.get('mbid', []))) for match in automatches]
+            ):
                 register_match(index, item, 'item', matchtype, mbids, auto=True, user='matched by index', ip=fakeip)
                 changed = True
             else: continue
@@ -147,8 +153,10 @@ def update_automatic_subitem_matches_by_index(index, item, data):
             automatches = data['_geordi']['matchings']['auto_matchings']
             # Do matches with more linked items first, then supersede with fewer-ID matches
             for (matchtype, mbids) in sorted(subitem_matches.iteritems(), key=lambda x: (len(x[1]), order.index(x[0]) if x[0] in order else 999), reverse=True):
-                if (fakeip not in [match.get('ip') for match in automatches] or
-                    ",".join(sorted(mbids)) not in [",".join(sorted(match.get('mbid', []))) for match in automatches]):
+                if (
+                    fakeip not in [match.get('ip') for match in automatches] or
+                    ",".join(sorted(mbids)) not in [",".join(sorted(match.get('mbid', []))) for match in automatches]
+                ):
                     register_match(index, subitem_id, 'subitem', matchtype, mbids, auto=True, user='matched by index', ip=fakeip)
                     changed = True
                 else: continue

@@ -23,9 +23,19 @@ import re
 
 class wcd():
     def link_types(self):
-        return {'artist_id': {'name':"artist id", 'key': 'wcd_artist_id', 'type': ['artist']},
-                'file': {'name':"file sha1", 'key': 'sha1', 'type': ['recording']},
-                'version': 1}
+        return {
+            'artist_id': {
+                'name': "artist id",
+                'key': 'wcd_artist_id',
+                'type': ['artist']
+            },
+            'file': {
+                'name': "file sha1",
+                'key': 'sha1',
+                'type': ['recording']
+            },
+            'version': 1
+        }
 
     def code_url(self):
         return "https://github.com/metabrainz/geordi/blob/master/geordi/geordi/mappings/wcd.py"
@@ -75,11 +85,9 @@ class wcd():
         return {u'name': unicode(artist['name']), u'wcd_artist_id': int(artist['id']), u'type': atype}
 
     def _extract_file(self, x):
-        f = {
-            u'sha1': unicode(x['sha1']['text']),
-            u'format': unicode(x['format']['text']),
-            u'filename': unicode(x['_name'])
-            }
+        f = {u'sha1': unicode(x['sha1']['text']),
+             u'format': unicode(x['format']['text']),
+             u'filename': unicode(x['_name'])}
         try:
             f[u'title'] = unicode(x['title']['text'])
         except: pass
@@ -130,7 +138,6 @@ class wcd():
                         f['totaltracks'].append(num)
         except: pass
 
-
         disk_re = re.compile('(cd|dis[ck])\s*(\d+)', re.IGNORECASE)
         if disk_re.search(track['_name']):
             medium_candidates = [disk_re.search(track['_name']).group(2)]
@@ -139,7 +146,7 @@ class wcd():
 
         if disk_re.search(track['album']['text']):
             medium_candidates.append(disk_re.search(track['album']['text']).group(2))
-        f['medium'] = uniq(medium_candidates);
+        f['medium'] = uniq(medium_candidates)
 
         if 'external-identifier' in track:
             f[u'acoustid'] = [re.sub('^urn:acoustid:', '', acoustid) for acoustid in collect_text(track['external-identifier'], 'urn:acoustid(?!:unknown)')]
@@ -235,11 +242,12 @@ class wcd():
         # Tracks
         links = self.extract_linked(data)
         try:
-            release['tracks'] = sorted([self._extract_track(x, links)
+            tracks = [self._extract_track(x, links)
                       for x
                       in data['files_xml']['files']['file']
-                      if (x['_source'] == 'original' and x['format']['text'] in self._acceptable_formats())],
-                  key=self._track_sorter)
+                      if (x['_source'] == 'original' and
+                          x['format']['text'] in self._acceptable_formats())]
+            release['tracks'] = sorted(tracks, key=self._track_sorter)
         except: pass
 
         # URLs
