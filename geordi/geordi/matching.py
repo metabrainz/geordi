@@ -29,11 +29,11 @@ from pyelasticsearch import ElasticHttpNotFoundError
 
 def make_match_definition(user, matchtype, mbids, auto=False, ip=False):
     match = {'user': user,
-            'timestamp': datetime.utcnow(),
-            'type': matchtype,
-            'mbid': mbids,
-            'auto': True if auto else False,
-            'version': 1}
+             'timestamp': datetime.utcnow(),
+             'type': matchtype,
+             'mbid': mbids,
+             'auto': True if auto else False,
+             'version': 1}
     if ip:
         match['ip'] = ip
     return match
@@ -106,10 +106,12 @@ def register_match(index, item, itemtype, matchtype, mbids, auto=False, user=Non
         ip = False
 
     match = make_match_definition(user, matchtype, mbids, auto, ip)
-    if ((not auto or
-        len(data['_geordi']['matchings']['matchings']) == 0 or
-        data['_geordi']['matchings']['current_matching']['auto'])
-          and matchtype != 'unmatch'):
+    if (
+        (not auto or
+         len(data['_geordi']['matchings']['matchings']) == 0 or
+         data['_geordi']['matchings']['current_matching']['auto'])
+        and matchtype != 'unmatch'
+    ):
         data['_geordi']['matchings']['current_matching'] = match
     if not auto:
         data['_geordi']['matchings']['matchings'].append(match)

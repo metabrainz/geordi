@@ -43,8 +43,8 @@ def read_directory(directory, base):
     numfiles = len(os.listdir(directory))
     for filename in os.listdir(directory):
         filebase = re.sub(r'\.', '_',
-                      re.sub(r'^[\s_-]+|[\s_-]+$', '',
-                      filename.replace(base, '')))
+                          re.sub(r'^[\s_-]+|[\s_-]+$', '',
+                          filename.replace(base, '')))
         with open(directory + '/' + filename) as fh:
             content = fh.read()
         if re.search(r'\.xml$', filename):
@@ -63,7 +63,10 @@ def read_directory(directory, base):
 
 def process_xml(content):
     try:
-        return xmltodict.parse(content, force_cdata=True, attr_prefix='_', cdata_key='text')
+        return xmltodict.parse(content,
+                               force_cdata=True,
+                               attr_prefix='_',
+                               cdata_key='text')
     except:
         return None
 

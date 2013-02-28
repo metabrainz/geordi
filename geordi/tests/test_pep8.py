@@ -51,7 +51,7 @@ class CodeStyleTestCase(unittest.TestCase):
     def test_pep8_compliance(self):
         """Test that we comply with PEP 8."""
         import pep8
-        ignore = ['E302']
+        ignore = ['E302', 'E701', 'E501']
         pep8style = pep8.StyleGuide(ignore=ignore)
         result = pep8style.check_files(self.files_to_check)
         self.assertEqual(result.total_errors, 0,

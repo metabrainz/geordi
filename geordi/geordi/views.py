@@ -71,7 +71,7 @@ def document(itemindex, item):
                 for link in links:
                     subitem = "{}-{}".format(link_type, link[link_types[link_type]['key']])
                     subitems[subitem] = get_subitem(itemindex, subitem, create=True, seed=copy.deepcopy(link))
-        return render_template(template, item=item, index=itemindex, data = data, mapping = data['_source']['_geordi']['mapping'], mapoptions = mapoptions, subitems=subitems, code_url=code_url)
+        return render_template(template, item=item, index=itemindex, data=data, mapping=data['_source']['_geordi']['mapping'], mapoptions=mapoptions, subitems=subitems, code_url=code_url)
     except ElasticHttpNotFoundError:
         return render_template('notfound.html')
 
@@ -81,7 +81,7 @@ def search():
     params = get_search_params()
     if 'error' in params and params['error'] != 'You must provide a query.':
         flash(params["error"])
-    return render_template('search.html', query=params.get('query'), data = params.get('data'), mapping = params.get('mapping'), start_from= params.get('start_from'), page_size=params.get('page_size'))
+    return render_template('search.html', query=params.get('query'), data=params.get('data'), mapping=params.get('mapping'), start_from=params.get('start_from'), page_size=params.get('page_size'))
 
 # Internal API urls for matching etc.
 @app.route('/api/search')
@@ -91,7 +91,7 @@ def apisearch():
     if 'error' in params:
         response = Response(json.dumps({'code': 400, 'error': params['error']}), 400, mimetype="application/json")
     else:
-        response= Response(json.dumps({'code': 200, 'result': params.get('data'), 'mapping': params.get('mapping')}), 200, mimetype="application/json");
+        response = Response(json.dumps({'code': 200, 'result': params.get('data'), 'mapping': params.get('mapping')}), 200, mimetype="application/json")
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 
@@ -107,9 +107,9 @@ def item(index, item):
                     for link in links:
                         subitem = "{}-{}".format(link_type, link[link_types[link_type]['key']])
                         get_subitem(index, subitem, create=True, seed=copy.deepcopy(link))
-        response = Response(json.dumps({'code': 200, 'document': document}), 200, mimetype="application/json");
+        response = Response(json.dumps({'code': 200, 'document': document}), 200, mimetype="application/json")
     except ElasticHttpNotFoundError:
-        response =  Response(json.dumps({'code': 404, 'error': 'The provided item could not be found.'}), 404, mimetype="application/json")
+        response = Response(json.dumps({'code': 404, 'error': 'The provided item could not be found.'}), 404, mimetype="application/json")
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 
@@ -137,7 +137,7 @@ def subitem(index, subitem):
     "Get information for a subitem's matching"
     subitem = get_subitem(index, subitem)
     if subitem:
-        response = Response(json.dumps({'code': 200, 'document': subitem}), 200, mimetype="application/json");
+        response = Response(json.dumps({'code': 200, 'document': subitem}), 200, mimetype="application/json")
     else:
         response = Response(json.dumps({'code': 404, 'error': 'The provided item could not be found.'}), 404, mimetype="application/json")
     response.headers.add('Access-Control-Allow-Origin', '*')
@@ -171,7 +171,7 @@ def internal_mbid_type(mbid):
 # Login/logout-related views
 @app.route('/login')
 def login():
-    return render_template("login.html", client_id = app.config['OAUTH_CLIENT_ID'], redirect_uri = app.config['OAUTH_REDIRECT_URI'])
+    return render_template("login.html", client_id=app.config['OAUTH_CLIENT_ID'], redirect_uri=app.config['OAUTH_REDIRECT_URI'])
 
 @app.route('/internal/oauth')
 def oauth_callback():
@@ -180,9 +180,9 @@ def oauth_callback():
         state = request.args.getlist('state')
         username = state[0]
         if len(state) > 1 and state[1] == 'on':
-            remember = True;
+            remember = True
         else:
-            remember = False;
+            remember = False
         code = request.args.get('code')
         if check_mb_account(username, code):
             login_user(User(username), remember=remember)
@@ -192,7 +192,7 @@ def oauth_callback():
             flash('Incorrect username, please try again.')
     else:
         flash('There was an error: ' + error)
-    return render_template("login.html", client_id = app.config['OAUTH_CLIENT_ID'], redirect_uri = app.config['OAUTH_REDIRECT_URI'])
+    return render_template("login.html", client_id=app.config['OAUTH_CLIENT_ID'], redirect_uri=app.config['OAUTH_REDIRECT_URI'])
 
 @app.route("/logout")
 @login_required
@@ -236,7 +236,8 @@ def get_search_params():
         if size is None and 'size' in json_query:
             try:
                 size = int(json_query['size'])
-            except: pass
+            except:
+                pass
         try:
             data = do_search_raw(json_query, indices, start_from=request.args.get('from', None), filters=filters, doc_type=itemtypes, size=size)
         except ValueError:
@@ -304,10 +305,10 @@ def get_subitem(index, subitem, create=False, seed={}):
 def check_mb_account(username, auth_code):
     url = 'https://beta.musicbrainz.org/oauth2/token'
     data = urllib.urlencode({'grant_type': 'authorization_code',
-            'code': auth_code,
-            'client_id': app.config['OAUTH_CLIENT_ID'],
-            'client_secret': app.config['OAUTH_CLIENT_SECRET'],
-            'redirect_uri': app.config['OAUTH_REDIRECT_URI']})
+                             'code': auth_code,
+                             'client_id': app.config['OAUTH_CLIENT_ID'],
+                             'client_secret': app.config['OAUTH_CLIENT_SECRET'],
+                             'redirect_uri': app.config['OAUTH_REDIRECT_URI']})
     json_data = json.load(urllib2.urlopen(url, data))
 
     url = 'https://beta.musicbrainz.org/ws/1/user?name=' + username

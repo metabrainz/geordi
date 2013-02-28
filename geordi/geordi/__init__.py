@@ -53,7 +53,7 @@ login_manager.login_view = "login"
 def load_user(username):
     return User(username)
 
-login_manager.setup_app(app, add_context_processor = True)
+login_manager.setup_app(app, add_context_processor=True)
 
 es = ElasticSearch(app.config['ELASTICSEARCH_ENDPOINT'], max_retries=2)
 

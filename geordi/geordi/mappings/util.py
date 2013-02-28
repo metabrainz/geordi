@@ -63,7 +63,7 @@ def base_mapping(maptype):
                 'urls': [],
             }
         })
-    elif maptype == 'track': # only as part of release; recording is different.
+    elif maptype == 'track':  # only as part of release; recording is different.
         mapping = {'title': [], 'artist': [],
                    'length': [], 'length_formatted': [],
                    'number': [], 'totaltracks': []}
