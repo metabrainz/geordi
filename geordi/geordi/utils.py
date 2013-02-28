@@ -49,5 +49,5 @@ def htmldefchar(code):
 
 def htmlunescape(text):
     "unescape HTML code refs; c.f. http://wiki.python.org/moin/EscapingHtml"
-    return re.sub(r'&({}|#\d+);'.format('|'.join(name2codepoint)),
+    return re.sub(r'&({0}|#\d+);'.format('|'.join(name2codepoint)),
                           lambda m: htmldefchar(m.group(1)), text)
