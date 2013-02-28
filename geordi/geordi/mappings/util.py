@@ -63,8 +63,10 @@ def base_mapping(maptype):
                 'urls': [],
             }
         })
-    elif maptype == 'track': # yes, this will only happen as part of other things. recording is different.
-        mapping = {'title': [], 'artist': [], 'length': [], 'length_formatted': [], 'number': [], 'totaltracks': []}
+    elif maptype == 'track': # only as part of release; recording is different.
+        mapping = {'title': [], 'artist': [],
+                   'length': [], 'length_formatted': [],
+                   'number': [], 'totaltracks': []}
     else:
         raise Exception('unimplemented')
     return mapping
@@ -79,4 +81,6 @@ def format_track_length(ms):
         return '{}:{:02d}'.format(sec // 60, sec % 60)
     else:
         sec = (ms + 500) // 1000
-        return '{}:{:02d}:{:02d}'.format(sec // (60 * 60), (sec % (60 * 60)) // 60 , sec % 60)
+        hours = sec // (60 * 60)
+        minutes = sec % (60 * 60)
+        return '{}:{:02d}:{:02d}'.format(hours, minutes, sec % 60)

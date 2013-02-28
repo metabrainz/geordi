@@ -23,28 +23,37 @@ from __future__ import unicode_literals
 import unittest
 import geordi.mappings.util
 
-class TestMappingsUtil (unittest.TestCase):
+class TestMappingsUtil(unittest.TestCase):
 
-    def test_comma_list (self):
-        result = geordi.mappings.util.comma_list([ "aap", "noot", "mies", "aap", "mies" ])
+    def test_comma_list(self):
+        lst = ["aap", "noot", "mies", "aap", "mies"]
+        result = geordi.mappings.util.comma_list(lst)
         expected = "aap, noot, mies, aap and mies"
 
-        self.assertEqual (result, expected)
+        self.assertEqual(result, expected)
 
-    def test_comma_only_list (self):
-        result = geordi.mappings.util.comma_only_list([ "aap", "noot", "mies", "aap", "mies" ])
+    def test_comma_only_list(self):
+        lst = ["aap", "noot", "mies", "aap", "mies"]
+        result = geordi.mappings.util.comma_only_list(lst)
         expected = "aap, noot, mies, aap, mies"
 
-        self.assertEqual (result, expected)
+        self.assertEqual(result, expected)
 
-    def test_base_mapping_release (self):
+    def test_base_mapping_release(self):
         release_mapping = geordi.mappings.util.base_mapping('release')
         self.assertTrue('version' in release_mapping)
         self.assertTrue('release' in release_mapping)
-        for prop in ['title', 'date', 'artist', 'other_artist', 'label', 'catalog_number', 'combined_artist', 'tracks', 'urls']:
+        props = ['title', 'date', 'artist', 'other_artist', 'label',
+                 'catalog_number', 'combined_artist', 'tracks', 'urls']
+        for prop in props:
             self.assertTrue(prop in release_mapping['release'])
 
-    def test_base_mapping_track (self):
+    def test_base_mapping_track(self):
         track_mapping = geordi.mappings.util.base_mapping('track')
-        expected = {'title': [], 'artist': [], 'length': [], 'length_formatted': [], 'number': [], 'totaltracks': []}
+        expected = {'title': [],
+                    'artist': [],
+                    'length': [],
+                    'length_formatted': [],
+                    'number': [],
+                    'totaltracks': []}
         self.assertEqual(track_mapping, expected)

@@ -1,3 +1,4 @@
 Flask-Login >= 0.1.3
 Flask >= 0.9
 pyelasticsearch >= 0.3
+pep8

@@ -37,7 +37,7 @@ def get_code_url_by_index(index):
     if index in class_map:
         return class_map[index].code_url()
 
-def get_link_types_by_index (index):
+def get_link_types_by_index(index):
     if index in class_map:
         return class_map[index].link_types()
 

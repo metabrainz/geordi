@@ -23,17 +23,24 @@ from pyelasticsearch import ElasticSearch
 
 app = Flask(__name__)
 app.config.from_object(__name__)
+
 @app.before_first_request
 def setup_logging():
     if not app.debug:
         import logging
         from logging.handlers import RotatingFileHandler
-        error_filehandler = RotatingFileHandler('/var/log/geordi/errors.log', maxBytes=1024 * 1024 * 10, backupCount=10, encoding='utf_8')
-        error_filehandler.setLevel(logging.ERROR)
-        warning_filehandler = RotatingFileHandler('/var/log/geordi/warnings.log', maxBytes=1024 * 1024 * 10, backupCount=10, encoding='utf_8')
-        warning_filehandler.setLevel(logging.WARNING)
-        app.logger.addHandler(error_filehandler)
-        app.logger.addHandler(warning_filehandler)
+        error_fh = RotatingFileHandler('/var/log/geordi/errors.log',
+                                       maxBytes=1024 * 1024 * 10,
+                                       backupCount=10,
+                                       encoding='utf_8')
+        error_fh.setLevel(logging.ERROR)
+        warning_fh = RotatingFileHandler('/var/log/geordi/warnings.log',
+                                         maxBytes=1024 * 1024 * 10,
+                                         backupCount=10,
+                                         encoding='utf_8')
+        warning_fh.setLevel(logging.WARNING)
+        app.logger.addHandler(error_fh)
+        app.logger.addHandler(warning_fh)
 
 class User(UserMixin):
     def __init__(self, id):

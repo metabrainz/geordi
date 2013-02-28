@@ -23,22 +23,21 @@ from __future__ import unicode_literals
 import unittest
 import geordi.utils
 
-class TestUtils (unittest.TestCase):
+class TestUtils(unittest.TestCase):
 
-    def test_uniq (self):
-        result = geordi.utils.uniq([ "aap", "noot", "mies", "aap", "mies" ])
-        expected = [ "aap", "noot", "mies" ]
+    def test_uniq(self):
+        result = geordi.utils.uniq(["aap", "noot", "mies", "aap", "mies"])
+        expected = ["aap", "noot", "mies"]
 
-        self.assertEqual (result, expected)
+        self.assertEqual(result, expected)
 
-
-    def test_htmlunescape (self):
+    def test_htmlunescape(self):
         kodakumi = '&#20502;&#30000;&#20358;&#26410;'
         expected = '倖田來未'
 
-        self.assertEqual (geordi.utils.htmlunescape (kodakumi), expected)
+        self.assertEqual(geordi.utils.htmlunescape(kodakumi), expected)
 
-    def test_check_data_format (self):
+    def test_check_data_format(self):
         # Test empty dict ends up correct
         self.assertEqual(geordi.utils.check_data_format({}),
                          {'_geordi':
