@@ -20,10 +20,12 @@ from geordi.mappings import get_link_types_by_index
 
 from pyelasticsearch import ElasticHttpNotFoundError
 
-def do_search(query_string, indices, start_from=None, filters=None, doc_type=['item'], size=None):
+def do_search(query_string, indices,
+              start_from=None, filters=None, doc_type=['item'], size=None):
     query = {'query':
              {"query_string": {"query": query_string}}}
-    return do_search_raw(query, indices, start_from, filters, doc_type, size=size)
+    return do_search_raw(query, indices, start_from,
+                         filters, doc_type, size=size)
 
 def do_subitem_search(query_string, index, subtype,
                       start_from=None, filters=None, size=None):
@@ -33,9 +35,11 @@ def do_subitem_search(query_string, index, subtype,
                                                                key=key)
     query = {'query':
              {'match': {query_field: query_string}}}
-    return do_search_raw(query, [index], start_from, filters, 'item', size=size)
+    return do_search_raw(query, [index], start_from,
+                         filters, 'item', size=size)
 
-def do_search_raw(query, indices, start_from=None, filters=None, doc_type=['item'], size=None):
+def do_search_raw(query, indices,
+                  start_from=None, filters=None, doc_type=['item'], size=None):
     if indices in [[], ['']]:
         indices = app.config['AVAILABLE_INDICES']
     if start_from:
@@ -58,19 +62,22 @@ def make_filters(human=False, auto=False, un=False):
         filters = {}
 
     if human:
-        thisf = {'query': {'match': {'_geordi.matchings.current_matching.auto': False}}}
+        thisf = {'query':
+                 {'match': {'_geordi.matchings.current_matching.auto': False}}}
         if 'or' in filters:
             filters['or'].append(thisf)
         else:
             filters = thisf
     if auto:
-        thisf = {'query': {'match': {'_geordi.matchings.current_matching.auto': True}}}
+        thisf = {'query':
+                 {'match': {'_geordi.matchings.current_matching.auto': True}}}
         if 'or' in filters:
             filters['or'].append(thisf)
         else:
             filters = thisf
     if un:
-        thisf = {'missing': {'field': '_geordi.matchings.current_matching.user'}}
+        thisf = {'missing':
+                 {'field': '_geordi.matchings.current_matching.user'}}
         if 'or' in filters:
             filters['or'].append(thisf)
         else:
