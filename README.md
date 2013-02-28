@@ -10,21 +10,37 @@ It's named after [Geordi La Forge](http://en.memory-alpha.org/wiki/Geordi_La_For
 Setup
 =====
 
-Shared dependencies: elasticsearch -- install and make available, presumably on localhost:9200 (the default)
+Shared dependencies: elasticsearch -- install and make available,
+presumably on localhost:9200 (the default).  See
+http://www.elasticsearch.org/download/ .
+
+You will also need to be able to install python packages, we recommend
+using virtualenvwrapper for this.  On Debian/Ubuntu systems you can
+install that with:
+
+`sudo apt-get install virtualenvwrapper`
 
 ----
 
 Python dependencies:
 
-`virtualenv geordi`
+`mkvirtualenv geordi`
 
-`./geordi/bin/pip install -r requirements.txt`
+The mkvirtualenv command will create and activate a virtual
+environment in which python modules will be installed.  You can
+re-active this environment with the following command:
+
+`workon geordi`
+
+To install all the dependencies run:
+
+`pip install -r requirements.txt`
 
 ----
 
 To run the server:
 
-`./geordi/bin/python run.py`
+`python geordi/run.py`
 
 ----
 
