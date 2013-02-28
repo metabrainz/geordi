@@ -45,6 +45,24 @@ Usage
 
 Thus far, only displays data, updates when that's fixed!
 
+
+Tests
+=====
+
+To run tests, install nose:
+
+`./geordi/bin/pip install nose`
+
+And then run the tests, you should see something like this:
+
+    $ ./geordi/bin/nosetests
+    ..
+    ----------------------------------------------------------------------
+    Ran 2 tests in 0.121s
+    
+    OK
+
+
 Code Layout
 ===========
 
