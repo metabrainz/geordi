@@ -22,18 +22,17 @@ from pyelasticsearch import ElasticHttpNotFoundError
 
 def do_search(query_string, indices, start_from=None, filters=None, doc_type=['item'], size=None):
     query = {'query':
-               {"query_string": {"query": query_string}}
-            }
+             {"query_string": {"query": query_string}}}
     return do_search_raw(query, indices, start_from, filters, doc_type, size=size)
 
-def do_subitem_search(query_string, index, subtype, start_from=None, filters=None, size=None):
+def do_subitem_search(query_string, index, subtype,
+                      start_from=None, filters=None, size=None):
     link_types = get_link_types_by_index(index)
     key = link_types[subtype]['key']
+    query_field = '_geordi.links.links.{subtype}.{key}'.format(subtype=subtype,
+                                                               key=key)
     query = {'query':
-              {'match':
-                  {'_geordi.links.links.{subtype}.{key}'.format(subtype=subtype, key=key): query_string}
-              }
-            }
+             {'match': {query_field: query_string}}}
     return do_search_raw(query, [index], start_from, filters, 'item', size=size)
 
 def do_search_raw(query, indices, start_from=None, filters=None, doc_type=['item'], size=None):
@@ -42,12 +41,12 @@ def do_search_raw(query, indices, start_from=None, filters=None, doc_type=['item
     if start_from:
         query['from'] = start_from
     if int(query.get('size', 10)) > 10000:
-        query['size'] = 10000;
+        query['size'] = 10000
     if filters:
         query['filter'] = filters
     if size:
         query['size'] = size
-    return es.search(query, index = indices, doc_type = doc_type)
+    return es.search(query, index=indices, doc_type=doc_type)
 
 def make_filters(human=False, auto=False, un=False):
     if human and auto and un:
