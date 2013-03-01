@@ -40,6 +40,16 @@ class TestMappings(unittest.TestCase):
             self.assertEqual(cls.link_types(),
                              geordi.mappings.get_link_types_by_index(idx))
 
+    def test_map(self):
+        for (idx, cls) in geordi.mappings.class_map.iteritems():
+            self.assertTrue(cls.map,
+                            msg="All mappings must have a map function")
+
+    def test_automatic_matches(self):
+        for (idx, cls) in geordi.mappings.class_map.iteritems():
+            self.assertTrue(cls.automatic_item_matches)
+            self.assertTrue(cls.automatic_subitem_matches)
+
     def test_get_mapoptions(self):
         everything_track = {
             'medium': ['1'],
