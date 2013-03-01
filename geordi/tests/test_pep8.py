@@ -19,6 +19,7 @@ class CodeStyleTestCase(unittest.TestCase):
         # Exclude .hidden directories (e.g., .git, .tx).
         if directory[:1] == '.':
             return True
+        if directory == 've':
         return False
 
     def include_file(self, filename):
