@@ -20,6 +20,7 @@ class CodeStyleTestCase(unittest.TestCase):
         if directory[:1] == '.':
             return True
         if directory == 've':
+            return True
         return False
 
     def include_file(self, filename):
