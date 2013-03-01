@@ -21,12 +21,22 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import unittest
+import re
 import geordi.mappings
 
 class TestMappings(unittest.TestCase):
 
     def test_code_url(self):
+        urls = []
         for (idx, cls) in geordi.mappings.class_map.iteritems():
+            self.assertTrue(cls.code_url() not in urls,
+                            msg="Code URL must be different for each index")
+            urls.append(cls.code_url())
+
+            self.assertTrue(re.search('geordi/mappings/{0}.py'.format(idx),
+                                      cls.code_url()),
+                            msg="Mapping class and file are named the same")
+
             self.assertTrue(cls.code_url(),
                             msg="Code URL must be available for all mappings.")
             self.assertEqual(
@@ -36,7 +46,7 @@ class TestMappings(unittest.TestCase):
 
     def test_link_types(self):
         for (idx, cls) in geordi.mappings.class_map.iteritems():
-            self.assertTrue(cls.link_types().get('version'))
+            self.assertTrue('version' in cls.link_types())
             self.assertEqual(cls.link_types(),
                              geordi.mappings.get_link_types_by_index(idx))
 
