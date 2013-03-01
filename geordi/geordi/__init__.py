@@ -29,18 +29,20 @@ def setup_logging():
     if not app.debug:
         import logging
         from logging.handlers import RotatingFileHandler
-        error_fh = RotatingFileHandler('/var/log/geordi/errors.log',
-                                       maxBytes=1024 * 1024 * 10,
-                                       backupCount=10,
-                                       encoding='utf_8')
-        error_fh.setLevel(logging.ERROR)
-        warning_fh = RotatingFileHandler('/var/log/geordi/warnings.log',
-                                         maxBytes=1024 * 1024 * 10,
-                                         backupCount=10,
-                                         encoding='utf_8')
-        warning_fh.setLevel(logging.WARNING)
-        app.logger.addHandler(error_fh)
-        app.logger.addHandler(warning_fh)
+        if app.config['ERROR_LOG']:
+            error_fh = RotatingFileHandler(app.config['ERROR_LOG'],
+                                           maxBytes=1024 * 1024 * 10,
+                                           backupCount=10,
+                                           encoding='utf_8')
+            error_fh.setLevel(logging.ERROR)
+            app.logger.addHandler(error_fh)
+        if app.config['WARNING_LOG']:
+            warning_fh = RotatingFileHandler(app.config['WARNING_LOG'],
+                                             maxBytes=1024 * 1024 * 10,
+                                             backupCount=10,
+                                             encoding='utf_8')
+            warning_fh.setLevel(logging.WARNING)
+            app.logger.addHandler(warning_fh)
 
 class User(UserMixin):
     def __init__(self, id):
