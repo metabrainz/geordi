@@ -1,0 +1,22 @@
+Download the data from http://www.discogs.com/data/
+
+    wget http://www.discogs.com/data/discogs_20130201_artists.xml.gz http://www.discogs.com/data/discogs_20130201_labels.xml.gz http://www.discogs.com/data/discogs_20130201_masters.xml.gz
+    wget http://www.discogs.com/data/discogs_20130201_releases.xml.gz
+
+Uncompress the files
+
+    gunzip discogs_20130201_artists.xml.gz discogs_20130201_labels.xml.gz discogs_20130201_masters.xml.gz discogs_20130201_releases.xml.gz
+
+Create the directories to store the extracted data
+
+    mkdir artists labels masters releases
+
+Extract the data!
+
+    python discogs_parser.py 20130201
+
+Extract and combine the release data!
+
+    python discogs_release_parser.py 20130201
+
+
