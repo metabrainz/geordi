@@ -22,11 +22,13 @@ from geordi.utils import check_data_format
 from pyelasticsearch import ElasticHttpNotFoundError
 
 from geordi.mappings.wcd import wcd
+from geordi.mappings.discogs import discogs
 
 import re
 
 class_map = {
-    'wcd': wcd()
+    'wcd': wcd(),
+    'discogs': discogs()
 }
 
 def get_map_by_index(index, data):
@@ -179,13 +181,15 @@ def map_search_data(data):
 
 def get_mapoptions(mapping):
     options = {'mediums': False, 'totaltracks': False, 'acoustid': False}
-    for track in mapping['release']['tracks']:
-        if len(track['medium']) > 0:
-            options['mediums'] = True
-        if len(track['totaltracks']) > 0:
-            options['totaltracks'] = True
-        if len(track['acoustid']) > 0:
-            options['acoustid'] = True
-        if options['mediums'] and options['totaltracks'] and options['acoustid']:
-            break
+    try:
+        for track in mapping['release']['tracks']:
+            if len(track['medium']) > 0:
+                options['mediums'] = True
+            if len(track['totaltracks']) > 0:
+                options['totaltracks'] = True
+            if len(track['acoustid']) > 0:
+                options['acoustid'] = True
+            if options['mediums'] and options['totaltracks'] and options['acoustid']:
+                break
+    except: pass
     return options
