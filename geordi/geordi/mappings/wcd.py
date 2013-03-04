@@ -16,12 +16,12 @@
 
 from __future__ import division, absolute_import, unicode_literals
 
-from geordi.mappings.util import concatenate_text, collect_text, comma_list, base_mapping, format_track_length
+from geordi.mappings.util import concatenate_text, collect_text, comma_list, base_mapping, format_track_length, MappingBase
 from geordi.utils import uniq, htmlunescape
 
 import re
 
-class wcd():
+class wcd(MappingBase):
     def link_types(self):
         return {
             'artist_id': {
@@ -38,19 +38,20 @@ class wcd():
         }
 
     def code_url(self):
-        return "https://github.com/metabrainz/geordi/blob/master/geordi/geordi/mappings/wcd.py"
+        return self.code_url_pattern().format('wcd')
 
     def extract_linked(self, data):
         all_artists = files = []
         try:
-            main_artists = [self._extract_artist(artist, 'artist') for artist in data['what_cd_json']['response']['group']['musicInfo']['artists']]
-            extra_artists = [self._extract_artist(artist, 'with') for artist in data['what_cd_json']['response']['group']['musicInfo']['with']]
-            remixers = [self._extract_artist(artist, 'remixer') for artist in data['what_cd_json']['response']['group']['musicInfo']['remixedBy']]
-            producers = [self._extract_artist(artist, 'producer') for artist in data['what_cd_json']['response']['group']['musicInfo']['producer']]
-            composers = [self._extract_artist(artist, 'composer') for artist in data['what_cd_json']['response']['group']['musicInfo']['composers']]
-            conductors = [self._extract_artist(artist, 'conductor') for artist in data['what_cd_json']['response']['group']['musicInfo']['conductor']]
-            djs = [self._extract_artist(artist, 'dj') for artist in data['what_cd_json']['response']['group']['musicInfo']['dj']]
-            all_artists = uniq(main_artists + extra_artists + remixers + producers + composers + conductors + djs)
+            mapping = {'artists': 'artist',
+                       'with': 'with',
+                       'remixedBy': 'remixer',
+                       'composers': 'composer'}
+            for (type, list) in data['what_cd_json']['response']['group']['musicInfo'].iteritems():
+                all_artists.extend(
+                    [self._extract_artist(artist, mapping.get(type, type)) for artist in list]
+                )
+            all_artists = uniq(all_artists)
         except: pass
         try:
             files = [self._extract_file(x) for x in self._linkable_files(data)]
@@ -82,7 +83,9 @@ class wcd():
         return ['Flac', '24bit Flac', 'VBR MP3', 'Ogg Vorbis', 'Apple Lossless Audio']
 
     def _extract_artist(self, artist, atype):
-        return {u'name': unicode(artist['name']), u'wcd_artist_id': int(artist['id']), u'type': atype}
+        return {u'name': unicode(artist['name']),
+                u'wcd_artist_id': int(artist['id']),
+                u'type': atype}
 
     def _extract_file(self, x):
         f = {u'sha1': unicode(x['sha1']['text']),

@@ -16,16 +16,17 @@
 
 from __future__ import division, absolute_import, unicode_literals
 
+from geordi.mappings.util import MappingBase
 import re
 
-class discogs():
+class discogs(MappingBase):
     def link_types(self):
         return {
             'version': 0
         }
 
     def code_url(self):
-        return "https://github.com/metabrainz/geordi/blob/master/geordi/geordi/mappings/discogs.py"
+        return self.code_url_pattern().format('discogs')
 
     def extract_linked(self, data):
         return {'version': 0}

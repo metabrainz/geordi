@@ -84,3 +84,8 @@ def format_track_length(ms):
         hours = sec // (60 * 60)
         minutes = sec % (60 * 60)
         return '{}:{:02d}:{:02d}'.format(hours, minutes, sec % 60)
+
+class MappingBase():
+    def code_url_pattern(self):
+        return ("https://github.com/metabrainz/geordi/blob/" +
+                "master/geordi/geordi/mappings/{0}.py")
