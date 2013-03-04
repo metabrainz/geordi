@@ -33,11 +33,11 @@ class DiscogsHandler(xml.sax.handler.ContentHandler):
         self.string += ">"
 
         # Store release ID
-        if len(self.tree) == 2 and 'id' in attrs and name == "release":
+        if len(self.tree) == 2 and attrs.get('id', False) and name == "release":
             self.id = attrs.getValue("id")
 
         # Store label IDs
-        if name == "label" and 'name' in attrs:
+        if name == "label" and attrs.get('name', False):
             self.labels.append(attrs.getValue("name"))
 
     def endElement(self, name):
@@ -89,7 +89,7 @@ class DiscogsHandler(xml.sax.handler.ContentHandler):
                         relf.write(f.read())
                         f.close()
                     except:
-                        print "Data for label " + label + " not found"
+                        print "Data for label " + label.encode("utf-8") + " not found"
 
                 relf.write("</discogs>")
                 relf.close()

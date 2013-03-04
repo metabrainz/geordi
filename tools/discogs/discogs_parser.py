@@ -30,7 +30,7 @@ class DiscogsHandler(xml.sax.handler.ContentHandler):
         self.string += ">"
 
         # IDs for masters are an attribute of the <master> element
-        if len(self.tree) == 2 and 'id' in attrs and name == "master":
+        if len(self.tree) == 2 and name == 'master' and attrs.get('id', False):
             self.id = attrs.getValue("id")
 
     def endElement(self, name):
