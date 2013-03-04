@@ -80,7 +80,8 @@ class wcd(MappingBase):
         return [f for f in data['files_xml']['files']['file'] if (f['_source'] == 'original' and 'sha1' in f and f['format']['text'] in self._acceptable_formats())]
 
     def _acceptable_formats(self):
-        return ['Flac', '24bit Flac', 'VBR MP3', 'Ogg Vorbis', 'Apple Lossless Audio']
+        return ['Flac', '24bit Flac', 'Apple Lossless Audio',
+                'VBR MP3', 'Ogg Vorbis']
 
     def _extract_artist(self, artist, atype):
         return {u'name': unicode(artist['name']),
@@ -188,16 +189,23 @@ class wcd(MappingBase):
         # Release Artists
         if 'what_cd_json' in data:
             try:
-                release['artist'] = [{'name': artist['name'], 'subitem': "artist_id-{}".format(int(artist['id']))} for artist in data['what_cd_json']['response']['group']['musicInfo']['artists']]
+                release['artist'] = [
+                    {'name': artist['name'],
+                     'subitem': "artist_id-{}".format(int(artist['id']))}
+                    for artist
+                    in data['what_cd_json']['response']['group']['musicInfo']['artists']
+                ]
             except (KeyError, TypeError): pass
             try:
-                extra_artists = [{'name': artist['name'], 'subitem': "artist_id-{}".format(int(artist['id']))} for artist in data['what_cd_json']['response']['group']['musicInfo']['with']]
-                remixers = [{'name': artist['name'], 'subitem': "artist_id-{}".format(int(artist['id']))} for artist in data['what_cd_json']['response']['group']['musicInfo']['remixedBy']]
-                producers = [{'name': artist['name'], 'subitem': "artist_id-{}".format(int(artist['id']))} for artist in data['what_cd_json']['response']['group']['musicInfo']['producer']]
-                composers = [{'name': artist['name'], 'subitem': "artist_id-{}".format(int(artist['id']))} for artist in data['what_cd_json']['response']['group']['musicInfo']['composers']]
-                conductors = [{'name': artist['name'], 'subitem': "artist_id-{}".format(int(artist['id']))} for artist in data['what_cd_json']['response']['group']['musicInfo']['conductor']]
-                djs = [{'name': artist['name'], 'subitem': "artist_id-{}".format(int(artist['id']))} for artist in data['what_cd_json']['response']['group']['musicInfo']['dj']]
-                release['other_artist'] = uniq(extra_artists + remixers + producers + composers + conductors + djs)
+                other_artists = []
+                for (type, list) in data['what_cd_json']['response']['group']['musicInfo'].iteritems():
+                    if type != 'artists':
+                        other_artists.extend([
+                            {'name': artist['name'],
+                             'subitem': 'artist_id-{0}'.format(int(artist['id']))}
+                            for artist in list
+                        ])
+                release['other_artist'] = uniq(other_artists)
             except (KeyError, TypeError): pass
         if 'artist' not in release or len(release['artist']) < 1:
             try:
