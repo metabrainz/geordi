@@ -2,6 +2,7 @@
 
 import hashlib
 import sys
+import os
 import xml.sax
 import xml.sax.handler
 from xml.sax.saxutils import escape, quoteattr
@@ -18,6 +19,7 @@ class DiscogsHandler(xml.sax.handler.ContentHandler):
         self.artist = ""
         self.master = ""
         self.content = ""
+        self.dead_artists = []
 
     def startElement(self, name, attrs):
         self.tree.append(name)
@@ -40,6 +42,18 @@ class DiscogsHandler(xml.sax.handler.ContentHandler):
         if name == "label" and attrs.get('name', False):
             self.labels.append(attrs.getValue("name"))
 
+    def getArtistData(self, artist_id):
+        if artist_id in self.dead_artists:
+            return None
+        else:
+            try:
+                with open("artists/" + artist_id) as f:
+                    return f.read()
+            except:
+                print "Data for artist " + artist_id + " not found"
+                self.dead_artists.append(artist_id)
+                return None
+
     def endElement(self, name):
         self.tree.pop()
 
@@ -58,20 +72,18 @@ class DiscogsHandler(xml.sax.handler.ContentHandler):
             self.master = ""
 
         if len(self.tree) == 1 and name == "release":
-            if self.id != "":
+            if self.id != "" and os.path.exists("releases/" + self.id + ".xml"):
+                print "Release " + self.id + " already done! :D"
+            elif self.id != "":
+                print "Doing release " + self.id
                 relf = open("releases/" + self.id + ".xml", "w")
                 relf.write("<discogs>")
                 relf.write(self.string.encode("utf-8"))
 
                 for artist in set(self.artists):
-                    filename = "artists/" + artist
-                    try:
-                        f = open(filename)
-                        relf.write(f.read())
-                        f.close()
-                    except:
-                        # There are some IDs for placeholders, e.g. 194 to represent Various
-                        print "Data for artist " + artist + " not found"
+                    artistData = self.getArtistData(artist)
+                    if artistData is not None:
+                        relf.write(artistData)
 
                 for master in set(self.masters):
                     filename = "masters/" + master
@@ -93,7 +105,6 @@ class DiscogsHandler(xml.sax.handler.ContentHandler):
 
                 relf.write("</discogs>")
                 relf.close()
-
             else:
                 print "No ID found D:"
                 print self.string.encode("utf-8")
