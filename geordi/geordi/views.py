@@ -303,7 +303,7 @@ def get_subitem(index, subitem, create=False, seed={}):
         return None
 
 def check_mb_account(username, auth_code):
-    url = 'https://beta.musicbrainz.org/oauth2/token'
+    url = 'https://musicbrainz.org/oauth2/token'
     data = urllib.urlencode({'grant_type': 'authorization_code',
                              'code': auth_code,
                              'client_id': app.config['OAUTH_CLIENT_ID'],
@@ -311,7 +311,7 @@ def check_mb_account(username, auth_code):
                              'redirect_uri': app.config['OAUTH_REDIRECT_URI']})
     json_data = json.load(urllib2.urlopen(url, data))
 
-    url = 'https://beta.musicbrainz.org/ws/1/user?name=' + username
+    url = 'https://musicbrainz.org/ws/1/user?name=' + username
     opener = urllib2.build_opener()
     opener.addheaders = [('Authorization', 'Bearer ' + json_data['access_token'])]
     try:
