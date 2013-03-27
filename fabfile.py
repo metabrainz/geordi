@@ -6,7 +6,7 @@ env.use_ssh_config = True
 env.sudo_prefix = "sudo -S -p '%(sudo_prompt)s' -H " % env
 
 def production():
-    env.host_string = "teto"
+    env.host_string = "rocko"
     no_local_changes()
     with cd("/var/www/geordi/geordi"):
         sudo("git pull --ff-only", user="www-data")
