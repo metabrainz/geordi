@@ -38,4 +38,15 @@ class discogs(MappingBase):
         return {}
 
     def map(self, data):
-        return {'version': 0}
+        target = base_mapping('release')
+        target['version'] = 1
+        release = target['release']
+
+        # Release Title
+        try:
+            title_candidates = collect_text(data['discogs']['release']['title'])
+        except:
+            title_candidates = []
+        release['title'] = uniq(title_candidates)
+
+        return target
