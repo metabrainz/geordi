@@ -16,7 +16,7 @@
 
 from __future__ import division, absolute_import, unicode_literals
 
-from geordi.mappings.util import MappingBase
+from geordi.mappings.util import collect_text, base_mapping, MappingBase
 import re
 
 class discogs(MappingBase):
