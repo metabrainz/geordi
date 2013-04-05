@@ -98,12 +98,12 @@ class discogs(MappingBase):
         except: pass
 
         try:
-            image = data['discogs']['release']['images']['image'];
-            release['urls'].append({"url": image["uri"], "type": "cover art"})
+            image = data['discogs']['release']['images']['image']
+            release['urls'].append({"url": image["_uri"], "type": "cover art"})
         except (KeyError, TypeError):
             try:
                 for image in data["discogs"]["release"]["images"]["image"]:
-                    release['urls'].append({"url": image["uri"], "type": "cover art"})
+                    release['urls'].append({"url": image["_uri"], "type": "cover art"})
             except: pass
 
         return target
