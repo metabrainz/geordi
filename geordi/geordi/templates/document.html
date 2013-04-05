@@ -27,6 +27,9 @@
       {% for date in mapping.release.date -%}
       <tr><th>Date{% if mapping.release.date | length > 1 %} (alternate){% endif %}:</th><td>{{ date }}</td></tr>
       {%- endfor %}
+      {% for country in mapping.release.country -%}
+      <tr><th>Country{% if mapping.release.country | length > 1 %} (alternate){% endif %}:</th><td>{{ country }}</td></tr>
+      {%- endfor %}
       {% for label in mapping.release.label -%}
       <tr><th>Label:</th>
           <td>{%- if label.subitem -%}

@@ -65,6 +65,7 @@ def base_mapping(maptype):
             'release': {
                 'title': [],
                 'date': [],
+                'country': [],
                 'artist': [],
                 'other_artist': [],
                 'label': [],
