@@ -16,7 +16,7 @@
 
 from __future__ import division, absolute_import, unicode_literals
 
-from geordi.mappings.util import collect_text, comma_list, collect_obj, base_mapping, MappingBase
+from geordi.mappings.util import collect_text, comma_list, collect_obj, base_mapping, MappingBase, unformat_track_length
 from geordi.utils import uniq
 import re
 
@@ -68,7 +68,7 @@ class discogs(MappingBase):
 
     def map(self, data):
         target = base_mapping('release')
-        target['version'] = 7
+        target['version'] = 8
         release = target['release']
 
         try:
@@ -86,6 +86,20 @@ class discogs(MappingBase):
 
         try:
             release['urls'] = [{'url': image['_uri'], 'type': 'cover art'} for image in collect_obj(data['discogs']['release']['images']['image'])]
+        except: pass
+
+        try:
+            tracks = collect_obj(data['discogs']['release']['tracklist']['track'])
+            for track in tracks:
+                obj = {'title': collect_text(track['title'])}
+                if 'artists' in track:
+                    obj['artist'] = [{'name': artist['name']['text'], 'subitem': 'artist-{0}'.format(int(artist['id']['text']))} for artist in collect_obj(track['artists']['artist'])]
+                else:
+                    obj['artist'] = release['artist']
+                obj['length_formatted'] = collect_text(track['duration'])
+                obj['length'] = [unformat_track_length(a) for a in collect_text(track['duration'])]
+                obj['number'] = collect_text(track['position'])
+                release['tracks'].append(obj)
         except: pass
 
         return target

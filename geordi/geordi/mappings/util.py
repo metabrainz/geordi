@@ -96,6 +96,23 @@ def format_track_length(ms):
         minutes = sec % (60 * 60)
         return '{}:{:02d}:{:02d}'.format(hours, minutes, sec % 60)
 
+def unformat_track_length(length):
+    if not length:
+        return None
+    h_m_s = re.compile(r'^\s*(\d+}):(\d{1,2}):(\d{1,2})\s*$')
+    m_s = re.compile(r'^\s*(\d+):(\d{1,2})\s*$')
+    ms = re.compile(r'^\s*(\d+)\s*ms\s*$')
+    if h_m_s.match(length):
+        (h, m, s) = h_m_s.match(length).group(1, 2, 3)
+        return (int(h) * 3600 + int(m) * 60 + int(s)) * 1000
+    elif m_s.match(length):
+        (m, s) = m_s.match(length).group(1, 2)
+        return (int(m) * 60 + int(s)) * 1000
+    elif ms.match(length):
+        return int(ms.match(length).group(1))
+    else:
+        return None
+
 class MappingBase():
     def code_url_pattern(self):
         return ("https://github.com/metabrainz/geordi/blob/" +
