@@ -51,7 +51,7 @@ class discogs(MappingBase):
             obj['artist_id'] = data['discogs']['artist']['id']['text']
             obj['name'] = data['discogs']['artist']['name']['text']
             artists = [obj]
-        except KeyError:
+        except (KeyError, TypeError):
             artists = [{'artist_id': artist['id']['text'], 'name': artist['name']['text']} for artist in data['discogs']['artist']]
 
         return {u'artist': artists, u'label': labels, u'master': masters, 'version': 1}
