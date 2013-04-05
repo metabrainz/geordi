@@ -54,7 +54,23 @@ class discogs(MappingBase):
         except (KeyError, TypeError):  # otherwise > 1
             artists = [{'artist_id': artist['id']['text'], 'name': artist['name']['text']} for artist in data['discogs']['artist']]
 
-        return {u'artist': artists, u'label': labels, u'master': masters, 'version': 1}
+        try:  # if it passes, there's one label
+            obj = {}
+            obj['label_id'] = data['discogs']['label']['id']['text']
+            obj['name'] = data['discogs']['label']['name']['text']
+            labels = [obj]
+        except (KeyError, TypeError):  # otherwise > 1
+            labels = [{'label_id': label['id']['text'], 'name': label['name']['text']} for label in data['discogs']['label']]
+
+        try:  # if it passes, there's one master
+            obj = {}
+            obj['master_id'] = data['discogs']['master']['_id']
+            obj['title'] = data['discogs']['master']['title']['text']
+            masters = [obj]
+        except (KeyError, TypeError):  # otherwise > 1
+            masters = [{'master_id': master['_id'], 'title': master['title']['text']} for master in data['discogs']['master']]
+
+        return {u'artist': artists, u'label': labels, u'master': masters, 'version': 2}
 
     def automatic_item_matches(self, data):
         return {}
