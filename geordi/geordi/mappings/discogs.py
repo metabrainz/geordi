@@ -329,7 +329,7 @@ class discogs(MappingBase):
 
     def map(self, data):
         target = base_mapping('release')
-        target['version'] = 9
+        target['version'] = 10
         release = target['release']
 
         try:
@@ -351,6 +351,10 @@ class discogs(MappingBase):
 
         try:
             release['urls'] = [{'url': image['_uri'], 'type': 'cover art'} for image in collect_obj(data['discogs']['release']['images']['image'])]
+        except: pass
+
+        try:
+            release['barcode'] = [re.sub(' ', '', barcode_obj['_value']) for barcode_obj in collect_obj(data['discogs']['release']['identifiers']['identifier'], {'_type': '^Barcode$'})]
         except: pass
 
         try:

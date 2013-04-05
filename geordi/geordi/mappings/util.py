@@ -48,15 +48,38 @@ def collect_text(block, regex='.*'):
 def concatenate_text(block, regex='.*', combiner=comma_list):
     return combiner(collect_text(block, regex))
 
-def collect_obj(block):
+def collect_obj(block, path_filter=None):
     if block is None:
-        return []
+        blocks = []
     if isinstance(block, collections.Mapping):
-        return [block]
+        blocks = [block]
     elif isinstance(block, collections.Iterable):
-        return block
+        blocks = block
     else:
-        return []
+        blocks = []
+    if path_filter is None:
+        return blocks
+    else:
+        final = []
+        for entry in blocks:
+            append = False
+            for (path, value) in path_filter.iteritems():
+                try:
+                    path_keys = path.split('.')
+                    dest = entry
+                    for key in path_keys:
+                        dest = dest[key]
+                    if re.search(value, dest):
+                        append = True
+                    else:
+                        append = False
+                        break
+                except:
+                    append = False
+                    break
+            if append:
+                final.append(entry)
+        return final
 
 def base_mapping(maptype):
     mapping = {'version': 0}

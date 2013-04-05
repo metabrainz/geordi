@@ -40,6 +40,9 @@
                 {{ search_mb_link('label', label.name) }}
       </td></tr>
       {%- endfor %}
+      {% for barcode in mapping.release.barcode -%}
+      <tr><th>Barcode{% if mapping.release.barcode | length > 1 %} (alternate){% endif %}:</th><td>{{ barcode }}</td></tr>
+      {%- endfor %}
       {% for catalog_number in mapping.release.catalog_number -%}
       <tr><th>Catalog Number:</th><td>{{ catalog_number }} {{ search_mb_link('release', 'catno:"' + catalog_number + '"', 1) }}</td></tr>
       {%- endfor %}

@@ -136,6 +136,15 @@
           {{ display_label(label, 0, alt) }}
         {%- endif -%}
       </fieldset>
+      {%- if mapping.release.barcode | length > 0 -%}
+      <fieldset><legend>Barcode:</legend>
+        {%- if mapping.release.barcode | length > 1 -%}Select one: {% endif -%}
+        {%- for barcode in mapping.release.barcode -%}
+          <input type="hidden" name="barcode" id="id-barcode-{{ loop.index0 }}" value="{{ barcode }}"{% if not loop.first %}disabled="disabled" {% endif %}/>
+          <div class="import-clicker exclusive{% if loop.first %} selected{% endif %}" data-for="id-barcode-{{ loop.index0 }}">{{ barcode }}</div>
+        {%- endfor -%}
+      </fieldset>
+      {%- endif -%}
       <fieldset><legend>Tracklist</legend>
         <table class="zebra">
         <thead>
