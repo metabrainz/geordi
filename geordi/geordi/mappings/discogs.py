@@ -23,14 +23,38 @@ import re
 class discogs(MappingBase):
     def link_types(self):
         return {
-            'version': 0
+            'artist': {
+                'name': "artist id",
+                'key': 'artist_id',
+                'type': ['artist']
+            },
+            'label': {
+                'name': "label id",
+                'key': 'label_id',
+                'type': ['label']
+            },
+            'master': {
+                'name': "master id",
+                'key': 'master_id',
+                'type': ['master']
+            },
+            'version': 1
         }
 
     def code_url(self):
         return self.code_url_pattern().format('discogs')
 
     def extract_linked(self, data):
-        return {'version': 0}
+        artists = labels = masters = []
+        try: # if it passes, there's one artist
+            obj = {}
+            obj['artist_id'] = data['discogs']['artist']['id']['text']
+            obj['name'] = data['discogs']['artist']['name']['text']
+            artists = [obj]
+        except KeyError:
+            artists = [{'artist_id': artist['id']['text'], 'name': artist['name']['text']} for artist in data['discogs']['artist']]
+
+        return {u'artist': artists, u'label': labels, u'master': masters, 'version': 1}
 
     def automatic_item_matches(self, data):
         return {}
