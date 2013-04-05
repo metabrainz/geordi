@@ -51,4 +51,9 @@ class discogs(MappingBase):
             release['date'] = collect_text(data['discogs']['release']['released'])
         except: pass
 
+        try:
+             for image in data["discogs"]["release"]["images"]["image"]:
+                release['urls'].append({"url": image["url"], "type": "cover art"})
+        except: pass
+
         return target
