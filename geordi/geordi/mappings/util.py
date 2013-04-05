@@ -17,6 +17,7 @@
 from __future__ import division, absolute_import, unicode_literals
 
 import re
+import collections
 
 def comma_list(lst):
     if len(lst) == 0:
@@ -46,6 +47,16 @@ def collect_text(block, regex='.*'):
 
 def concatenate_text(block, regex='.*', combiner=comma_list):
     return combiner(collect_text(block, regex))
+
+def collect_obj(block):
+    if block is None:
+        return []
+    if isinstance(block, collections.Mapping):
+        return [block]
+    elif isinstance(block, collections.Iterable):
+        return block
+    else:
+        return []
 
 def base_mapping(maptype):
     mapping = {'version': 0}

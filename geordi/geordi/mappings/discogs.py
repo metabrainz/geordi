@@ -16,7 +16,7 @@
 
 from __future__ import division, absolute_import, unicode_literals
 
-from geordi.mappings.util import collect_text, base_mapping, MappingBase
+from geordi.mappings.util import collect_text, collect_obj, base_mapping, MappingBase
 from geordi.utils import uniq
 import re
 
@@ -86,7 +86,7 @@ class discogs(MappingBase):
 
     def map(self, data):
         target = base_mapping('release')
-        target['version'] = 4
+        target['version'] = 5
         release = target['release']
 
         try:
@@ -98,12 +98,7 @@ class discogs(MappingBase):
         except: pass
 
         try:
-            image = data['discogs']['release']['images']['image']
-            release['urls'].append({"url": image["_uri"], "type": "cover art"})
-        except (KeyError, TypeError):
-            try:
-                for image in data["discogs"]["release"]["images"]["image"]:
-                    release['urls'].append({"url": image["_uri"], "type": "cover art"})
-            except: pass
+            release['urls'] = [{'url': image['_uri'], 'type': 'cover art'} for image in collect_obj(data['discogs']['release']['images']['image'])]
+        except: pass
 
         return target
