@@ -98,7 +98,7 @@ class discogs(MappingBase):
         except: pass
 
         try:
-             for image in data["discogs"]["release"]["images"]["image"]:
+            for image in data["discogs"]["release"]["images"]["image"]:
                 release['urls'].append({"url": image["uri"], "type": "cover art"})
         except: pass
 
