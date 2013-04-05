@@ -86,7 +86,7 @@ class discogs(MappingBase):
 
     def map(self, data):
         target = base_mapping('release')
-        target['version'] = 3
+        target['version'] = 4
         release = target['release']
 
         try:
@@ -98,8 +98,12 @@ class discogs(MappingBase):
         except: pass
 
         try:
-            for image in data["discogs"]["release"]["images"]["image"]:
-                release['urls'].append({"url": image["uri"], "type": "cover art"})
-        except: pass
+            image = data['discogs']['release']['images']['image'];
+            release['urls'].append({"url": image["uri"], "type": "cover art"})
+        except (KeyError, TypeError):
+            try:
+                for image in data["discogs"]["release"]["images"]["image"]:
+                    release['urls'].append({"url": image["uri"], "type": "cover art"})
+            except: pass
 
         return target
