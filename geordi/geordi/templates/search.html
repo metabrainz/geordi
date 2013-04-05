@@ -47,7 +47,11 @@ We found {{ data.hits.total }} results; starting at {{ start_from }}.
          {%- if mapping[loop.index0] and mapping[loop.index0].release -%}
          {{ mapping[loop.index0].release.title[0] }}
            {%- if mapping[loop.index0].release.combined_artist %} by {{ mapping[loop.index0].release.combined_artist }}{% endif %}
-           {%- if mapping[loop.index0].release.date | length > 0 %} ({{ mapping[loop.index0].release.date[0]}}){% endif %}
+           {%- if mapping[loop.index0].release.date | length > 0 or mapping[loop.index0].release.country | length > 0 %} (
+             {%- if mapping[loop.index0].release.date | length > 0 -%}{{ mapping[loop.index0].release.date[0] }}{%- endif -%}
+             {%- if mapping[loop.index0].release.date | length > 0 and mapping[loop.index0].release.country | length > 0 %}, {% endif %}
+             {%- if mapping[loop.index0].release.country | length > 0 -%}{{ mapping[loop.index0].release.country[0] }}{%- endif -%}
+           ){% endif %}
            {%- if mapping[loop.index0].release.tracks | length > 0 %} ({{ mapping[loop.index0].release.tracks | length }} tracks){% endif %}
          {% endif -%}
        </big>
