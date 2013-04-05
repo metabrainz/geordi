@@ -68,7 +68,7 @@ class discogs(MappingBase):
 
     def map(self, data):
         target = base_mapping('release')
-        target['version'] = 5
+        target['version'] = 6
         release = target['release']
 
         try:
@@ -77,6 +77,11 @@ class discogs(MappingBase):
 
         try:
             release['date'] = collect_text(data['discogs']['release']['released'])
+        except: pass
+
+        try:
+            release['artist'] = [{'artist_id': artist['id']['text'], 'name': artist['name']['text'], 'subitem': 'artist-{0}'.format(int(artist['id']['text']))} for artist in collect_obj(data['discogs']['release']['artists']['artist'])]
+            release['combined_artist'] = comma_list([artist['name'] for artist in release['artist']])
         except: pass
 
         try:
