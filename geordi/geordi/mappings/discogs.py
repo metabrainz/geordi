@@ -80,7 +80,7 @@ class discogs(MappingBase):
         except: pass
 
         try:
-            release['artist'] = [{'artist_id': artist['id']['text'], 'name': artist['name']['text'], 'subitem': 'artist-{0}'.format(int(artist['id']['text']))} for artist in collect_obj(data['discogs']['release']['artists']['artist'])]
+            release['artist'] = [{'name': artist['name']['text'], 'subitem': 'artist-{0}'.format(int(artist['id']['text']))} for artist in collect_obj(data['discogs']['release']['artists']['artist'])]
             release['combined_artist'] = comma_list([artist['name'] for artist in release['artist']])
         except: pass
 
