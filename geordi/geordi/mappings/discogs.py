@@ -46,37 +46,19 @@ class discogs(MappingBase):
 
     def extract_linked(self, data):
         artists = labels = masters = []
-        try:  # if it passes, there's one artist
-            obj = {}
-            obj['artist_id'] = data['discogs']['artist']['id']['text']
-            obj['name'] = data['discogs']['artist']['name']['text']
-            artists = [obj]
-        except (KeyError, TypeError):  # otherwise > 1
-            try:
-                artists = [{'artist_id': artist['id']['text'], 'name': artist['name']['text']} for artist in data['discogs']['artist']]
-            except: pass
+        try:
+            artists = [{'artist_id': artist['id']['text'], 'name': artist['name']['text']} for artist in collect_obj(data['discogs']['artist'])]
+        except: pass
 
-        try:  # if it passes, there's one label
-            obj = {}
-            obj['label_id'] = data['discogs']['label']['id']['text']
-            obj['name'] = data['discogs']['label']['name']['text']
-            labels = [obj]
-        except (KeyError, TypeError):  # otherwise > 1
-            try:
-                labels = [{'label_id': label['id']['text'], 'name': label['name']['text']} for label in data['discogs']['label']]
-            except: pass
+        try:
+            labels = [{'label_id': label['id']['text'], 'name': label['name']['text']} for label in collect_obj(data['discogs']['label'])]
+        except: pass
 
-        try:  # if it passes, there's one master
-            obj = {}
-            obj['master_id'] = data['discogs']['master']['_id']
-            obj['title'] = data['discogs']['master']['title']['text']
-            masters = [obj]
-        except (KeyError, TypeError):  # otherwise > 1
-            try:
-                masters = [{'master_id': master['_id'], 'title': master['title']['text']} for master in data['discogs']['master']]
-            except: pass
+        try:
+            masters = [{'master_id': master['_id'], 'title': master['title']['text']} for master in collect_obj(data['discogs']['master'])]
+        except: pass
 
-        return {u'artist': artists, u'label': labels, u'master': masters, 'version': 2}
+        return {u'artist': artists, u'label': labels, u'master': masters, 'version': 3}
 
     def automatic_item_matches(self, data):
         return {}
