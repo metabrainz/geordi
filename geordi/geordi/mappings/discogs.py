@@ -16,7 +16,7 @@
 
 from __future__ import division, absolute_import, unicode_literals
 
-from geordi.mappings.util import collect_text, collect_obj, base_mapping, MappingBase
+from geordi.mappings.util import collect_text, comma_list, collect_obj, base_mapping, MappingBase
 from geordi.utils import uniq
 import re
 
@@ -68,7 +68,7 @@ class discogs(MappingBase):
 
     def map(self, data):
         target = base_mapping('release')
-        target['version'] = 6
+        target['version'] = 7
         release = target['release']
 
         try:
