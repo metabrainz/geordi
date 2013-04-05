@@ -53,7 +53,7 @@ class discogs(MappingBase):
 
         try:
              for image in data["discogs"]["release"]["images"]["image"]:
-                release['urls'].append({"url": image["url"], "type": "cover art"})
+                release['urls'].append({"url": image["uri"], "type": "cover art"})
         except: pass
 
         return target
