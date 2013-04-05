@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # geordi
 # Copyright (C) 2012 Ian McEwen, MetaBrainz Foundation
 #
