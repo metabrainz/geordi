@@ -96,6 +96,15 @@
           <div class="import-clicker exclusive{% if loop.first %} selected{% endif %}" data-for="id-date.year-{{loop.index0}},id-date.month-{{loop.index0}},id-date.day-{{loop.index0}}">{{ date }}</div>
         {%- endfor -%}
       </fieldset>
+      {%- if mapping.release.country | length > 0 -%}
+      <fieldset><legend>Release Country:</legend>
+        {%- if mapping.release.country | length > 1 -%}Select one: {% endif -%}
+        {%- for country in mapping.release.country -%}
+          <input type="hidden" name="country" id="id-country-{{ loop.index0 }}" value="{{ country }}"{% if not loop.first %}disabled="disabled" {% endif %}/>
+          <div class="import-clicker exclusive{% if loop.first %} selected{% endif %}" data-for="id-country-{{ loop.index0 }}">{{ country }}</div>
+        {%- endfor -%}
+      </fieldset>
+      {%- endif -%}
       <fieldset><legend>Release Artist:</legend>
         Select one or more:
         {% for artist in mapping.release.artist -%}
