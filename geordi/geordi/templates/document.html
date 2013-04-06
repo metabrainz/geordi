@@ -34,10 +34,12 @@
       <tr><th>Label:</th>
           <td>{%- if label.subitem -%}
                 {{ subitem_search(data._index, g.re.split('-', label.subitem)[0], g.re.split('-', label.subitem)[1], label.name) }}
+                {%- if label.catalog_number %} ({{ label.catalog_number }}){%- endif -%}
                 <a class="subitem-opener action-icon" data-subitem="{{label.subitem}}" href="#li-subitem-{{label.subitem}}"><img title="Jump to subitem" src="/static/images/arrow-down.png" /></a>
                 {{ current_match_span(subitems[label.subitem], 'subitem', label.subitem, true) }}
-                {%- else -%}{{label.name}}{%- endif -%}
-                {%- if label.catalog_number -%} ({{ label.catalog_number }}){%- endif -%}
+              {%- else -%}{{label.name}}
+                {%- if label.catalog_number %} ({{ label.catalog_number }}){%- endif -%}
+              {%- endif -%}
                 {{ search_mb_link('label', label.name) }}
       </td></tr>
       {%- endfor %}
