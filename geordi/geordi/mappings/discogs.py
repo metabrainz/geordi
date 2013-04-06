@@ -329,7 +329,7 @@ class discogs(MappingBase):
 
     def map(self, data):
         target = base_mapping('release')
-        target['version'] = 10
+        target['version'] = 11
         release = target['release']
 
         try:
@@ -351,6 +351,21 @@ class discogs(MappingBase):
 
         try:
             release['urls'] = [{'url': image['_uri'], 'type': 'cover art'} for image in collect_obj(data['discogs']['release']['images']['image'])]
+        except: pass
+
+        try:
+            labels = [{'name': label['_name'], 'catalog_number': label['_catno']} for label in collect_obj(data['discogs']['release']['labels']['label'])]
+            subitem_labels = self.extract_linked(data)['label']
+            for label in labels:
+                added = False
+                for candidate in subitem_labels:
+                    if candidate['name'] == label['name']:
+                        label.update({'subitem': 'label-' + candidate['label_id']})
+                        release['label'].append(label)
+                        added = True
+                        break
+                if not added:
+                    release['label'].append(label)
         except: pass
 
         try:
