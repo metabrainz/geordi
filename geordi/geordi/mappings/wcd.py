@@ -206,7 +206,7 @@ class wcd(MappingBase):
                             for artist in list
                         ])
                 release['other_artist'] = uniq(other_artists)
-            except (KeyError, TypeError): pass
+            except: pass
         if 'artist' not in release or len(release['artist']) < 1:
             try:
                 release['artist'] = [{'name': name} for name in collect_text(data['meta_xml']['metadata']['artist'])]
