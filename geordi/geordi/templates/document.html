@@ -49,6 +49,9 @@
       {% for catalog_number in mapping.release.catalog_number -%}
       <tr><th>Catalog Number:</th><td>{{ catalog_number }} {{ search_mb_link('release', 'catno:"' + catalog_number + '"', 1) }}</td></tr>
       {%- endfor %}
+      {% for url in mapping.release.urls if url.link == "link_type" AND url.link_type == "discogs" -%}
+      <tr><th>Discogs URL:</th><td>{{ url.url | urlize(40) }}</td></tr>
+      {%- endfor %}
       {% for url in mapping.release.urls if url.type == "cover art" -%}
       <tr><th>Cover Art:</th><td>{{ url.url | urlize(40) }}</td></tr>
       {%- endfor %}
