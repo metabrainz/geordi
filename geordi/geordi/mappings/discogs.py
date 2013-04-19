@@ -351,7 +351,7 @@ class discogs(MappingBase):
 
         try:
             release['urls'] = [{'url': image['_uri'], 'type': 'cover art'} for image in collect_obj(data['discogs']['release']['images']['image'])]
-	    release['urls'].append({'url': 'http://www.discogs.com/release/' + data['discogs']['release']['_id'], 'type': 'link type', 'link_type': 'discogs'})
+            release['urls'].append({'url': 'http://www.discogs.com/release/' + data['discogs']['release']['_id'], 'type': 'link type', 'link_type': 'discogs'})
         except: pass
 
         try:
