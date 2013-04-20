@@ -329,7 +329,7 @@ class discogs(MappingBase):
 
     def map(self, data):
         target = base_mapping('release')
-        target['version'] = 11
+        target['version'] = 12
         release = target['release']
 
         try:
