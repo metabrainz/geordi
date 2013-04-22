@@ -75,6 +75,11 @@ table tr:last-child td, table tr:last-child th {
           transition: height 0.35s ease;
 }
 
+/* 'geordi' header styling */
+a.head_title:link { text-decoration: none; color: #111; }
+a.head_title:hover { text-decoration: none; color: #111; }
+a.head_title:visited { text-decoration: none; color: #111; }
+
 /* Main search/header styling */
 select#id-index, select#id-itemtype { width: 200px }
 
