@@ -329,7 +329,7 @@ class discogs(MappingBase):
 
     def map(self, data):
         target = base_mapping('release')
-        target['version'] = 12
+        target['version'] = 13
         release = target['release']
 
         try:
@@ -351,6 +351,9 @@ class discogs(MappingBase):
 
         try:
             release['urls'] = [{'url': image['_uri'], 'type': 'cover art'} for image in collect_obj(data['discogs']['release']['images']['image'])]
+        except: pass
+
+        try:
             release['urls'].append({'url': 'http://www.discogs.com/release/' + data['discogs']['release']['_id'], 'type': 'link type', 'link_type': 'discogs'})
         except: pass
 
