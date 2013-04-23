@@ -10,8 +10,11 @@ import xmltodict
 import json
 import copy
 
+sys.path.append(os.path.abspath('../geordi/geordi'))
+from config import ELASTICSEARCH_ENDPOINT
+
 xmltodict.OrderedDict = dict
-es = ElasticSearch('http://localhost:9200')
+es = ElasticSearch(ELASTICSEARCH_ENDPOINT)
 
 def process_dir(index, directory):
     base = re.sub('(.*?)/([^/]+)/?$', r'\2', directory)
