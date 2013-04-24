@@ -10,7 +10,7 @@ import xmltodict
 import json
 import copy
 
-sys.path.append(os.path.abspath(os.path.dirname(__file__)+'/../geordi/geordi'))
+sys.path.append(os.path.abspath(os.path.dirname(__file__) + '/../geordi/geordi'))
 from config import ELASTICSEARCH_ENDPOINT
 
 xmltodict.OrderedDict = dict
