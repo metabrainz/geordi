@@ -178,18 +178,18 @@ def oauth_callback():
     error = request.args.get('error')
     if not error:
         state = request.args.getlist('state')
-        username = state[0]
-        if len(state) > 1 and state[1] == 'on':
+        if len(state) > 0 and state[0] == 'on':
             remember = True
         else:
             remember = False
         code = request.args.get('code')
-        if check_mb_account(username, code):
+        username = check_mb_account(code)
+        if username:
             login_user(User(username), remember=remember)
             flash("Logged in!")
             return redirect(request.args.get("next") or url_for("search"))
         else:
-            flash('Incorrect username, please try again.')
+            flash('We couldn\'t log you in D:')
     else:
         flash('There was an error: ' + error)
     return render_template("login.html", client_id=app.config['OAUTH_CLIENT_ID'], redirect_uri=app.config['OAUTH_REDIRECT_URI'])
@@ -302,7 +302,7 @@ def get_subitem(index, subitem, create=False, seed={}):
             es.index(index, 'subitem', data, id=subitem)
         return None
 
-def check_mb_account(username, auth_code):
+def check_mb_account(auth_code):
     url = 'https://musicbrainz.org/oauth2/token'
     data = urllib.urlencode({'grant_type': 'authorization_code',
                              'code': auth_code,
@@ -311,11 +311,11 @@ def check_mb_account(username, auth_code):
                              'redirect_uri': app.config['OAUTH_REDIRECT_URI']})
     json_data = json.load(urllib2.urlopen(url, data))
 
-    url = 'https://musicbrainz.org/ws/1/user?name=' + username
+    url = 'https://beta.musicbrainz.org/oauth2/userinfo'
     opener = urllib2.build_opener()
     opener.addheaders = [('Authorization', 'Bearer ' + json_data['access_token'])]
     try:
-        opener.open(url, timeout=5)
+        userdata = json.load(opener.open(url, timeout=5))
+        return userdata['sub']
     except StandardError:
-        return False
-    return True
+        return None
