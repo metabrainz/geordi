@@ -172,7 +172,9 @@
     {%- if current_matching %}
       {{ match_span(current_matching, none, sparse) }}
     {%- endif %}
-    {{ link_opener(linker_type, id, data, not sparse) }}
+    {%- if matching_enabled -%}
+      {{ link_opener(linker_type, id, data, not sparse) }}
+    {%- endif %}
 </span>
 {%- endmacro -%}
 

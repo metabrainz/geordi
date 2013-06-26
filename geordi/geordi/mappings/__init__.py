@@ -51,6 +51,10 @@ def get_automatic_subitem_matches_by_index(index, data):
     if index in class_map:
         return class_map[index].automatic_subitem_matches(data)
 
+def get_matching_enabled_by_index(index):
+    if index in class_map:
+        return class_map[index].matching_enabled()
+
 def update_map_by_index(index, item, data):
     if index in class_map:
         try:

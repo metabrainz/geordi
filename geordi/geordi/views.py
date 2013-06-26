@@ -20,7 +20,7 @@ from flask.ext.login import login_required, login_user, logout_user, current_use
 from geordi import app, login_manager, User, es
 from geordi.search import do_search, do_search_raw, do_subitem_search, make_filters
 from geordi.matching import register_match, check_type
-from geordi.mappings import map_search_data, update_map_by_index, update_linked_by_index, get_link_types_by_index, update_automatic_item_matches_by_index, update_automatic_subitem_matches_by_index, get_mapoptions, get_code_url_by_index
+from geordi.mappings import map_search_data, update_map_by_index, update_linked_by_index, get_link_types_by_index, update_automatic_item_matches_by_index, update_automatic_subitem_matches_by_index, get_mapoptions, get_code_url_by_index, get_matching_enabled_by_index
 from geordi.mappings.util import comma_list, comma_only_list
 from geordi.utils import check_data_format
 
@@ -66,12 +66,13 @@ def document(itemindex, item):
         subitems = {}
         link_types = get_link_types_by_index(itemindex)
         code_url = get_code_url_by_index(itemindex)
+        matching_enabled = get_matching_enabled_by_index(itemindex)
         for (link_type, links) in data['_source']['_geordi']['links']['links'].iteritems():
             if link_type != 'version':
                 for link in links:
                     subitem = "{}-{}".format(link_type, link[link_types[link_type]['key']])
                     subitems[subitem] = get_subitem(itemindex, subitem, create=True, seed=copy.deepcopy(link))
-        return render_template(template, item=item, index=itemindex, data=data, mapping=data['_source']['_geordi']['mapping'], mapoptions=mapoptions, subitems=subitems, code_url=code_url)
+        return render_template(template, item=item, index=itemindex, data=data, mapping=data['_source']['_geordi']['mapping'], mapoptions=mapoptions, subitems=subitems, code_url=code_url, matching_enabled=matching_enabled)
     except ElasticHttpNotFoundError:
         return render_template('notfound.html')
 
@@ -116,21 +117,24 @@ def item(index, item):
 @app.route('/api/matchitem/<index>/<item>')
 def matchitem(index, item):
     "Submit a match for this item"
-    if current_user.is_authenticated():
-        auto = False
-        user = None
-        if request.args.get('unmatch', False):
-            return register_match(index, item, 'item', 'unmatch', [], auto, user)
+    if get_matching_enabled_by_index(index):
+        if current_user.is_authenticated():
+            auto = False
+            user = None
+            if request.args.get('unmatch', False):
+                return register_match(index, item, 'item', 'unmatch', [], auto, user)
+        else:
+            auto = True
+            user = request.args.get('user')
+            if user in ['matched by index']:
+                return Response(json.dumps({'code': 400, 'error': 'The name "{}" is reserved.'.format(user)}), 400, mimetype="application/json")
+        matchtype = request.args.get('type', 'release')
+        mbids = request.args.getlist('mbid')
+        if not mbids:
+            mbids = re.split(',\s*', request.args.get('mbids'))
+        return register_match(index, item, 'item', matchtype, mbids, auto, user)
     else:
-        auto = True
-        user = request.args.get('user')
-        if user in ['matched by index']:
-            return Response(json.dumps({'code': 400, 'error': 'The name "{}" is reserved.'.format(user)}), 400, mimetype="application/json")
-    matchtype = request.args.get('type', 'release')
-    mbids = request.args.getlist('mbid')
-    if not mbids:
-        mbids = re.split(',\s*', request.args.get('mbids'))
-    return register_match(index, item, 'item', matchtype, mbids, auto, user)
+        return Response(json.dumps({'code': 400, 'error': 'Matching is not enabled for this index'}), 400, mimetype="application/json")
 
 @app.route('/api/subitem/<index>/<subitem>')
 def subitem(index, subitem):
@@ -146,19 +150,22 @@ def subitem(index, subitem):
 @app.route('/api/matchsubitem/<index>/<subitem>')
 def matchsubitem(index, subitem):
     "Submit a match for this subitem"
-    if current_user.is_authenticated():
-        auto = False
-        user = None
-        if request.args.get('unmatch', False):
-            return register_match(index, subitem, 'subitem', 'unmatch', [], auto, user)
+    if get_matching_enabled_by_index(index):
+        if current_user.is_authenticated():
+            auto = False
+            user = None
+            if request.args.get('unmatch', False):
+                return register_match(index, subitem, 'subitem', 'unmatch', [], auto, user)
+        else:
+            auto = True
+            user = request.args.get('user')
+        matchtype = request.args.get('type', 'artist')
+        mbids = request.args.getlist('mbid')
+        if not mbids:
+            mbids = re.split(',\s*', request.args.get('mbids'))
+        return register_match(index, subitem, 'subitem', matchtype, mbids, auto, user)
     else:
-        auto = True
-        user = request.args.get('user')
-    matchtype = request.args.get('type', 'artist')
-    mbids = request.args.getlist('mbid')
-    if not mbids:
-        mbids = re.split(',\s*', request.args.get('mbids'))
-    return register_match(index, subitem, 'subitem', matchtype, mbids, auto, user)
+        return Response(json.dumps({'code': 400, 'error': 'Matching is not enabled for this index'}), 400, mimetype="application/json")
 
 @app.route('/internal/mbidtype/<mbid>')
 def internal_mbid_type(mbid):
