@@ -16,11 +16,12 @@
 
 from __future__ import division, absolute_import
 import re
+import copy
 
 from flask import Blueprint, request, Response, json
 from flask.ext.login import current_user
 
-from geordi.data import resolve_data, get_search_params, get_subitem
+from geordi.data import get_search_params, get_item, get_subitem, update_item
 from geordi.mappings import get_link_types_by_index, get_matching_enabled_by_index
 from geordi.matching import register_match
 
@@ -43,8 +44,9 @@ def apisearch():
 def item(index, item):
     "Get information for an item"
     try:
-        document = resolve_data(index, item)
-        if request.args.get('subitems', False):
+        document = get_item(index, item)
+        if request.args.get('update', False):
+            update_item(index, item, document)
             link_types = get_link_types_by_index(index)
             for (link_type, links) in document['_source']['_geordi']['links']['links'].iteritems():
                 if link_type != 'version':

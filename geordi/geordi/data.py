@@ -25,20 +25,6 @@ from pyelasticsearch import ElasticHttpNotFoundError
 
 import collections
 
-def resolve_data(index, item):
-    "Shared data-update functionality"
-    data = es.get(index, 'item', item)
-    return update_data(index, item, data)
-
-def update_data(index, item, data):
-    linked_update = update_linked_by_index(index, item, data['_source'])
-    map_update = update_map_by_index(index, item, data['_source'])
-    match_update = update_automatic_item_matches_by_index(index, item, data['_source'])
-    if linked_update or map_update or match_update:
-        data = es.get(index, 'item', item)
-    update_automatic_subitem_matches_by_index(index, item, data['_source'])
-    return data
-
 def get_search_params():
     "Shared search functionality"
     search_type = request.args.get('type', 'query')
@@ -93,6 +79,18 @@ def flatten(l):
                 yield sub
         else:
             yield el
+
+def get_item(index, item):
+    return es.get(index, 'item', item)
+
+def update_item(index, item, data):
+    linked_update = update_linked_by_index(index, item, data['_source'])
+    map_update = update_map_by_index(index, item, data['_source'])
+    match_update = update_automatic_item_matches_by_index(index, item, data['_source'])
+    if linked_update or map_update or match_update:
+        data = es.get(index, 'item', item)
+    update_automatic_subitem_matches_by_index(index, item, data['_source'])
+    return data
 
 def get_subitem(index, subitem, create=False, seed={}):
     try:

@@ -20,7 +20,7 @@ from flask.ext.login import login_required, login_user, logout_user
 from geordi import app, User
 from geordi.matching import check_type
 from geordi.mappings import get_link_types_by_index, get_mapoptions, get_code_url_by_index, get_matching_enabled_by_index
-from geordi.data import resolve_data, get_search_params, get_subitem
+from geordi.data import get_search_params, get_item, get_subitem
 
 import urllib2
 import urllib
@@ -39,7 +39,7 @@ def document(itemindex, item):
     else:
         template = 'document.html'
     try:
-        data = resolve_data(itemindex, item)
+        data = get_item(itemindex, item)
         mapoptions = get_mapoptions(data['_source']['_geordi']['mapping'])
         subitems = {}
         link_types = get_link_types_by_index(itemindex)
