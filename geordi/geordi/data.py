@@ -23,6 +23,8 @@ from geordi.utils import check_data_format
 
 from pyelasticsearch import ElasticHttpNotFoundError
 
+import collections
+
 def resolve_data(index, item):
     "Shared data-update functionality"
     data = es.get(index, 'item', item)
