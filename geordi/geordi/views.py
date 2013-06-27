@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division, absolute_import
-from flask import render_template, request, redirect, url_for, flash, Response, g
+from flask import render_template, request, redirect, url_for, flash, Response, g, json
 from flask.ext.login import login_required, login_user, logout_user, current_user
 from geordi import app, login_manager, User, es
 from geordi.search import do_search, do_search_raw, do_subitem_search, make_filters
@@ -24,7 +24,6 @@ from geordi.mappings import map_search_data, update_map_by_index, update_linked_
 from geordi.mappings.util import comma_list, comma_only_list
 from geordi.utils import check_data_format
 
-import json
 import uuid
 import urllib2
 import urllib

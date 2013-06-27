@@ -15,12 +15,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division, absolute_import
-from flask import Response, request
+from flask import Response, request, json
 from flask.ext.login import current_user
 from geordi import app, es
 from geordi.utils import check_data_format
 
-import json
 import uuid
 import urllib2
 from datetime import datetime
