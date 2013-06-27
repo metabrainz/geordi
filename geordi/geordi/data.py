@@ -28,6 +28,9 @@ import collections
 def resolve_data(index, item):
     "Shared data-update functionality"
     data = es.get(index, 'item', item)
+    return update_data(index, item, data)
+
+def update_data(index, item, data):
     linked_update = update_linked_by_index(index, item, data['_source'])
     map_update = update_map_by_index(index, item, data['_source'])
     match_update = update_automatic_item_matches_by_index(index, item, data['_source'])
