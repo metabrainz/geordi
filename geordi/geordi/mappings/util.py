@@ -140,6 +140,7 @@ def unformat_track_length(length):
 class MappingBase():
     def matching_enabled(self):
         return True
+
     def code_url_pattern(self):
         return ("https://github.com/metabrainz/geordi/blob/" +
                 "master/geordi/geordi/mappings/{0}.py")

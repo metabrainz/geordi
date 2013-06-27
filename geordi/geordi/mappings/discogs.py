@@ -284,6 +284,7 @@ countries = {
 class discogs(MappingBase):
     def matching_enabled(self):
         return False
+
     def link_types(self):
         return {
             'artist': {
