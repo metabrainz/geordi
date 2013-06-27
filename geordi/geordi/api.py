@@ -57,24 +57,24 @@ def item(index, item):
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 
-@bp.route('/matchitem/<index>/<item>')
+@bp.route('/matchitem/<index>/<item>', methods=['POST'])
 def matchitem(index, item):
     "Submit a match for this item"
     if get_matching_enabled_by_index(index):
         if current_user.is_authenticated():
             auto = False
             user = None
-            if request.args.get('unmatch', False):
+            if request.form.get('unmatch', False):
                 return register_match(index, item, 'item', 'unmatch', [], auto, user)
         else:
             auto = True
-            user = request.args.get('user')
+            user = request.form.get('user')
             if user in ['matched by index']:
                 return Response(json.dumps({'code': 400, 'error': 'The name "{}" is reserved.'.format(user)}), 400, mimetype="application/json")
-        matchtype = request.args.get('type', 'release')
-        mbids = request.args.getlist('mbid')
+        matchtype = request.form.get('type', 'release')
+        mbids = request.form.getlist('mbid')
         if not mbids:
-            mbids = re.split(',\s*', request.args.get('mbids'))
+            mbids = re.split(',\s*', request.form.get('mbids'))
         return register_match(index, item, 'item', matchtype, mbids, auto, user)
     else:
         return Response(json.dumps({'code': 400, 'error': 'Matching is not enabled for this index'}), 400, mimetype="application/json")
@@ -90,22 +90,22 @@ def subitem(index, subitem):
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 
-@bp.route('/matchsubitem/<index>/<subitem>')
+@bp.route('/matchsubitem/<index>/<subitem>', methods=['POST'])
 def matchsubitem(index, subitem):
     "Submit a match for this subitem"
     if get_matching_enabled_by_index(index):
         if current_user.is_authenticated():
             auto = False
             user = None
-            if request.args.get('unmatch', False):
+            if request.form.get('unmatch', False):
                 return register_match(index, subitem, 'subitem', 'unmatch', [], auto, user)
         else:
             auto = True
-            user = request.args.get('user')
-        matchtype = request.args.get('type', 'artist')
-        mbids = request.args.getlist('mbid')
+            user = request.form.get('user')
+        matchtype = request.form.get('type', 'artist')
+        mbids = request.form.getlist('mbid')
         if not mbids:
-            mbids = re.split(',\s*', request.args.get('mbids'))
+            mbids = re.split(',\s*', request.form.get('mbids'))
         return register_match(index, subitem, 'subitem', matchtype, mbids, auto, user)
     else:
         return Response(json.dumps({'code': 400, 'error': 'Matching is not enabled for this index'}), 400, mimetype="application/json")

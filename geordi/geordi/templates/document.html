@@ -201,7 +201,7 @@
   <h3>{{ title }}</h3>
   <h4>Match</h4>
   <div class="matcher">
-    <form class="match-form" id="match-{{type}}-{{item}}" action="/api/match{{type}}/{{ index }}/{{ item }}" method="get">
+    <form class="match-form" id="match-{{type}}-{{item}}" action="/api/match{{type}}/{{ index }}/{{ item }}" method="POST">
       <span class="match-type{% if current_matching %} {{current_matching.type}}{%- endif -%}">{% if current_matching %}{{current_matching.type}}{%- endif -%}</span>
       <input type="hidden" name="type" {% if current_matching %}value="{{current_matching.type}}"{%- endif -%} />
       <textarea name="mbids" placeholder="MBIDs, comma separated">
@@ -210,7 +210,7 @@
       <input type="submit" class="btn primary" value="Match"{%- if not (current_matching and current_matching.mbid | length > 0) -%} disabled="disabled"{%- endif -%} />
     </form>
     {% if current_matching -%}<div class="current-match">Current match: {{ match_span(current_matching) }}
-      <form class="unmatch-form" action="/api/match{{type}}/{{index}}/{{item}}" method="get"><input type="submit" value="Unmatch" /><input type="hidden" name="unmatch" value="true" /></form></div>
+      <form class="unmatch-form" action="/api/match{{type}}/{{index}}/{{item}}" method="POST"><input type="submit" value="Unmatch" /><input type="hidden" name="unmatch" value="true" /></form></div>
     {%- endif %}
     <div class="preview"></div>
     <div class="response"></div>
