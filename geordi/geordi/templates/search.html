@@ -1,5 +1,5 @@
 {%- macro build_search_url(from_value) -%}
-{{ url_with_search('search', query, from_value) }}
+{{ url_with_search('ui.search', query, from_value) }}
 {%- endmacro -%}
 
 {%- macro url_with_search(baseurl, query, from_value, index, item) -%}
@@ -55,7 +55,7 @@ We found {{ data.hits.total }} results; starting at {{ start_from }}.
            {%- if mapping[loop.index0].release.tracks | length > 0 %} ({{ mapping[loop.index0].release.tracks | length }} tracks){% endif %}
          {% endif -%}
        </big>
-       {%- set link = url_with_search('document', query, none, result._index, result._id) -%}
+       {%- set link = url_with_search('ui.document', query, none, result._index, result._id) -%}
      {%- elif result._type == 'subitem' -%}
        <big class="left"></big>
        <small class="left">
