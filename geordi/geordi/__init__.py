@@ -49,7 +49,7 @@ class User(UserMixin):
         self.id = id
 
 login_manager = LoginManager()
-login_manager.login_view = "login"
+login_manager.login_view = "ui.login"
 
 @login_manager.user_loader
 def load_user(username):

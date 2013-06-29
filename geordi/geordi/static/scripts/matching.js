@@ -24,7 +24,7 @@ $('form.match-form').submit(function (e) {
   e.preventDefault();
 
   var promise = $.ajax({
-       type: "GET",
+       type: "POST",
        url: $(this).attr('action'),
        data: $(this).serialize(),
        dataType: 'json',
@@ -47,7 +47,7 @@ $('form.unmatch-form').submit(function (e) {
   e.preventDefault();
 
   var promise = $.ajax({
-       type: "GET",
+       type: "POST",
        url: $(this).attr('action'),
        data: $(this).serialize(),
        dataType: 'json',
