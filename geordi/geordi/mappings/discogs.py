@@ -331,7 +331,7 @@ class discogs(MappingBase):
             url_data = musicbrainzngs.browse_urls(
                 resource='http://www.discogs.com/release/%s' % data['discogs']['release']['_id'],
                 includes=['release-rels'])
-            mbids = [release['id'] for release in url_data['url']['release-relation-list']]
+            mbids = [release['release']['id'] for release in url_data['url']['release-relation-list']]
             return {'release': mbids}
         except:
             return {'unmatch': []}
