@@ -19,7 +19,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from flask.ext.login import login_required, login_user, logout_user
 from geordi import app, User
 from geordi.matching import check_type
-from geordi.mappings import get_link_types_by_index, get_mapoptions, get_code_url_by_index, get_matching_enabled_by_index
+from geordi.mappings import get_index
 from geordi.data import get_search_params, get_item, get_subitem
 
 import urllib2
@@ -31,26 +31,27 @@ from pyelasticsearch import ElasticHttpNotFoundError
 bp = Blueprint('ui', __name__)
 
 # Main user-facing views
-@bp.route('/<itemindex>/<item>')
+@bp.route('/<index>/<item>')
 @login_required
-def document(itemindex, item):
+def document(index_name, item):
     if request.args.get('import', False):
         template = 'import.html'
     else:
         template = 'document.html'
     try:
-        data = get_item(itemindex, item)
+        data = get_item(index_name, item)
+        index = get_index(index_name)
         mapoptions = get_mapoptions(data['_source']['_geordi']['mapping'])
         subitems = {}
-        link_types = get_link_types_by_index(itemindex)
-        code_url = get_code_url_by_index(itemindex)
-        matching_enabled = get_matching_enabled_by_index(itemindex)
+        link_types = index.link_types()
+        code_url = index.code_url()
+        matching_enabled = index.matching_enabled()
         for (link_type, links) in data['_source']['_geordi']['links']['links'].iteritems():
             if link_type != 'version':
                 for link in links:
                     subitem = "{}-{}".format(link_type, link[link_types[link_type]['key']])
-                    subitems[subitem] = get_subitem(itemindex, subitem, create=True, seed=copy.deepcopy(link))
-        return render_template(template, item=item, index=itemindex, data=data, mapping=data['_source']['_geordi']['mapping'], mapoptions=mapoptions, subitems=subitems, code_url=code_url, matching_enabled=matching_enabled)
+                    subitems[subitem] = get_subitem(index_name, subitem, create=True, seed=copy.deepcopy(link))
+        return render_template(template, item=item, index=index_name, data=data, mapping=data['_source']['_geordi']['mapping'], mapoptions=mapoptions, subitems=subitems, code_url=code_url, matching_enabled=matching_enabled)
     except ElasticHttpNotFoundError:
         return render_template('notfound.html')
 

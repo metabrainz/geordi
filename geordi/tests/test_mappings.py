@@ -39,16 +39,10 @@ class TestMappings(unittest.TestCase):
 
             self.assertTrue(cls.code_url(),
                             msg="Code URL must be available for all mappings.")
-            self.assertEqual(
-                cls.code_url(), geordi.mappings.get_code_url_by_index(idx),
-                msg="get_code_url_by_index is the same as direct on class"
-            )
 
     def test_link_types(self):
         for (idx, cls) in geordi.mappings.class_map.iteritems():
             self.assertTrue('version' in cls.link_types())
-            self.assertEqual(cls.link_types(),
-                             geordi.mappings.get_link_types_by_index(idx))
 
     def test_map(self):
         for (idx, cls) in geordi.mappings.class_map.iteritems():

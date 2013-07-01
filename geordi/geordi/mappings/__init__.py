@@ -31,33 +31,11 @@ class_map = {
     'discogs': discogs()
 }
 
-def get_map_by_index(index, data):
-    if index in class_map:
-        return class_map[index].map(data)
-
-def get_code_url_by_index(index):
-    if index in class_map:
-        return class_map[index].code_url()
-
-def get_link_types_by_index(index):
-    if index in class_map:
-        return class_map[index].link_types()
-
-def get_automatic_item_matches_by_index(index, data):
-    if index in class_map:
-        return class_map[index].automatic_item_matches(data)
-
-def get_automatic_subitem_matches_by_index(index, data):
-    if index in class_map:
-        return class_map[index].automatic_subitem_matches(data)
-
-def get_individual_subitem_matches_by_index(index, subitem, data):
-    if index in class_map:
-        return class_map[index].individual_subitem_matches(subitem)
-
-def get_matching_enabled_by_index(index):
-    if index in class_map:
-        return class_map[index].matching_enabled()
+def get_index(index_name):
+    if index_name in class_map:
+        return class_map[index_name]
+    else:
+        raise Exception('Unknown index %s' % index_name)
 
 def update_map_by_index(index, item, data):
     if index in class_map:
@@ -72,7 +50,7 @@ def update_map_by_index(index, item, data):
         data = check_data_format(data)
 
         currentmapping = data['_geordi']['mapping']
-        mapping = get_map_by_index(index, data)
+        mapping = get_index(index).map(data)
 
         if not currentmapping['version'] == mapping['version']:
             data['_geordi']['mapping'] = mapping
@@ -131,7 +109,7 @@ order = ['area', 'url', 'work', 'recording', 'label', 'artist', 'release', 'rele
 def update_automatic_item_matches_by_index(index, item, data):
     if index in class_map:
         data = check_data_format(data)
-        matches = get_automatic_item_matches_by_index(index, data)
+        matches = get_index(index).automatic_item_matches(data)
         fakeip = 'internal, matched by index {}'.format(index)
         automatches = data['_geordi']['matchings']['auto_matchings']
         changed = False
@@ -148,7 +126,7 @@ def update_automatic_item_matches_by_index(index, item, data):
 def update_automatic_subitem_matches_by_index(index, item, data):
     if index in class_map:
         data = check_data_format(data)
-        matches = get_automatic_subitem_matches_by_index(index, data)
+        matches = get_index(index).automatic_subitem_matches(data)
         fakeip = 'internal, matched by index {}'.format(index)
         changed = False
         for (subitem_id, subitem_matches) in matches.iteritems():
@@ -174,7 +152,7 @@ def update_automatic_subitem_matches_by_index(index, item, data):
 def update_individual_subitem_matches_by_index(index, subitem, data):
     if index in class_map:
         data = check_data_format(data)
-        matches = get_individual_subitem_matches_by_index(index, subitem, data)
+        matches = get_index(index).individual_subitem_matches(subitem, data)
         fakeip = 'internal, matched by index {}'.format(index)
         automatches = data['_geordi']['matchings']['auto_matchings']
         changed = False
@@ -195,7 +173,7 @@ def map_search_data(data):
         for result in data['hits']['hits']:
             if result['_type'] == 'item':
                 try:
-                    maps.append(get_map_by_index(result['_index'], result['_source']))
+                    maps.append(get_index(result['_index']).map(result['_source']))
                 except:
                     maps.append(None)
             elif result['_type'] == 'subitem':

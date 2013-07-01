@@ -22,7 +22,7 @@ from flask import Blueprint, request, Response, json
 from flask.ext.login import current_user
 
 from geordi.data import get_search_params, get_item, get_subitem, update_item, update_subitem
-from geordi.mappings import get_link_types_by_index, get_matching_enabled_by_index
+from geordi.mappings import get_index
 from geordi.matching import register_match
 
 from pyelasticsearch import ElasticHttpNotFoundError
@@ -47,7 +47,7 @@ def item(index, item):
         document = get_item(index, item)
         if request.args.get('update', False):
             update_item(index, item, document)
-            link_types = get_link_types_by_index(index)
+            link_types = get_index(index).link_types()
             for (link_type, links) in document['_source']['_geordi']['links']['links'].iteritems():
                 if link_type != 'version':
                     for link in links:
@@ -62,7 +62,7 @@ def item(index, item):
 @bp.route('/matchitem/<index>/<item>', methods=['POST'])
 def matchitem(index, item):
     "Submit a match for this item"
-    if get_matching_enabled_by_index(index):
+    if get_index(index).matching_enabled():
         if current_user.is_authenticated():
             auto = False
             user = None
@@ -97,7 +97,7 @@ def subitem(index, subitem_id):
 @bp.route('/matchsubitem/<index>/<subitem>', methods=['POST'])
 def matchsubitem(index, subitem):
     "Submit a match for this subitem"
-    if get_matching_enabled_by_index(index):
+    if get_index(index).matching_enabled():
         if current_user.is_authenticated():
             auto = False
             user = None
