@@ -20,6 +20,7 @@ from __future__ import division, absolute_import, unicode_literals
 from geordi.mappings.util import collect_text, comma_list, collect_obj, base_mapping, MappingBase, unformat_track_length
 from geordi.utils import uniq
 import re
+import musicbrainzngs
 
 #cribbed from https://github.com/murdos/musicbrainz-userscripts/blob/master/discogs_importer.user.js
 countries = {
@@ -325,6 +326,22 @@ class discogs(MappingBase):
         return {u'artist': artists, u'label': labels, u'master': masters, 'version': 3}
 
     def automatic_item_matches(self, data):
+        musicbrainzngs.set_useragent('geordi', 'discogs-item-matches', 'http://geordi.musicbrainz.org')
+        try:
+            url_data = musicbrainzngs.browse_urls(
+                resource='http://www.discogs.com/release/%s' % data['discogs']['release']['_id'],
+                includes=['release-rels'])
+            mbids = [release['id'] for release in url_data['url']['release-relation-list']]
+            return {'release': mbids}
+        except:
+            return {'unmatch': []}
+        # call to MB here
+
+    def individual_subitem_matches(self, subitem, data):
+        #musicbrainzngs.set_useragent('geordi', 'discogs-subitem-matches', 'http://geordi.musicbrainz.org')
+        #(discogs_type, discogs_id) = re.split('-', subitem, 1)
+        #url_data = musicbrainzngs.browse_urls(resource='')
+        # call to MB here
         return {}
 
     def automatic_subitem_matches(self, data):

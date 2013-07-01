@@ -16,7 +16,7 @@
 
 from __future__ import division, absolute_import
 from geordi import app, es
-from geordi.mappings import get_link_types_by_index
+from geordi.mappings import get_index
 
 from pyelasticsearch import ElasticHttpNotFoundError
 
@@ -27,7 +27,7 @@ def do_search(query_string, indices, start_from=None, filters=None, doc_type=['i
 
 def do_subitem_search(query_string, index, subtype,
                       start_from=None, filters=None, size=None):
-    link_types = get_link_types_by_index(index)
+    link_types = get_index(index).link_types()
     key = link_types[subtype]['key']
     query_field = '_geordi.links.links.{subtype}.{key}'.format(subtype=subtype,
                                                                key=key)

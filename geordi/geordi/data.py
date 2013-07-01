@@ -18,7 +18,7 @@ from __future__ import division, absolute_import
 from flask import request, json
 from geordi import es
 from geordi.search import do_search, do_search_raw, do_subitem_search, make_filters
-from geordi.mappings import map_search_data, update_map_by_index, update_linked_by_index, get_link_types_by_index, update_automatic_item_matches_by_index, update_automatic_subitem_matches_by_index
+from geordi.mappings import map_search_data, update_map_by_index, update_linked_by_index, update_automatic_item_matches_by_index, update_automatic_subitem_matches_by_index, update_individual_subitem_matches_by_index, get_index
 from geordi.utils import check_data_format
 
 from pyelasticsearch import ElasticHttpNotFoundError
@@ -62,7 +62,7 @@ def get_search_params():
     elif search_type == 'sub':
         index = request.args.get('subitem_index')
         subtype = request.args.get('subitem_type')
-        if subtype not in get_link_types_by_index(index).keys():
+        if subtype not in get_index(index).link_types().keys():
             return {'error': 'Invalid subitem type for index {}'.format(index)}
         data = do_subitem_search(query, index, subtype, start_from=request.args.get('from', None), filters=filters, size=size)
     else:
@@ -125,3 +125,6 @@ def get_subitem(index, subitem, create=False, seed={}):
             data = check_data_format(seed)
             es.index(index, 'subitem', data, id=subitem)
         return None
+
+def update_subitem(index, subitem, data):
+    update_individual_subitem_matches_by_index(index, subitem, data)

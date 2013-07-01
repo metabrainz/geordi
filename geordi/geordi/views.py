@@ -17,7 +17,7 @@
 from __future__ import division, absolute_import
 from flask import g, json
 from geordi import app
-from geordi.mappings import get_link_types_by_index
+from geordi.mappings import get_index
 from geordi.mappings.util import comma_list, comma_only_list
 
 from geordi.api import bp as api
@@ -38,7 +38,7 @@ def quote(text):
 @app.before_request
 def before_request():
     g.all_indices = app.config['AVAILABLE_INDICES']
-    g.link_types = dict([(index, get_link_types_by_index(index)) for index in app.config['AVAILABLE_INDICES']])
+    g.link_types = dict([(index, get_index(index).link_types()) for index in app.config['AVAILABLE_INDICES']])
     g.json = json
     g.re = re
     g.quote = quote
