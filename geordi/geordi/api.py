@@ -21,7 +21,7 @@ import copy
 from flask import Blueprint, request, Response, json
 from flask.ext.login import current_user
 
-from geordi.data import get_search_params, get_item, get_subitem, update_item
+from geordi.data import get_search_params, get_item, get_subitem, update_item, update_subitem
 from geordi.mappings import get_link_types_by_index, get_matching_enabled_by_index
 from geordi.matching import register_match
 
@@ -82,10 +82,12 @@ def matchitem(index, item):
         return Response(json.dumps({'code': 400, 'error': 'Matching is not enabled for this index'}), 400, mimetype="application/json")
 
 @bp.route('/subitem/<index>/<subitem>')
-def subitem(index, subitem):
+def subitem(index, subitem_id):
     "Get information for a subitem's matching"
-    subitem = get_subitem(index, subitem)
+    subitem = get_subitem(index, subitem_id)
     if subitem:
+        if request.args.get('update', False):
+            update_subitem(index, subitem_id, subitem)
         response = Response(json.dumps({'code': 200, 'document': subitem}), 200, mimetype="application/json")
     else:
         response = Response(json.dumps({'code': 404, 'error': 'The provided item could not be found.'}), 404, mimetype="application/json")

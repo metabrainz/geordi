@@ -18,7 +18,7 @@ from __future__ import division, absolute_import
 from flask import request, json
 from geordi import es
 from geordi.search import do_search, do_search_raw, do_subitem_search, make_filters
-from geordi.mappings import map_search_data, update_map_by_index, update_linked_by_index, get_link_types_by_index, update_automatic_item_matches_by_index, update_automatic_subitem_matches_by_index
+from geordi.mappings import map_search_data, update_map_by_index, update_linked_by_index, get_link_types_by_index, update_automatic_item_matches_by_index, update_automatic_subitem_matches_by_index, update_individual_subitem_matches_by_index
 from geordi.utils import check_data_format
 
 from pyelasticsearch import ElasticHttpNotFoundError
@@ -125,3 +125,6 @@ def get_subitem(index, subitem, create=False, seed={}):
             data = check_data_format(seed)
             es.index(index, 'subitem', data, id=subitem)
         return None
+
+def update_subitem(index, subitem, data):
+    update_individual_subitem_matches_by_index(index, subitem, data)
