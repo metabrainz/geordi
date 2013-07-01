@@ -334,8 +334,10 @@ class discogs(MappingBase):
             mbids = [release['release']['id'] for release in url_data['url']['release-relation-list']]
             return {'release': mbids}
         except:
-            return {'unmatch': []}
-        # call to MB here
+            if 'mbid' in data['_geordi']['matchings']['current_matching']:
+                return {'unmatch': []}
+            else:
+                return {}
 
     def individual_subitem_matches(self, subitem, data):
         #musicbrainzngs.set_useragent('geordi', 'discogs-subitem-matches', 'http://geordi.musicbrainz.org')
