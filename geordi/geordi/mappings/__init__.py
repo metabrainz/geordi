@@ -106,6 +106,7 @@ def update_linked_by_index(index, item, data):
 
 # Do matches with more linked items first, then supersede with fewer-ID matches
 order = ['area', 'url', 'work', 'recording', 'label', 'artist', 'release', 'release_group', 'unmatch']
+
 def update_automatic_item_matches_by_index(index, item, data):
     if index in class_map:
         data = check_data_format(data)
@@ -138,7 +139,6 @@ def update_automatic_subitem_matches_by_index(index, item, data):
 
             data = check_data_format(data)
             automatches = data['_geordi']['matchings']['auto_matchings']
-            # Do matches with more linked items first, then supersede with fewer-ID matches
             for (matchtype, mbids) in sorted(subitem_matches.iteritems(), key=lambda x: (len(x[1]), order.index(x[0]) if x[0] in order else 999), reverse=True):
                 if (
                     fakeip not in [match.get('ip') for match in automatches] or
@@ -165,7 +165,6 @@ def update_individual_subitem_matches_by_index(index, subitem, data):
                 changed = True
             else: continue
         return changed
-    pass
 
 def map_search_data(data):
     maps = []

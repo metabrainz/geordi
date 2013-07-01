@@ -142,7 +142,7 @@ class MappingBase():
         return True
 
     def individual_subitem_matches(self, subitem):
-        return []
+        return {}
 
     def code_url_pattern(self):
         return ("https://github.com/metabrainz/geordi/blob/" +

@@ -325,6 +325,11 @@ class discogs(MappingBase):
         return {u'artist': artists, u'label': labels, u'master': masters, 'version': 3}
 
     def automatic_item_matches(self, data):
+        # call to MB here
+        return {}
+
+    def individual_subitem_matches(self, subitem, data):
+        # call to MB here
         return {}
 
     def automatic_subitem_matches(self, data):
