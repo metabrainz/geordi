@@ -81,7 +81,7 @@ def matchitem(index, item):
     else:
         return Response(json.dumps({'code': 400, 'error': 'Matching is not enabled for this index'}), 400, mimetype="application/json")
 
-@bp.route('/subitem/<index>/<subitem>')
+@bp.route('/subitem/<index>/<subitem_id>')
 def subitem(index, subitem_id):
     "Get information for a subitem's matching"
     subitem = get_subitem(index, subitem_id)

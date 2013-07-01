@@ -31,7 +31,7 @@ from pyelasticsearch import ElasticHttpNotFoundError
 bp = Blueprint('ui', __name__)
 
 # Main user-facing views
-@bp.route('/<index>/<item>')
+@bp.route('/<index_name>/<item>')
 @login_required
 def document(index_name, item):
     if request.args.get('import', False):
