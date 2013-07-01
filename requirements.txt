@@ -3,3 +3,4 @@ Flask-Testing >= 0.4
 Flask >= 0.9
 pyelasticsearch >= 0.3
 pep8
+musicbrainzngs
