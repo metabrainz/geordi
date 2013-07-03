@@ -345,7 +345,7 @@ class discogs(MappingBase):
                     resource='http://www.discogs.com/master/%s' % discogs_id,
                     includes=['release-group-rels'])
                 mbids = [release_group['release-group']['id'] for release_group in url_data['url']['release_group-relation-list']]
-                return {'release': mbids}
+                return {'release-group': mbids}
             except:
                 return {'unmatch': []}
         else:
