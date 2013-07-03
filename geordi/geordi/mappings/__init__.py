@@ -113,7 +113,8 @@ def register_matches(index, item_type, item, matches, existing):
     for (matchtype, mbids) in sorted(matches.iteritems(), key=lambda x: (len(x[1]), order.index(x[0]) if x[0] in order else 999), reverse=True):
         if (
             fakeip not in [match.get('ip') for match in existing] or
-            ",".join(sorted(mbids)) not in [",".join(sorted(match.get('mbid', []))) for match in existing]
+            ",".join(sorted(mbids)) not in [",".join(sorted(match.get('mbid', []))) for match in existing] or
+            (matchtype == 'unmatch' and len(existing) > 0 and existing[-1]['type'] != 'unmatch')
         ):
             register_match(index, item, item_type, matchtype, mbids, auto=True, user='matched by index', ip=fakeip)
             changed = True
