@@ -87,7 +87,7 @@ def subitem(index, subitem_id):
     subitem = get_subitem(index, subitem_id)
     if subitem:
         if request.args.get('update', False):
-            update_subitem(index, subitem_id, subitem)
+            update_subitem(index, subitem_id, subitem['_source'])
         response = Response(json.dumps({'code': 200, 'document': subitem}), 200, mimetype="application/json")
     else:
         response = Response(json.dumps({'code': 404, 'error': 'The provided item could not be found.'}), 404, mimetype="application/json")
