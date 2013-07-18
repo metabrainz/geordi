@@ -114,7 +114,8 @@ def register_matches(index, item_type, item, matches, existing):
         if (
             fakeip not in [match.get('ip') for match in existing] or
             ",".join(sorted(mbids)) not in [",".join(sorted(match.get('mbid', []))) for match in existing] or
-            (matchtype == 'unmatch' and len(existing) > 0 and existing[-1]['type'] != 'unmatch')
+            (matchtype == 'unmatch' and len(existing) > 0 and existing[-1]['type'] != 'unmatch') or
+            (not get_index(index).matching_enabled() and existing[-1]['mbid'] != mbids)
         ):
             register_match(index, item, item_type, matchtype, mbids, auto=True, user='matched by index', ip=fakeip)
             changed = True
