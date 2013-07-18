@@ -352,7 +352,7 @@ class discogs(MappingBase):
             name = data.get('name')[0]
             try:
                 url_data = musicbrainzngs.browse_urls(
-                    resource='http://www.discogs.com/%s/%s' % (discogs_type, name),
+                    resource='http://www.discogs.com/%s/%s' % (discogs_type, name.replace(' ', '+'),
                     includes=['%s-rels' % discogs_type])
                 mbids = [entity[discogs_type]['id'] for entity in url_data['url']['%s-relation-list' % discogs_type]]
                 return {discogs_type: mbids}
