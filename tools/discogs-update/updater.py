@@ -6,7 +6,6 @@ import sys
 import os
 import json
 import urllib2
-import musicbrainzngs
 
 from time import sleep
 
@@ -14,7 +13,6 @@ sys.path.append(os.path.abspath(os.path.dirname(__file__) + '/../../geordi/geord
 from config import ELASTICSEARCH_ENDPOINT, PUBLIC_ENDPOINT
 
 es = ElasticSearch(ELASTICSEARCH_ENDPOINT)
-musicbrainzngs.set_useragent('geordi', 'discogs-updater', 'http://geordi.musicbrainz.org')
 
 PUBLIC_ENDPOINT = 'http://geordi.musicbrainz.org'
 def initialize():
@@ -29,9 +27,7 @@ def update():
     pass
 
 def update_match(itemtype, identifier):
-    # ignore artists and labels for now since names are hard
-    if itemtype not in ['release', 'master']:
-        raise Exception('cannot process this type yet')
+    # We're assuming you're passing a real ID number, not a name.
     if itemtype == 'release':
         geordi_type = 'item'
         geordi_identifier = identifier
