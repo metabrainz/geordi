@@ -348,6 +348,16 @@ class discogs(MappingBase):
                 return {'release-group': mbids}
             except:
                 return {'unmatch': []}
+        elif discogs_type in ['artist', 'label'] and data.get('name', False):
+            name = data.get('name')[0]
+            try:
+                url_data = musicbrainzngs.browse_urls(
+                    resource='http://www.discogs.com/%s/%s' % (discogs_type, name),
+                    includes=['%s-rels' % discogs_type])
+                mbids = [entity[discogs_type]['id'] for entity in url_data['url']['%s-relation-list' % discogs_type]]
+                return {discogs_type: mbids}
+            except:
+                return {'unmatch': []}
         else:
             return {}
 
