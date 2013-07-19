@@ -14,11 +14,12 @@ from config import ELASTICSEARCH_ENDPOINT, PUBLIC_ENDPOINT
 
 es = ElasticSearch(ELASTICSEARCH_ENDPOINT)
 
+DATA_FILE = './data.json'
 PUBLIC_ENDPOINT = 'http://geordi.musicbrainz.org'
 def initialize():
     # for match in geordi, update
     stored_data = []
-    existing_matches = []
+    existing_matches = get_from_elasticsearch()
     for match in existing_matches:
         data = update_match(match['itemtype'], match['id'])
         if data[2] is not None:
@@ -34,22 +35,63 @@ def update():
     existing = get_stored_data()
     # for match in MB, skip and remove from existing match list if exactly the same, otherwise update (store whichever match is most recent after update)
     stored_data = []
-    mb_matches = []
+    mb_matches = get_from_mb()
     for match in mb_matches:
-        # resolve name here, if appropriate
-        data = update_match(match['itemtype'], match['id'])
+        if match['itemtype'] not in ['release', 'master']:
+            key = match['itemtype'] + ':' + match['name']
+        else:
+            key = match['itemtype'] + ':' + match['id']
+
+        if existing.get(key, False):
+            if ','.join(match['mbids']) == ','.join(existing[key][2]):
+                stored_data.append(existing[key])
+            else:
+                data = update_match(existing[key][0], existing[key][1])
+                if data[2] is not None:
+                    stored_data.append(data)
+            del existing[key]
+        else:
+            # resolve name here, if appropriate
+            if match['itemtype'] not in ['release', 'master']:
+                match['id'] = get_id(match['itemtype'], match['name'])
+            data = update_match(match['itemtype'], match['id'])
+            if data[2] is not None:
+                stored_data.append(data)
+
+    # for remaining matches in existing, update and store most recent match afterwards [should be unmatches]
+    for (key, match) in existing.iteritems():
+        data = update_match(match[0], match[1])
         if data[2] is not None:
             stored_data.append(data)
 
-    # for remaining matches in existing, update and store most recent match afterwards [should be unmatches]
-
     store_data(stored_data)
 
+def get_id(itemtype, name):
+    raise Exception('unimplemented')
+
+def get_from_mb():
+    return []
+
+def get_from_elasticsearch():
+    return []
+
 def store_data(stored_data):
-    pass
+    store_dict = {}
+    for entry in stored_data:
+        if entry[0] not in ['release', 'master']:
+            key = entry[0] + ':' + entry[3]
+        else:
+            key = entry[0] + ':' + entry[1]
+        store_dict[key] = entry
+    fh = open(DATA_FILE, 'w')
+    fh.write(json.dumps(store_dict))
+    fh.close()
 
 def get_stored_data():
-    pass
+    fh = open(DATA_FILE, 'r')
+    data = json.load(fh)
+    fh.close()
+    return data
 
 def update_match(itemtype, identifier):
     # We're assuming you're passing a real ID number, not a name.
