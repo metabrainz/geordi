@@ -21,6 +21,7 @@ from geordi.mappings.util import collect_text, comma_list, collect_obj, base_map
 from geordi.utils import uniq
 import re
 import musicbrainzngs
+import urllib
 
 #cribbed from https://github.com/murdos/musicbrainz-userscripts/blob/master/discogs_importer.user.js
 countries = {
@@ -349,14 +350,19 @@ class discogs(MappingBase):
             except:
                 return {'unmatch': []}
         elif discogs_type in ['artist', 'label'] and data.get('name', False):
-            name = data.get('name')[0]
-            try:
-                url_data = musicbrainzngs.browse_urls(
-                    resource='http://www.discogs.com/%s/%s' % (discogs_type, name.replace(' ', '+')),
-                    includes=['%s-rels' % discogs_type])
-                mbids = [entity[discogs_type]['id'] for entity in url_data['url']['%s-relation-list' % discogs_type]]
+            names = data.get('name', [])
+            mbids = []
+            for name in names:
+                try:
+                    url_data = musicbrainzngs.browse_urls(
+                        resource='http://www.discogs.com/%s/%s' % (discogs_type, urllib.quote_plus(name, '!\'()*-._~')),
+                        includes=['%s-rels' % discogs_type])
+                    mbids = mbids + [entity[discogs_type]['id'] for entity in url_data['url']['%s-relation-list' % discogs_type]]
+                except: continue
+            mbids = uniq(mbids)
+            if len(mbids) > 0:
                 return {discogs_type: mbids}
-            except:
+            else:
                 return {'unmatch': []}
         else:
             return {}
