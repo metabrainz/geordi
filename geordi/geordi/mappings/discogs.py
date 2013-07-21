@@ -16,6 +16,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import division, absolute_import, unicode_literals
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8') # sue me, urllib won't let me fix it any other way
 
 from geordi.mappings.util import collect_text, comma_list, collect_obj, base_mapping, MappingBase, unformat_track_length
 from geordi.utils import uniq
@@ -355,7 +358,7 @@ class discogs(MappingBase):
             for name in names:
                 try:
                     url_data = musicbrainzngs.browse_urls(
-                        resource='http://www.discogs.com/%s/%s' % (discogs_type, urllib.quote_plus(name, '!\'()*-._~')),
+                        resource='http://www.discogs.com/%s/%s' % (discogs_type, urllib.quote_plus(name.encode('utf-8'), '!\'()*-._~')),
                         includes=['%s-rels' % discogs_type])
                     mbids = mbids + [entity[discogs_type]['id'] for entity in url_data['url']['%s-relation-list' % discogs_type]]
                 except: continue
