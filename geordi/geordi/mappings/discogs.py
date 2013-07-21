@@ -355,7 +355,7 @@ class discogs(MappingBase):
             for name in names:
                 try:
                     url_data = musicbrainzngs.browse_urls(
-                        resource='http://www.discogs.com/%s/%s' % (discogs_type, urllib.quote_plus(name, '!\'()*-._~')),
+                        resource='http://www.discogs.com/%s/%s' % (discogs_type, urllib.quote_plus(name.encode('utf-8'), '!\'()*-._~')),
                         includes=['%s-rels' % discogs_type])
                     mbids = mbids + [entity[discogs_type]['id'] for entity in url_data['url']['%s-relation-list' % discogs_type]]
                 except: continue
