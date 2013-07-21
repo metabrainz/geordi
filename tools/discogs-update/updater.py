@@ -102,8 +102,9 @@ def get_from_mb():
     fh = open(MB_FILE, 'r')
     for line in fh.readlines():
         # Format is <type>\t<ID, parsed from URL>\t<MBIDs, comma-separated>
-        (itemtype, identifier, mbid_string) = line[:-1].split('\t')
+        (itemtype, identifier_raw, mbid_string) = line[:-1].split('\t')
         mbids = mbid_string.split(',')
+        identifier = urllib.unquote_plus(identifier_raw)
 
         if itemtype not in ['release', 'master']:
             mbdata.append({'itemtype': itemtype, 'name': identifier, 'mbids': mbids})
