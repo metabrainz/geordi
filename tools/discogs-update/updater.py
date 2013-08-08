@@ -45,8 +45,8 @@ def update():
         if count % 50 == 0:
             print('Storing data...')
             store_data(stored_data)
-        match['name'] = urllib.unquote_plus(str(match['name'])).decode('utf-8')
         if match['itemtype'] not in ['release', 'master']:
+            match['name'] = urllib.unquote_plus(str(match['name'])).decode('utf-8')
             key = match['itemtype'] + ':' + match['name']
         else:
             key = match['itemtype'] + ':' + match['id']
@@ -66,11 +66,11 @@ def update():
                     print('>> No match registered.')
             del existing[key]
         else:
-            print('> No record, resolving name.')
+            print('> No record, resolving.')
             try:
                 if match['itemtype'] not in ['release', 'master']:
                     match['id'] = get_id(match['itemtype'], match['name'])
-                print('>> Found name ' + match['name'] + ' maps to id ' + match['id'])
+                    print('>> Found name ' + match['name'] + ' maps to id ' + match['id'])
                 data = update_match(match['itemtype'], match['id'])
                 if data[2] is not None:
                     print('>> Updated to ' + repr(data[2]))
@@ -78,7 +78,7 @@ def update():
                 else:
                     print('>> No match registered.')
             except Exception:
-                print('>> Name not found in geordi. Skipping.')
+                print('>> Not found in geordi. Skipping.')
                 continue
 
     # for remaining matches in existing, update and store most recent match afterwards [should be unmatches]
@@ -160,9 +160,9 @@ def update_match(itemtype, identifier):
         geordi_identifier = itemtype + '-' + identifier
     url = PUBLIC_ENDPOINT + '/api/' + geordi_type + '/discogs/' + geordi_identifier + '?update=1'
     # first an update
-    urllib2.urlopen(url)
+    urllib2.urlopen(url, timeout=10)
     # then a fetch
-    json_data = json.load(urllib2.urlopen(url))
+    json_data = json.load(urllib2.urlopen(url, timeout=10))
     mbids = json_data['document']['_source']['_geordi']['matchings']['current_matching'].get('mbid', None)
     if itemtype not in ['release', 'master']:
         return (itemtype, identifier, mbids, json_data['document']['_source']['name'])

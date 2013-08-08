@@ -16,7 +16,7 @@ SELECT 'master'::text, regexp_replace(url.url, '^http://www.discogs.com/master/'
   FROM url
   JOIN l_release_group_url ON url.id = l_release_group_url.entity1
   JOIN release_group ON l_release_group_url.entity0 = release_group.id
- WHERE url.url ~ '^http://www.discogs.com/release_group/'
+ WHERE url.url ~ '^http://www.discogs.com/master/'
  GROUP BY regexp_replace(url.url, '^http://www.discogs.com/master/', '')
 UNION
 SELECT 'label'::text, regexp_replace(url.url, '^http://www.discogs.com/label/', ''), string_agg(label.gid::text, ',')
