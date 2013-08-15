@@ -96,9 +96,9 @@ def get_id(itemtype, name):
     query = u'_id:%s-* and name:"%s"' % (itemtype, name.replace('"', '\\"'))
     query = query.encode('utf-8')
     url_data = urllib.urlencode({'type': 'query',
-            'query': query,
-            'index': 'discogs',
-            'itemtype': 'subitem'})
+                                 'query': query,
+                                 'index': 'discogs',
+                                 'itemtype': 'subitem'})
 
     data = json.load(urllib2.urlopen(url + '?' + url_data))
     for result in data['result']['hits']['hits']:

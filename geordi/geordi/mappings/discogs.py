@@ -18,7 +18,7 @@
 from __future__ import division, absolute_import, unicode_literals
 import sys
 reload(sys)
-sys.setdefaultencoding('utf-8') # sue me, urllib won't let me fix it any other way
+sys.setdefaultencoding('utf-8')  # sue me, urllib won't let me fix it any other way
 
 from geordi.mappings.util import collect_text, comma_list, collect_obj, base_mapping, MappingBase, unformat_track_length
 from geordi.utils import uniq
