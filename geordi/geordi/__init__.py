@@ -57,6 +57,6 @@ def load_user(username):
 
 login_manager.setup_app(app, add_context_processor=True)
 
-es = ElasticSearch(app.config['ELASTICSEARCH_ENDPOINT'], max_retries=2)
+es = ElasticSearch(app.config['ELASTICSEARCH_ENDPOINT'], max_retries=2, timeout=10, revival_delay=0)
 
 import geordi.views
