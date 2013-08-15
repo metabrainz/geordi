@@ -16,6 +16,7 @@ from config import ELASTICSEARCH_ENDPOINT, PUBLIC_ENDPOINT
 es = ElasticSearch(ELASTICSEARCH_ENDPOINT)
 
 DATA_FILE = './data.json'
+DATA_TMP_FILE = './data-tmp.json'
 MB_FILE = './mb-data.tsv'
 
 PUBLIC_ENDPOINT = 'http://geordi.musicbrainz.org'
@@ -88,6 +89,7 @@ def update():
             stored_data.append(data)
 
     store_data(stored_data)
+    finalize_stored_data(stored_data)
 
 def get_id(itemtype, name):
     url = PUBLIC_ENDPOINT + '/api/search'
@@ -130,6 +132,12 @@ def get_from_elasticsearch():
     return []
 
 def store_data(stored_data):
+    store_data_file(stored_data, DATA_TMP_FILE)
+
+def finalize_stored_data(stored_data):
+    store_data_file(stored_data, DATA_FILE)
+
+def store_data_file(stored_data, filename):
     store_dict = {}
     for entry in stored_data:
         if entry[0] not in ['release', 'master']:
@@ -137,18 +145,22 @@ def store_data(stored_data):
         else:
             key = entry[0] + ':' + entry[1]
         store_dict[key] = entry
-    fh = open(DATA_FILE, 'w')
+    fh = open(filename, 'w')
     fh.write(json.dumps(store_dict))
     fh.close()
 
 def get_stored_data():
-    try:
-        fh = open(DATA_FILE, 'r')
-        data = json.load(fh)
-        fh.close()
-        return data
-    except Exception:
-        return {}
+    fh = open(DATA_FILE, 'r')
+    data = json.load(fh)
+    fh.close()
+    print("Loaded %s keys" % len(data.keys()))
+    fh = open(DATA_TMP_FILE, 'r')
+    tmp_data = json.load(fh)
+    fh.close()
+    print("Loaded %s already-done keys" % len(tmp_data.keys()))
+    data.update(tmp_data)
+    print("Total of %s keys" % len(data.keys()))
+    return data
 
 def update_match(itemtype, identifier):
     # We're assuming you're passing a real ID number, not a name.
