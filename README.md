@@ -91,5 +91,3 @@ tools subdir:
     Submits files to the local elastic search server.
 
  * other largely outdated files for historical understanding
-
-ingestr-server-perl subdir: old perl codebase
