@@ -25,3 +25,5 @@ Technical details
 -----------------
 
 Most of the things described above are either stored in the MusicBrainz database (for MusicBrainz matches), or in geordi's SQL schema. The exception is data items, which other than their link to items are stored entirely within elasticsearch. Data from the SQL database is also regularly propagated into elasticsearch so that it's available to the search process: a map, which item corresponds to a data item, matches (raw and MusicBrainz), and item-item links. Thus, search within geordi is always for data items, though they're then resolved to items in order to be used for matching, importing, or whatever else.
+
+The [geordi SQL schema](../sql/tables.sql) is available for consideration.
