@@ -3,7 +3,7 @@ BEGIN;
 -- Schema 'geordi' should already exist.
 CREATE TABLE geordi.csrf (ip text NOT NULL, csrf text NOT NULL);
 
-CREATE TABLE geordi.user (name text PRIMARY KEY, tz text);
+CREATE TABLE geordi.user (name text PRIMARY KEY, tz text, internal boolean not null default false);
 
 CREATE TABLE geordi.item (id integer PRIMARY KEY, type text, map text, dirty boolean not null default false);
 CREATE TABLE geordi.item_data (data_id text PRIMARY KEY, item_id integer PRIMARY KEY REFERENCES item(id));
