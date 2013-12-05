@@ -44,23 +44,11 @@ To run the server:
 
 ----
 
-For importing, perl dependencies:
-
-`cpanm XML::XML2JSON LWP::UserAgent HTTP::Request URI::Escape Encode JSON Try::Tiny File::Slurp`
-
-----
-
 To import data, from tools directory:
 
-`./submit-dir.pl --index some-index-name /some/directory/*`
+`./submit-dir.py some-index-name /some/directory/*`
 
 Where * should be a bunch of directories named by identifier, containing XML and JSON files.
-
-Usage
-=====
-
-Thus far, only displays data, updates when that's fixed!
-
 
 Tests
 =====
@@ -86,8 +74,13 @@ geordi subdir: new python codebase (GPLv3+)
 
 tools subdir:
 
- * submit-dir.pl
+ * submit-dir.py
 
     Submits files to the local elastic search server.
 
- * other largely outdated files for historical understanding
+ * discogs updater and import formatting scripts, slightly outdated
+
+Further Documentation
+=====================
+
+The geordi server has some [additional documentation](geordi/docs/index.md) as well.
