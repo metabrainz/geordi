@@ -1,6 +1,6 @@
 from flask import Flask
+from geordi.frontend import frontend
+
 app = Flask(__name__)
 
-@app.route('/')
-def hello_world():
-    return 'Hello World!'
+app.register_blueprint(frontend)
