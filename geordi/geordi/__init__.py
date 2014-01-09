@@ -3,6 +3,7 @@ from flask import Flask
 from flask.ext.login import LoginManager, UserMixin
 from geordi.frontend import frontend
 import geordi.settings
+import geordi.db as db
 
 class User(UserMixin):
     def __init__(self, id):
@@ -23,5 +24,7 @@ def create_app():
     login_manager.init_app(app)
 
     app.register_blueprint(frontend)
+
+    db.init_app(app)
 
     return app
