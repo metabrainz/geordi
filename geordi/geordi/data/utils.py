@@ -2,7 +2,9 @@ from ..db import get_db
 import json
 
 def get_item(item_id):
-    data = [{'blah': 'foo', 'baz': {'quux': 'lol'}}]
+    with get_db().cursor() as curs:
+        curs.execute('''SELECT '{"blah": "foo", "baz": {"quux": "lol"}}';''')
+        data = [json.loads(d[0]) for d in curs.fetchall()]
     return {'id': item_id, 'data': data}
 
 def get_renderable(item_id):
