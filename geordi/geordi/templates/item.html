@@ -1,0 +1,6 @@
+{% extends "layout.html" %}
+{% block title %}Item {{ item.id }}{% if item.name %} ({{ item.name }}){% endif %}{% endblock %}
+{% block content %}
+  <h2>Item {{ item.id }}</h2>
+  {{ item.data }}
+{% endblock %}
