@@ -1,5 +1,4 @@
 from flask import Blueprint, render_template
-from flask.ext.login import login_required
 from geordi.db import get_db
 import json
 
@@ -7,7 +6,7 @@ frontend = Blueprint('frontend', __name__)
 
 @frontend.route('/login')
 def login():
-    return 'login? bah'
+    return 'login unimplemented yet'
 
 @frontend.route('/')
 def hello_world():
