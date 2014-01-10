@@ -1,6 +1,10 @@
 {% extends "layout.html" %}
-{% block title %}Item {{ item.id }}{% if item.name %} ({{ item.name }}){% endif %}{% endblock %}
+{% block title %}Item {{ item.id }}{% endblock %}
 {% block content %}
   <h2>Item {{ item.id }}</h2>
-  {{ item.data }}
+  <ul>
+    {% for data in item.data_formatted %}
+      <li><pre style="border: 1px solid grey">{{ data }}</pre></li>
+    {% endfor %}
+  </ul>
 {% endblock %}
