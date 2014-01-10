@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template
 from geordi.db import get_db
+import geordi.data as data
 import json
 
 frontend = Blueprint('frontend', __name__)
@@ -17,9 +18,5 @@ def hello_world():
 
 @frontend.route('/item/<item_id>')
 def item(item_id):
-    item = get_item(item_id)
+    item = data.get_renderable(item_id)
     return render_template('item.html', item=item)
-
-def get_item(item_id):
-    data = [{'blah': 'foo', 'baz': {'quux': 'lol'}}]
-    return {'id': item_id, 'data': data, 'data_formatted': [json.dumps(d, indent=4) for d in data]}
