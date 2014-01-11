@@ -14,7 +14,8 @@ def get_item(item_id):
 def get_renderable(item_id):
     '''Fetch and return an item's data including a pretty-printed version of the data items.'''
     item = get_item(item_id)
-    item['data_formatted'] = [json.dumps(i, indent=4) for i in item.get('data', [])]
+    if item is not None:
+        item['data_formatted'] = [json.dumps(i, indent=4) for i in item.get('data', [])]
     return item
 
 def data_to_item(data_id):
