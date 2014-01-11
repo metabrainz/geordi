@@ -15,6 +15,4 @@ def init_app(app):
     def close_connection(exception):
         db = getattr(g, '_database', None)
         if db is not None:
-            if exception is None:
-                db.commit()
             db.close()

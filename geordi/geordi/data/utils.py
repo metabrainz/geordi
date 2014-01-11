@@ -27,7 +27,6 @@ def data_to_item(data_id):
         if curs.rowcount == 1:
             (item_id,) = curs.fetchone()
         elif curs.rowcount > 1:
-            # error state
             raise Exception('More than one item found, that can\'t be right')
     return item_id
 
@@ -35,7 +34,7 @@ def map_item(item_id):
     pass
 
 def create_item(data_type):
-    with get_db().cursor() as curs:
+    with get_db() as conn, conn.cursor() as curs:
         curs.execute('INSERT INTO item (type) VALUES (%s) RETURNING id', (data_type,))
         if curs.rowcount == 1:
             return curs.fetchone()[0]
