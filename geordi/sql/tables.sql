@@ -5,8 +5,8 @@ CREATE TABLE geordi.csrf (ip text NOT NULL, csrf text NOT NULL);
 
 CREATE TABLE geordi.editor (name text PRIMARY KEY, tz text, internal boolean not null default false);
 
-CREATE TABLE geordi.item (id serial PRIMARY KEY, type text, map text, dirty boolean not null default false);
-CREATE TABLE geordi.item_data (data_id text PRIMARY KEY, item integer not null REFERENCES item(id));
+CREATE TABLE geordi.item (id serial PRIMARY KEY, type text);
+CREATE TABLE geordi.item_data (id text PRIMARY KEY, item integer not null REFERENCES item(id), data text);
 CREATE TABLE geordi.item_redirect (old integer PRIMARY KEY, new integer REFERENCES item(id));
 CREATE TABLE geordi.item_link (item integer not null REFERENCES item(id), linked integer not null REFERENCES item(id), type text not null);
 
