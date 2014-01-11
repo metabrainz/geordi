@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template
 from ..db import get_db
-import ..data
+import geordi.data as data
 import json
 
 frontend = Blueprint('frontend', __name__)
