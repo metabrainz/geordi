@@ -15,8 +15,10 @@ def show_data_item(data_id):
     print geordi.data.data_to_item(data_id)
 
 @data_manager.command
-def add_data_item(data_id, data_type, data):
+def add_data_item(data_id, data_type, data_filename):
     '''Add or update a data item given a data ID, a type, and the data to use.'''
+    with open(data_filename) as f:
+        data = f.read()
     print geordi.data.add_data_item(data_id, data_type, data)
 
 @data_manager.command

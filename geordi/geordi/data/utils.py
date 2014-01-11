@@ -51,7 +51,9 @@ def match_item(item_id, editor, mbid_type, mbid):
 def set_sequences():
     '''Set sequence values back to the max actual value in the tables.'''
     with get_db() as conn, conn.cursor() as curs:
-        curs.execute("SELECT setval('item_id_seq', (SELECT MAX(id) FROM item))")
+        curs.execute("select coalesce(max(id),0) + 1 from item")
+        (restart,) = curs.fetchone()
+        curs.execute("ALTER SEQUENCE item_id_seq RESTART %s", (restart,))
 
 def _create_item(data_type, conn):
     with conn.cursor() as curs:
