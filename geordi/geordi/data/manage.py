@@ -27,3 +27,8 @@ def delete_data_item(data_id):
 def add_match(item_id, editor, mbid_type, mbid):
     '''Add a match given an item, editor, entity type, and MBID.'''
     print geordi.data.match_item(item_id, editor, mbid_type, mbid)
+
+@data_manager.command
+def set_sequences():
+    '''Set sequence values back to the max actual value in the table.'''
+    print geordi.data.set_sequences()
