@@ -4,6 +4,7 @@ from flask.ext.login import LoginManager, UserMixin
 from geordi.frontend import frontend
 import geordi.settings
 import geordi.db as db
+import jinja2_highlight
 
 class User(UserMixin):
     def __init__(self, id):
@@ -16,8 +17,12 @@ login_manager.login_view = "frontend.login"
 def load_user(username):
     return User(username)
 
+class GeordiFlask(Flask):
+    jinja_options = dict(Flask.jinja_options)
+    jinja_options.setdefault('extensions', []).append('jinja2_highlight.HighlightExtension')
+
 def create_app():
-    app = Flask(__name__)
+    app = GeordiFlask(__name__)
     app.config.from_object('geordi.settings')
     app.config.from_pyfile('settings.cfg', silent=True)
 

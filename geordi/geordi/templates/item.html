@@ -1,10 +1,11 @@
 {% extends "layout.html" %}
 {% block title %}Item {{ item.id }}{% endblock %}
+{% block css %}{{ super() }}<link rel="stylesheet" href="{{ url_for('static', filename='styles/pygments.css') }}">{% endblock %}
 {% block content %}
   <h2>Item {{ item.id }}</h2>
-  <ul>
+  <ul style="list-style-type: none; padding: 0">
     {% for data in item.data_formatted %}
-      <li><pre style="border: 1px solid grey">{{ data }}</pre></li>
+      <li style="border: 1px solid grey">{% highlight 'json' %}{{ data }}{% endhighlight %}</li>
     {% endfor %}
   </ul>
 {% endblock %}
