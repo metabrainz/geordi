@@ -1,5 +1,7 @@
 import geordi.data
 import json
+import os
+import re
 from flask.ext.script import Manager
 
 data_manager = Manager(usage="Manipulate and query the elasticsearch and postgresql databases.")
@@ -20,6 +22,31 @@ def add_data_item(data_id, data_type, data_filename):
     with open(data_filename) as f:
         data = f.read()
     print geordi.data.add_data_item(data_id, data_type, data)
+
+@data_manager.command
+def add_folder(folder):
+    '''Add a whole folder. Should be organized by expected data ID, e.g.
+       <folder name>/discogs/artist/5.json becomes data item 'discogs/artist/5'
+    '''
+    indices = os.listdir(folder)
+    for index in indices:
+        item_types = os.listdir(folder + '/' + index)
+        for item_type in item_types:
+            items = os.listdir(folder + '/' + index + '/' + item_type)
+            if '_itemtype' in items:
+                with open('%s/%s/%s/_itemtype' % (folder, index, item_type)) as f:
+                    data_type = f.read().strip()
+                items = [item for item in items if item != '_itemtype']
+            else:
+                data_type = item_type
+            print "Using data type '%s' for %s/%s" % (data_type, index, item_type)
+            for item in items:
+                if re.search('.json$',item):
+                    basename = re.sub('.json$', '', item)
+                    print "> Adding %s/%s/%s as %s/%s/%s" % (index, item_type, item, index, item_type, basename)
+                    add_data_item('%s/%s/%s' % (index, item_type, basename), data_type, '%s/%s/%s/%s' % (folder, index, item_type, item))
+                else:
+                    print ">> File %s/%s/%s not a .json file, skipping" % (index, item_type, item)
 
 @data_manager.command
 def delete_data_item(data_id):

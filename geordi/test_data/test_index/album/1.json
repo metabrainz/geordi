@@ -1,0 +1,10 @@
+{
+  "id": 1,
+  "title": "Diggin' It",
+  "artists": [{"id": 1, "name": "Mari and the Peaches", "credit": "Berry & Peach"}],
+  "tracks": [
+    {"title": "Hey! Listen!", "duration": "185"},
+    {"title": "Loungin'", "duration": "254"},
+    {"title": "Caged", "duration": "196"}
+  ]
+}
