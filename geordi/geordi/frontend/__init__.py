@@ -10,11 +10,8 @@ def login():
     return 'login unimplemented yet'
 
 @frontend.route('/')
-def hello_world():
-    with get_db().cursor() as curs:
-        curs.execute("SELECT 'Hello World!';")
-        (v,) = curs.fetchone()
-    return render_template('hello.html', hello=v)
+def hello():
+    return render_template('hello.html')
 
 @frontend.route('/item/<item_id>')
 def item(item_id):
