@@ -4,9 +4,9 @@ import json
 def get_item(item_id):
     '''Fetch and return an item's data.'''
     with get_db().cursor() as curs:
-        curs.execute('SELECT data FROM item_data WHERE item = %s;', (item_id,))
+        curs.execute('SELECT id, data FROM item_data WHERE item = %s;', (item_id,))
         if curs.rowcount > 0:
-            data = [json.loads(d[0]) for d in curs.fetchall()]
+            data = dict([(d[0], json.loads(d[1])) for d in curs.fetchall()])
             return {'id': item_id, 'data': data}
         else:
             return None
@@ -15,7 +15,7 @@ def get_renderable(item_id):
     '''Fetch and return an item's data including a pretty-printed version of the data items.'''
     item = get_item(item_id)
     if item is not None:
-        item['data_formatted'] = [json.dumps(i, indent=4) for i in item.get('data', [])]
+        item['data_formatted'] = dict([(d_id, json.dumps(data, indent=4)) for d_id, data in item.get('data', {}).iteritems()])
     return item
 
 def data_to_item(data_id):
