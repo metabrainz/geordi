@@ -28,11 +28,11 @@ def add_folder(folder):
     '''Add a whole folder. Should be organized by expected data ID, e.g.
        <folder name>/discogs/artist/5.json becomes data item 'discogs/artist/5'
     '''
-    indices = os.listdir(folder)
+    indices = sorted(os.listdir(folder))
     for index in indices:
-        item_types = os.listdir(folder + '/' + index)
+        item_types = sorted(os.listdir(folder + '/' + index))
         for item_type in item_types:
-            items = os.listdir(folder + '/' + index + '/' + item_type)
+            items = sorted(os.listdir(folder + '/' + index + '/' + item_type))
             if '_itemtype' in items:
                 with open('%s/%s/%s/_itemtype' % (folder, index, item_type)) as f:
                     data_type = f.read().strip()
