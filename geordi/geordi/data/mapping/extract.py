@@ -5,6 +5,43 @@ class PathTraversalFailure(Exception):
     pass
 
 def extract_value(data, path):
+    '''
+    Extract a value from a JSON data structure by path.
+
+    Paths are defined as arrays comprised of indexes into structures (string or
+    integer) or choice definitions. Plain indexes specify exactly where to go
+    next within the data structure; an error will be raised in the case of
+    missing or string indexes to list-like structures (integer indexes for
+    dict-like structures, while less common, are not invalid).
+
+    Choice definitions are tuples of a descriptive name for the choice, and a
+    function of one argument that serves as a predicate for which choices should
+    be followed. The one argument provided is the immediate index of the possible
+    choice to be considered. That is, a choice of ('bar', lambda a: a > 0)
+    specifies that all values that correspond to indexes of 1 or greater (probably
+    in a list-like structure) should be returned.
+
+    This function will always return an array of (choices, value) tuples, where
+    'choices' will be a dictionary of choices by name mapped to what choice corresponds
+    to the particular value returned. (When no choices are made by a path, the return value
+    will therefore be [({}, value)]).
+
+    For example, given the data:
+    {
+     'foo': {
+       'bar': [
+          {'baz': 'quux'},
+          {'baz': 'quuy'},
+          {'baz': 'quuz'}
+       ]
+     }
+    }
+    and the path ['foo', 'bar', ('bar_index', lambda a: a > 0), 'baz'], this function
+    will produce
+    [({'bar_index': 1}, 'quuy'), ({'bar_index': 2}, 'quuz')]
+
+    Errors will raise PathTraversalFailure with a descriptive message.
+    '''
     grouped_path = []
     last_was_choice = True
     tmp = []
