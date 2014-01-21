@@ -70,7 +70,15 @@ def _extract_inner(data, grouped_path):
         grouped_path = grouped_path[1:]
         if this_path[0]:
             choices = _extract_choice_array(data, this_path[1])
-            inners = [(d[0], _extract_inner(d[1], copy.copy(grouped_path))) for d in choices]
+            inners = []
+            for choice in choices:
+                try:
+                    inner_val = _extract_inner(choice[1], copy.copy(grouped_path))
+                    inners.append((choice[0], inner_val))
+                except PathTraversalFailure:
+                    continue
+            if len(inners) == 0:
+                raise PathTraversalFailure('Choice produced no results')
             ret = []
             for choice_pair in inners:
                 for previous_value in choice_pair[1]:
