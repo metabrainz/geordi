@@ -1,5 +1,7 @@
 import collections
 import copy
+import logging
+logger = logging.getLogger('geordi.data.mapping.extract')
 
 class PathTraversalFailure(Exception):
     pass
@@ -42,6 +44,7 @@ def extract_value(data, path):
 
     Errors will raise PathTraversalFailure with a descriptive message.
     '''
+    logger.debug('extract_value %r %r', data, path)
     grouped_path = []
     last_was_choice = True
     tmp = []
@@ -65,6 +68,7 @@ def extract_value(data, path):
     return _extract_inner(data, grouped_path)
 
 def _extract_inner(data, grouped_path):
+    logger.debug('_extract_inner: %r %r', data, grouped_path)
     if len(grouped_path) > 0:
         this_path = grouped_path[0]
         grouped_path = grouped_path[1:]
@@ -75,8 +79,8 @@ def _extract_inner(data, grouped_path):
                 try:
                     inner_val = _extract_inner(choice[1], copy.copy(grouped_path))
                     inners.append((choice[0], inner_val))
-                except PathTraversalFailure:
-                    continue
+                except PathTraversalFailure as failure:
+                    logger.info('A choice (%r) produced nothing internally: %s', choice[0], failure)
             if len(inners) == 0:
                 raise PathTraversalFailure('Choice produced no results')
             ret = []
@@ -92,6 +96,7 @@ def _extract_inner(data, grouped_path):
         return [({}, data)]
 
 def _extract_choice_array(data, choice):
+    logger.debug('_extract_choice_array %r %r', data, choice)
     choice = list(choice)
     if isinstance(data, collections.Mapping):
         all_choices = data.keys()
@@ -102,6 +107,7 @@ def _extract_choice_array(data, choice):
     return [({choice[0]: c}, data[c]) for c in all_choices if choice[1](c)]
 
 def _extract_plain_value(data, path):
+    logger.debug('_extract_plain_value %r %r', data, path)
     path = list(path)
     tmp_value = data
     for key in path:
