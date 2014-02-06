@@ -1,9 +1,12 @@
 from ..db import get_db
+from .mapping import map_item
 import json
 
-def get_item(item_id):
+def get_item(item_id, conn=None):
     '''Fetch and return an item's data.'''
-    with get_db().cursor() as curs:
+    if conn is None:
+        conn = get_db()
+    with conn.cursor() as curs:
         curs.execute('SELECT id, data FROM item_data WHERE item = %s;', (item_id,))
         if curs.rowcount > 0:
             data = dict([(d[0], json.loads(d[1])) for d in curs.fetchall()])
@@ -65,7 +68,9 @@ def _create_item(data_type, conn):
 
 def _map_item(item_id, conn):
     # fetch data
+    item = get_item(item_id, conn)
     # generate map
+    (mapped, links) = map_item(item)
     # insert/propagate to relevant databases
     pass
 

@@ -2,9 +2,20 @@ import geordi.data
 import json
 import os
 import re
+import logging
 from flask.ext.script import Manager
+from geordi.data.mapping import map_item
 
 data_manager = Manager(usage="Manipulate and query the elasticsearch and postgresql databases.")
+
+def setup_logger():
+    logger = logging.getLogger('geordi')
+    logger.setLevel(logging.DEBUG)
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
 
 @data_manager.command
 def show_item(item_id):
@@ -15,6 +26,12 @@ def show_item(item_id):
 def show_data_item(data_id):
     '''Show item ID given a data ID.'''
     print geordi.data.data_to_item(data_id)
+
+@data_manager.command
+def show_item_map(item_id):
+    item = geordi.data.get_item(item_id)
+    data = map_item(item)
+    print json.dumps({'data': data[0], 'links': data[1]}, indent=4)
 
 @data_manager.command
 def add_data_item(data_id, data_type, data_filename):
