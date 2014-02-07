@@ -16,5 +16,11 @@ test_index = {
                    lambda *args, **kwargs: ['release', 'artists', kwargs.get('a_index')],
                    link=lambda value, data, *args, **kwargs: 'test_index/artist/%s' % value.get('id')),
              ],
-    'artist': []
+    'artist': [
+               Rule(['name'],
+                    lambda *args, **kwargs: ['artist', 'name']),
+               Rule([('name-lang', lambda key, *args, **kwargs: key[:5] == 'name-')],
+                    lambda *args, **kwargs: ['artist', 'aliases'],
+                    transform=lambda val, *args, **kwargs: {'name': val, 'locale': kwargs.get('name-lang')[5:]})
+              ]
 }
