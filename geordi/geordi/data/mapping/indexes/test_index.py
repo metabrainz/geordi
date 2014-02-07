@@ -2,7 +2,7 @@ from ..rule import Rule
 test_index = {
     'album': [
               Rule(['title'],
-                   lambda *args, **kwargs: ['release', 'title']),
+                   lambda *args, **kwargs: ['release', 'name']),
               Rule(['tracks', ('t_index', lambda a: True), 'title'],
                    lambda *args, **kwargs: ['release','tracks', kwargs.get('t_index'), 'name']),
               Rule(['tracks', ('t_index', lambda a: True), 'duration'],
