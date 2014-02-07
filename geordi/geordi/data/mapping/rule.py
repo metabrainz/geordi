@@ -2,36 +2,36 @@ from .extract import extract_value, PathTraversalFailure
 import logging
 logger = logging.getLogger('geordi.data.mapping.rule')
 
-def _no_op_none(*args, **kwargs):
-    return None
-
-def _no_op_true(*args, **kwargs):
-    return True
-
 def _none_or_index(*args, **kwargs):
     return kwargs.get('index', None)
 
 def _no_op_arg(value, *args, **kwargs):
     return value
 
+def _make_callable(value):
+    if not callable(value):
+        return lambda *args, **kwargs: value
+    else:
+        return value
+
 class Rule:
-    def __init__(self, source, destination, condition=_no_op_true,
-                       ordering=_none_or_index, node_destination=_no_op_none,
-                       link=_no_op_none, transform=_no_op_arg):
+    def __init__(self, source, destination, condition=True,
+                       ordering=_none_or_index, node_destination=None,
+                       link=None, transform=_no_op_arg):
         # source is an extraction path to use
         self.source = source
         # destination returns a simple path array for the destination
-        self.destination = destination
+        self.destination = _make_callable(destination)
         # node_destination returns a node (or None, for "this one") the destination applies to
-        self.node_destination = node_destination
+        self.node_destination = _make_callable(node_destination)
         # ordering returns an ordering key
-        self.ordering = ordering
+        self.ordering = _make_callable(ordering)
         # condition is a function that returns True or False given rule, value, data inputs
-        self.condition = condition
+        self.condition = _make_callable(condition)
         # link is a function that returns a link (by data item ID) or None
-        self.link = link
+        self.link = _make_callable(link)
         # transform is a function that transforms the value, if needed
-        self.transform = transform
+        self.transform = _make_callable(transform)
 
     def run(self, data):
         '''Runs the rule, producing an array of (node, destination, value, ordering, link) tuples'''

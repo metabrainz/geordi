@@ -95,16 +95,23 @@ def _extract_inner(data, grouped_path):
     else:
         return [({}, data)]
 
+def _make_callable(value):
+    if not callable(value):
+        return lambda *args, **kwargs: value
+    else:
+        return value
+
 def _extract_choice_array(data, choice):
     logger.debug('_extract_choice_array %r %r', data, choice)
-    choice = list(choice)
+    (name, pred) = choice
+    pred = _make_callable(pred)
     if isinstance(data, collections.Mapping):
         all_choices = data.keys()
     elif isinstance(data, collections.Sized):
         all_choices = range(0,len(data))
     else:
         raise PathTraversalFailure('Cannot determine choices for non-dict-like/non-list-like data')
-    return [({choice[0]: c}, data[c]) for c in all_choices if choice[1](c)]
+    return [({name: c}, data[c]) for c in all_choices if pred(c)]
 
 def _extract_plain_value(data, path):
     logger.debug('_extract_plain_value %r %r', data, path)
