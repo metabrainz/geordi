@@ -18,8 +18,7 @@ test_index = {
               #     lambda *args, **kwargs: ['release', 'artists', kwargs.get('a_index'), 'credit']),
              ],
     'artist': [
-               Rule(['name'],
-                    ['artist', 'name']),
+               Rule(['name'], ['artist', 'name']),
                Rule([('name-lang', lambda key, *args, **kwargs: key[:5] == 'name-')],
                     ['artist', 'aliases'],
                     transform=lambda val, *args, **kwargs: {'name': val, 'locale': kwargs.get('name-lang')[5:]})
