@@ -5,8 +5,11 @@ import re
 import logging
 from flask.ext.script import Manager
 from geordi.data.mapping import map_item
+from geordi.data.importer.manage import import_manager
 
 data_manager = Manager(usage="Manipulate and query the elasticsearch and postgresql databases.")
+
+data_manager.add_command('import', import_manager)
 
 def setup_logger():
     logger = logging.getLogger('geordi')
