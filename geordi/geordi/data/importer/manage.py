@@ -1,5 +1,6 @@
 from flask.ext.script import Manager
-from ..manage import add_folder, add_data_item
+from ..manage import add_folder
+from ..utils import add_data_item
 from .indexes import index_setup_functions
 
 import_manager = Manager(usage="Import data to geordi.")

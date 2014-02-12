@@ -5,11 +5,8 @@ import re
 import logging
 from flask.ext.script import Manager
 from geordi.data.mapping import map_item
-from geordi.data.importer.manage import import_manager
 
 data_manager = Manager(usage="Manipulate and query the elasticsearch and postgresql databases.")
-
-data_manager.add_command('import', import_manager)
 
 def setup_logger():
     logger = logging.getLogger('geordi')
@@ -41,7 +38,8 @@ def add_data_item(data_id, data_type, data_filename):
     '''Add or update a data item given a data ID, a type, and the data to use.'''
     with open(data_filename) as f:
         data = f.read()
-    print geordi.data.add_data_item(data_id, data_type, data)
+    item_id = geordi.data.add_data_item(data_id, data_type, data)
+    print json.dumps(geordi.data.get_item(item_id), indent=4)
 
 @data_manager.command
 def add_folder(folder):
@@ -81,3 +79,6 @@ def add_match(item_id, editor, mbid_type, mbid):
 def set_sequences():
     '''Set sequence values back to the max actual value in the table.'''
     print geordi.data.set_sequences()
+
+from geordi.data.importer.manage import import_manager
+data_manager.add_command('import', import_manager)

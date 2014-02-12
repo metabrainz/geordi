@@ -34,12 +34,13 @@ def data_to_item(data_id):
 
 def add_data_item(data_id, data_type, data):
     '''Add or update a data item given an ID, type, and data. Create a new item, for additions.'''
-    item_id = data_to_item(data_id)
+    item_id = original_item_id = data_to_item(data_id)
     with get_db() as conn:
         if item_id is None:
             item_id = _create_item(data_type, conn)
-        _register_data_item(item_id, data_id, data, conn)
+        _register_data_item(item_id, data_id, data, conn, update=original_item_id)
         _map_item(item_id, conn)
+    return item_id
 
 def delete_data_item(data_id):
     with get_db() as conn, conn.cursor() as curs:
@@ -70,13 +71,20 @@ def _map_item(item_id, conn):
     # fetch data
     item = get_item(item_id, conn)
     # generate map
-    (mapped, links) = map_item(item)
+    try:
+        (mapped, links) = map_item(item)
+    except Exception as failure:
+        print "Exception in mapping item: %s, continuing" % failure
     # insert/propagate to relevant databases
-    pass
 
-def _register_data_item(item_id, data_id, data, conn):
+def _register_data_item(item_id, data_id, data, conn, update=False):
     with conn.cursor() as curs:
-        curs.execute('INSERT INTO item_data (id, item, data) VALUES (%s, %s, %s) RETURNING (item, id)', (data_id, item_id, data))
+        if not update:
+            query = 'INSERT INTO item_data (item, data, id) VALUES (%s, %s, %s) RETURNING (item, id)'
+        else:
+            query = 'UPDATE item_data SET item = %s, data = %s WHERE id = %s RETURNING (item, id)'
+
+        curs.execute(query, (item_id, data, data_id))
         if curs.rowcount == 1:
             return curs.fetchone()
         else:
