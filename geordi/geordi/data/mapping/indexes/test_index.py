@@ -10,7 +10,7 @@ test_index = {
               Rule(['artists', ('a_index', True)],
                    lambda *args, **kwargs: ['release', 'artists', kwargs.get('a_index')],
                    transform=lambda value, *args, **kwargs: {'name': value['name'], 'credit': value.get('credit', value['name'])},
-                   link=lambda value, data, *args, **kwargs: 'test_index/artist/%s' % value.get('id'))
+                   link=lambda value, data, *args, **kwargs: ('test_index/artist/%s' % value.get('id'),'release_artist'))
               # alternately, remove 'transform' above and use:
               #Rule(['artists', ('a_index', True), 'name'],
               #     lambda *args, **kwargs: ['release', 'artists', kwargs.get('a_index'), 'name']),

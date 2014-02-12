@@ -28,7 +28,7 @@ class Rule:
         self.ordering = _make_callable(ordering)
         # condition is a function that returns True or False given rule, value, data inputs
         self.condition = _make_callable(condition)
-        # link is a function that returns a link (by data item ID) or None
+        # link is a function that returns a pair of link (by data item ID) and type or None
         self.link = _make_callable(link)
         # transform is a function that transforms the value, if needed
         self.transform = _make_callable(transform)

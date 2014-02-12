@@ -4,15 +4,24 @@ import json
 
 def get_item(item_id, conn=None):
     '''Fetch and return an item's data.'''
+    ret = {'id': item_id, 'data': [], 'map': {}, 'type': ''}
     if conn is None:
         conn = get_db()
     with conn.cursor() as curs:
         curs.execute('SELECT id, data FROM item_data WHERE item = %s;', (item_id,))
         if curs.rowcount > 0:
             data = dict([(d[0], json.loads(d[1])) for d in curs.fetchall()])
-            return {'id': item_id, 'data': data}
+            ret['data'] = data
         else:
             return None
+        curs.execute('SELECT map, type FROM item WHERE id = %s', (item_id,))
+        if curs.rowcount > 0:
+            row = curs.fetchone()
+            if row[0] is not None:
+                ret['map'] = json.loads(row[0])
+            if row[1] is not None:
+                ret['type'] = row[1]
+        return ret
 
 def get_renderable(item_id):
     '''Fetch and return an item's data including a pretty-printed version of the data items.'''
@@ -21,10 +30,12 @@ def get_renderable(item_id):
         item['data_formatted'] = dict([(d_id, json.dumps(data, indent=4)) for d_id, data in item.get('data', {}).iteritems()])
     return item
 
-def data_to_item(data_id):
+def data_to_item(data_id, conn=None):
     '''Resolve a data ID to its associated item ID, if it has one (it should!)'''
     item_id = None
-    with get_db().cursor() as curs:
+    if conn is None:
+        conn = get_db()
+    with conn.cursor() as curs:
         curs.execute('SELECT item FROM item_data WHERE id = %s', (data_id,))
         if curs.rowcount == 1:
             (item_id,) = curs.fetchone()
@@ -32,10 +43,12 @@ def data_to_item(data_id):
             raise Exception('More than one item found, that can\'t be right')
     return item_id
 
-def add_data_item(data_id, data_type, data):
+def add_data_item(data_id, data_type, data, conn=None):
     '''Add or update a data item given an ID, type, and data. Create a new item, for additions.'''
     item_id = original_item_id = data_to_item(data_id)
-    with get_db() as conn:
+    if conn is None:
+        conn = get_db()
+    with conn as conn:
         if item_id is None:
             item_id = _create_item(data_type, conn)
         _register_data_item(item_id, data_id, data, conn, update=original_item_id)
@@ -67,15 +80,38 @@ def _create_item(data_type, conn):
         else:
             raise Exception('No row created, or more than one.')
 
+link_type_to_item_type = {
+    'release_artist': 'artist'
+}
 def _map_item(item_id, conn):
     # fetch data
     item = get_item(item_id, conn)
     # generate map
-    try:
-        (mapped, links) = map_item(item)
-    except Exception as failure:
-        print "Exception in mapping item: %s, continuing" % failure
-    # insert/propagate to relevant databases
+    #try:
+    (mapped, links) = map_item(item)
+    this_mapped = mapped[None]
+    with conn.cursor() as curs:
+        curs.execute('UPDATE item SET map = %s WHERE id = %s', (json.dumps(this_mapped,separators=(',', ':')), item_id))
+    for data_id in mapped.keys():
+        if data_id is not None:
+            add_data_item(data_id, '', mapped[data_id], conn=conn)
+    for (node, destination, link_pair) in links:
+        (data_id, link_type) = link_pair
+        if node is None:
+            node_item = item_id
+        else:
+            node_item = data_to_item(node, conn=conn)
+        target_item = data_to_item(data_id, conn=conn)
+        if target_item is None:
+            target_item = _create_item(link_type_to_item_type.get(link_type, ''), conn)
+            print target_item
+            _register_data_item(target_item, data_id, '{}', conn)
+        with conn.cursor() as curs:
+            curs.execute('SELECT TRUE from item_link WHERE item = %s AND linked = %s AND type = %s', (node_item, target_item, link_type))
+            if curs.rowcount == 0:
+                curs.execute('INSERT INTO item_link (item, linked, type) VALUES (%s, %s, %s)', (node_item, target_item, link_type))
+    #except Exception as failure:
+    #    print "Exception in mapping item: %s, continuing" % failure
 
 def _register_data_item(item_id, data_id, data, conn, update=False):
     with conn.cursor() as curs:

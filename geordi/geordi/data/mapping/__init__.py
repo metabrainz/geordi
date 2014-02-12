@@ -60,6 +60,8 @@ def map_item(item):
     if len(item['data'].keys()) <= 1:
         for (data_id, data) in item['data'].iteritems():
             (mapped_data, links) = map_data_item(data_id, data)
+            mapped_data[None] = mapped_data[data_id]
+            del mapped_data[data_id]
     else:
         raise Exception('unimplemented')
     # merge XXX: implement along with merging of items
