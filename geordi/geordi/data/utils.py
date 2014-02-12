@@ -59,6 +59,10 @@ def delete_data_item(data_id):
     with get_db() as conn, conn.cursor() as curs:
         curs.execute('DELETE FROM item_data WHERE id = %s RETURNING item', (data_id,))
         item = curs.fetchone()[0]
+        curs.execute('''DELETE FROM item_link WHERE (item = %s OR linked = %s) AND (
+                            NOT EXISTS (SELECT true FROM item_data WHERE item = item_link.item)
+                            OR NOT EXISTS (SELECT true FROM item_data WHERE item = item_link.linked)
+                        )''', (item,item))
         curs.execute('DELETE FROM item WHERE id = %s AND NOT EXISTS (SELECT true FROM item_data WHERE item = item.id)', (item,))
 
 def match_item(item_id, editor, mbid_type, mbid):
