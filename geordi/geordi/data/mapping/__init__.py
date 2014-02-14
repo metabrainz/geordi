@@ -72,7 +72,7 @@ def map_data_item(data_id, data):
     logger.debug('map_data_item %r %r', data_id, data)
     (index, item_type, specific_identifier) = data_id.split('/', 2)
     if re.search(':', specific_identifier):  # blank node
-        return (data,[]) # XXX: inflate with orderings, when implementing merging (links?)
+        return ({data_id: data},[]) # XXX: inflate with orderings, when implementing merging (links?)
     else:
         # initial datastructure assumes at least data for this node
         res = {data_id: {}}

@@ -85,7 +85,8 @@ def _create_item(data_type, conn):
             raise Exception('No row created, or more than one.')
 
 link_type_to_item_type = {
-    'release_artist': 'artist'
+    'release_artist': 'artist',
+    'release_group': 'release_group',
 }
 def _map_item(item_id, conn):
     # fetch data
@@ -98,7 +99,7 @@ def _map_item(item_id, conn):
         curs.execute('UPDATE item SET map = %s WHERE id = %s', (json.dumps(this_mapped,separators=(',', ':')), item_id))
     for data_id in mapped.keys():
         if data_id is not None:
-            add_data_item(data_id, '', mapped[data_id], conn=conn)
+            add_data_item(data_id, '', json.dumps(mapped[data_id]), conn=conn)
     for (node, destination, link_pair) in links:
         (data_id, link_type) = link_pair
         if node is None:
