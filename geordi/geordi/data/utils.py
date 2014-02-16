@@ -84,39 +84,53 @@ def _create_item(data_type, conn):
         else:
             raise Exception('No row created, or more than one.')
 
-link_type_to_item_type = {
-    'release_artist': 'artist',
-    'release_group': 'release_group',
-}
+def link_type_to_item_type(link_type):
+    link_type_map = {
+        'release%artists': 'artist',
+        'release%release_group': 'release_group',
+    }
+    return link_type_map.get(link_type, None)
+
+def destination_to_link_type(destination_path):
+    if (destination_path[0] == ['release'] and
+        destination_path[1] in ['artists', 'release_group']):
+        return '%'.join(destination_path[:2])
+    else:
+        return '%'.join(destination_path)
+
 def _map_item(item_id, conn):
     # fetch data
     item = get_item(item_id, conn)
     # generate map
-    #try:
-    (mapped, links) = map_item(item)
-    this_mapped = mapped[None]
-    with conn.cursor() as curs:
-        curs.execute('UPDATE item SET map = %s WHERE id = %s', (json.dumps(this_mapped,separators=(',', ':')), item_id))
-    for data_id in mapped.keys():
-        if data_id is not None:
-            add_data_item(data_id, '', json.dumps(mapped[data_id]), conn=conn)
-    for (node, destination, link_pair) in links:
-        (data_id, link_type) = link_pair
-        if node is None:
-            node_item = item_id
-        else:
-            node_item = data_to_item(node, conn=conn)
-        target_item = data_to_item(data_id, conn=conn)
-        if target_item is None:
-            target_item = _create_item(link_type_to_item_type.get(link_type, ''), conn)
-            print target_item
-            _register_data_item(target_item, data_id, '{}', conn)
+    try:
+        (mapped, links) = map_item(item)
+        this_mapped = mapped[None]
         with conn.cursor() as curs:
-            curs.execute('SELECT TRUE from item_link WHERE item = %s AND linked = %s AND type = %s', (node_item, target_item, link_type))
-            if curs.rowcount == 0:
-                curs.execute('INSERT INTO item_link (item, linked, type) VALUES (%s, %s, %s)', (node_item, target_item, link_type))
-    #except Exception as failure:
-    #    print "Exception in mapping item: %s, continuing" % failure
+            curs.execute('UPDATE item SET map = %s WHERE id = %s', (json.dumps(this_mapped,separators=(',', ':')), item_id))
+        for (node, destination, data_id) in links:
+            link_type = destination_to_link_type(destination)
+            if node is None:
+                node_item = item_id
+            else:
+                node_item = data_to_item(node, conn=conn)
+            target_item = data_to_item(data_id, conn=conn)
+            if target_item is None:
+                target_item = _create_item(link_type_to_item_type(link_type), conn)
+                print "%s -> %s" % (data_id, target_item)
+                _register_data_item(target_item, data_id, '{}', conn)
+            if node_item is None:
+                node_item = _create_item('', conn)
+                print "%s -> %s" % (node, node_item)
+                _register_data_item(node_item, node, '{}', conn)
+            with conn.cursor() as curs:
+                curs.execute('SELECT TRUE from item_link WHERE item = %s AND linked = %s AND type = %s', (node_item, target_item, link_type))
+                if curs.rowcount == 0:
+                    curs.execute('INSERT INTO item_link (item, linked, type) VALUES (%s, %s, %s)', (node_item, target_item, link_type))
+        for data_id in mapped.keys():
+            if data_id is not None:
+                add_data_item(data_id, '', json.dumps(mapped[data_id]), conn=conn)
+    except Exception as failure:
+        print "Exception in mapping item: %s, continuing" % failure
 
 def _register_data_item(item_id, data_id, data, conn, update=False):
     with conn.cursor() as curs:

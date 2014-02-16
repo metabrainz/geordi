@@ -23,7 +23,7 @@ ninjatune = {
                    both(['release', 'artists', 0, 'name'], 'ARTIST', 'Artist'),
                    both(['release', 'artist_credit'], 'DISPLAY ARTIST', 'Display Artist'),
                    both(['release', 'barcode'], 'BARCODE', 'Barcode', transform=lambda val, *args, **kwargs: str(int(val))),
-                   both(['release', 'release_group'], 'CATALOGUE NUMBER', 'Catalogue Number', link=lambda value, data, *args, **kwargs: ('ninjatune/release/%s:rg' % value,'release_group')),
+                   both(['release', 'release_group'], 'CATALOGUE NUMBER', 'Catalogue Number', link=lambda value, data, *args, **kwargs: 'ninjatune/release/%s:rg' % value),
                    both(['release_group', 'tag'], 'MAIN GENRE', 'Main Genre', 'SUB_GENRE', 'Sub_Genre', node_destination='rg', condition=lambda x, *args, **kwargs: x != ''),
 
                    both(lambda x, *args, **kwargs: ['release', 'tracks', kwargs.get('t_index'), 'number'], 'TRACK NUMBER', 'track number',
