@@ -1,0 +1,46 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "properties": {
+        "release": {
+            "type": "object",
+            "properties": {
+                "name": {"type": "array"},
+                "barcode": {"type": "array"},
+                "status": {"type": "array"},
+                "packaging": {"type": "array"},
+                "language": {"type": "array"},
+                "script": {"type": "array"},
+
+                "release_group": {"type": "array"},
+
+                "artists": {"type": "array"},
+                "artist_credit": {"type": "array"},
+
+                "labels": {"type": "array"},
+                "unpaired_labels": {"type": "array"},
+                "catalog_numbers": {"type": "array"},
+
+                "events": {"type": "array"},
+                "countries": {"type": "array"},
+                "dates": {"type": "array"},
+
+                "mediums": {"type": "array"},
+                "format": {"type": "array"}
+                "tracks": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {"type": "array"},
+                            "artists": {"type": "array"},
+                            "artist_credit": {"type": "array"},
+                            "number": {"type": "array"},
+                            "length": {"type": "array"},
+                        }
+                    }
+                },
+            }
+        }
+    }
+}
