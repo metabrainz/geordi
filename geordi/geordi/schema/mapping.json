@@ -17,29 +17,86 @@
                 "artists": {"type": "array"},
                 "artist_credit": {"type": "array"},
 
-                "labels": {"type": "array"},
-                "unpaired_labels": {"type": "array"},
-                "catalog_numbers": {"type": "array"},
-
-                "events": {"type": "array"},
-                "countries": {"type": "array"},
-                "dates": {"type": "array"},
-
-                "mediums": {"type": "array"},
-                "format": {"type": "array"}
-                "tracks": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "name": {"type": "array"},
-                            "artists": {"type": "array"},
-                            "artist_credit": {"type": "array"},
-                            "number": {"type": "array"},
-                            "length": {"type": "array"},
+                "labels": {
+                    "type": "object",
+                    "properties": {
+                        "combined": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "label": {"type": "string"},
+                                    "catalog_number": {"type": "string"}
+                                }
+                            }
+                        },
+                        "split": {
+                            "type": "object",
+                            "properties": {
+                                "labels": {"type": "array"},
+                                "catalog_numbers": {"type": "array"}
+                            } 
                         }
                     }
                 },
+
+                "events": {
+                    "type": "object"
+                    "properties": {
+                        "combined": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "country": {"type": "string"},
+                                    "date": {"type": "string"}
+                                }
+                            }
+                        },
+                        "split": {
+                            "type": "object",
+                            "properties": {
+                                "countries": {"type": "array"},
+                                "dates": {"type": "array"}
+                            }
+                        }
+                    }
+                },
+
+                "mediums": {
+                    "type": "object"
+                    "properties": {
+                        "combined": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "tracks": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "name": {"type": "array"},
+                                                "artists": {"type": "array"},
+                                                "artist_credit": {"type": "array"},
+                                                "number": {"type": "array"},
+                                                "length": {"type": "array"},
+                                            }
+                                        }
+                                    },
+                                    "format": {"type": "string"}
+                                }
+                            }
+                        },
+                        "split": {
+                            "type": "object",
+                            "properties": {
+                                "tracks": {"type": "array"},
+                                "formats": {"type": "array"}
+                            }
+                        }
+                    }
+                }
             }
         }
     }
