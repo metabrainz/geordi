@@ -1,4 +1,5 @@
 {
+    "id": "http://geordi.musicbrainz.org/mapping-schema#",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
     "properties": {
@@ -14,7 +15,7 @@
 
                 "release_group": {"type": "array"},
 
-                "artists": {"type": "array"},
+                "artists": {"$ref": "#/definitions/artists"},
                 "artist_credit": {"type": "array"},
 
                 "labels": {
@@ -41,7 +42,7 @@
                 },
 
                 "events": {
-                    "type": "object"
+                    "type": "object",
                     "properties": {
                         "combined": {
                             "type": "array",
@@ -64,7 +65,7 @@
                 },
 
                 "mediums": {
-                    "type": "object"
+                    "type": "object",
                     "properties": {
                         "combined": {
                             "type": "array",
@@ -73,16 +74,7 @@
                                 "properties": {
                                     "tracks": {
                                         "type": "array",
-                                        "items": {
-                                            "type": "object",
-                                            "properties": {
-                                                "name": {"type": "array"},
-                                                "artists": {"type": "array"},
-                                                "artist_credit": {"type": "array"},
-                                                "number": {"type": "array"},
-                                                "length": {"type": "array"},
-                                            }
-                                        }
+                                        "items": { "$ref": "#/definitions/track" }
                                     },
                                     "format": {"type": "string"}
                                 }
@@ -91,12 +83,54 @@
                         "split": {
                             "type": "object",
                             "properties": {
-                                "tracks": {"type": "array"},
+                                "tracks": {
+                                    "type": "array",
+                                    "items": { "$ref": "#/definitions/track" }
+                                },
                                 "formats": {"type": "array"}
                             }
                         }
                     }
                 }
+            }
+        }
+    },
+    "definitions": {
+        "artists": {
+            "type": "object",
+            "properties": {
+                "combined": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {"type": "string"},
+                            "credit": {"type": "string"},
+                            "join_phrase": {"type": "string"}
+                        }
+                    }
+                },
+                "split": {
+                    "type": "object",
+                    "properties": {
+                        "names": {"type": "array"},
+                        "credits": {"type": "array"},
+                        "join_phrases": {"type": "array"}
+                    }
+                },
+                "unsplit": {
+                    "type": "array",
+                    "items": {"type": "string"}
+                }
+            }
+        },
+        "track": {
+            "type": "object",
+            "properties": {
+                "name": {"type": "array"},
+                "artists": {"$ref": "#/definitions/artists"},
+                "number": {"type": "array"},
+                "length": {"type": "array"}
             }
         }
     }
