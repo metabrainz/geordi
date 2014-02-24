@@ -3,6 +3,47 @@
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
     "properties": {
+        "area": {"$ref": "#/definitions/area"},
+        "artist": {"$ref": "#/definitions/artist"},
+        "label": {"$ref": "#/definitions/label"},
+        "place": {"$ref": "#/definitions/place"},
+        "recording": {"$ref": "#/definitions/recording"},
+        "release": {"$ref": "#/definitions/release"},
+        "release_group": {"$ref": "#/definitions/release_group"},
+        "work": {"$ref": "#/definitions/work"}
+    },
+    "definitions": {
+        "area": {
+            "type": "object",
+            "properties": {
+                "name": {"type": "array"}
+            }
+        },
+        "artist": {
+            "type": "object",
+            "properties": {
+                "name": {"type": "array"}
+            }
+        },
+        "label": {
+            "type": "object",
+            "properties": {
+                "name": {"type": "array"}
+            }
+        },
+        "place": {
+            "type": "object",
+            "properties": {
+                "name": {"type": "array"}
+            }
+        },
+        "recording": {
+            "type": "object",
+            "properties": {
+                "name": {"type": "array"},
+                "artists": {"$ref": "#/definitions/artists"}
+            }
+        },
         "release": {
             "type": "object",
             "properties": {
@@ -16,7 +57,6 @@
                 "release_group": {"type": "array"},
 
                 "artists": {"$ref": "#/definitions/artists"},
-                "artist_credit": {"type": "array"},
 
                 "labels": {
                     "type": "object",
@@ -93,9 +133,20 @@
                     }
                 }
             }
-        }
-    },
-    "definitions": {
+        },
+        "release_group": {
+            "type": "object",
+            "properties": {
+                "name": {"type": "array"}
+            }
+        },
+        "work": {
+            "type": "object",
+            "properties": {
+                "name": {"type": "array"}
+            }
+        },
+
         "artists": {
             "type": "object",
             "properties": {
