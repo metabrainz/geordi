@@ -4,7 +4,7 @@ import os
 import re
 import logging
 from flask.ext.script import Manager
-from geordi.data.mapping import map_item, verify_mapping
+from geordi.data.mapping import map_item, verify_map
 
 data_manager = Manager(usage="Manipulate and query the elasticsearch and postgresql databases.")
 
@@ -37,7 +37,7 @@ def show_item_map(item_id):
 def verify_map(map_data_filename):
     with open(map_data_filename) as f:
         data = json.load(f)
-    print list(verify_mapping(data))
+    print list(verify_map(data))
 
 @data_manager.command
 def add_data_item(data_id, data_type, data_filename):

@@ -1,5 +1,5 @@
 from ..db import get_db
-from .mapping import map_item
+from .mapping import map_item, verify_map
 import json
 
 def get_item(item_id, conn=None):
@@ -104,6 +104,8 @@ def _map_item(item_id, conn):
     # generate map
     (mapped, links) = map_item(item)
     this_mapped = mapped[None]
+    if verify_map(this_mapped):
+        print "Validation errors in mapping item %s: %r, continuing." % (item_id, verify_map(this_mapped))
     # First, update this item's map
     with conn.cursor() as curs:
         curs.execute('UPDATE item SET map = %s WHERE id = %s', (json.dumps(this_mapped,separators=(',', ':')), item_id))
@@ -130,6 +132,9 @@ def _map_item(item_id, conn):
     # Now that we can be assured any types set by links are already set on the items, insert the maps for other mapped nodes
     for data_id in mapped.keys():
         if data_id is not None:
+            verify = verify_map(mapped[data_id])
+            if verify:
+                print "Validation errors in mapping data item %s: %r, continuing" % (data_id, verify)
             add_data_item(data_id, '', json.dumps(mapped[data_id]), conn=conn)
 
 def _register_data_item(item_id, data_id, data, conn, update=False):

@@ -111,7 +111,7 @@ def map_data_item(data_id, data):
                         links.append((node, value[1], value[4]))
         return (res,links)
 
-def verify_mapping(data):
+def verify_map(data):
     with open(dirname(abspath(__file__)) + '/../../schema/mapping.json') as sch_file:
         schema = json.load(sch_file)
     validator = Draft4Validator(schema)
