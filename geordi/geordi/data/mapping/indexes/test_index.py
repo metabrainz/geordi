@@ -8,7 +8,7 @@ test_index = {
                    lambda *args, **kwargs: ['release','tracks', kwargs.get('t_index'), 'length'],
                    transform=lambda a, *args, **kwargs: int(a) * 1000),
               Rule(['artists', ('a_index', True)],
-                   lambda *args, **kwargs: ['release', 'artists', kwargs.get('a_index')],
+                   lambda *args, **kwargs: ['release', 'artists', 'combined', kwargs.get('a_index')],
                    transform=lambda value, *args, **kwargs: {'name': value['name'], 'credit': value.get('credit', value['name'])},
                    link=lambda value, data, *args, **kwargs: 'test_index/artist/%s' % value.get('id'))
               # alternately, remove 'transform' above and use:

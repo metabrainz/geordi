@@ -20,17 +20,17 @@ ninjatune = {
     'release': list(chain.from_iterable([
                    both(['release', 'title'], 'PRODUCT TITLE', 'Product Title'),
                    both(['release', 'comment'], 'PRODUCT VERSION', 'Product Version'),
-                   both(['release', 'artists', 0, 'name'], 'ARTIST', 'Artist'),
-                   both(['release', 'artist_credit'], 'DISPLAY ARTIST', 'Display Artist'),
+                   both(['release', 'artists', 'split', 'names'], 'ARTIST', 'Artist'),
+                   both(['release', 'artists', 'unsplit'], 'DISPLAY ARTIST', 'Display Artist'),
                    both(['release', 'barcode'], 'BARCODE', 'Barcode', transform=lambda val, *args, **kwargs: str(int(val))),
-                   both(['release', 'release_group'], 'CATALOGUE NUMBER', 'Catalogue Number', link=lambda value, data, *args, **kwargs: 'ninjatune/release/%s:rg' % value),
-                   both(['release_group', 'tag'], 'MAIN GENRE', 'Main Genre', 'SUB_GENRE', 'Sub_Genre', node_destination='rg', condition=lambda x, *args, **kwargs: x != ''),
+                   both(['release', 'release_group'], 'CATALOGUE NUMBER', 'Catalogue Number', link=lambda value, data, *args, **kwargs: 'ninjatune/release/%s:rg' % value, link_only=True),
+                   both(['release', 'tag'], 'MAIN GENRE', 'Main Genre', 'SUB_GENRE', 'Sub_Genre', condition=lambda x, *args, **kwargs: x != ''),
 
-                   both(lambda x, *args, **kwargs: ['release', 'tracks', kwargs.get('t_index'), 'number'], 'TRACK NUMBER', 'track number',
+                   both(lambda x, *args, **kwargs: ['release', 'mediums', 'split', 'tracks', kwargs.get('t_index'), 'number'], 'TRACK NUMBER', 'track number',
                         prefix=['tracks', ('t_index', True)], suffix=[],
                         transform=lambda val, *args, **kwargs: str(int(val))),
                    [Rule(['tracks', ('t_index', True)],
-                        lambda x, *args, **kwargs: ['release', 'tracks', kwargs.get('t_index'), 'name'],
+                        lambda x, *args, **kwargs: ['release', 'mediums', 'split', 'tracks', kwargs.get('t_index'), 'name'],
                         transform=track_name
                     )]
                ]))

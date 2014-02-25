@@ -92,13 +92,14 @@ def map_data_item(data_id, data):
                     if value[0] is not None:
                         node = node + ':' + value[0]
                     # insert in a separate dict by node, then at provided path
-                    try:
-                        res = _insert(res, [node] + value[1], tuple(value[2:4]))
-                    except InvalidInsertion as failure:
-                        if value[4] is not None:
-                            logger.info('ignoring an insertion failure since links are provided')
-                        else:
-                            raise failure
+                    if value[2] is not None:
+                        try:
+                            res = _insert(res, [node] + value[1], tuple(value[2:4]))
+                        except InvalidInsertion as failure:
+                            if value[4] is not None:
+                                logger.info('ignoring an insertion failure since links are provided')
+                            else:
+                                raise failure
                     # add to links
                     if value[4] is not None:
                         # data item ID, node, destination, linked data item

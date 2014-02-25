@@ -17,7 +17,7 @@ def _make_callable(value):
 class Rule:
     def __init__(self, source, destination, condition=True,
                        ordering=_none_or_index, node_destination=None,
-                       link=None, transform=_no_op_arg):
+                       link=None, link_only=False, transform=_no_op_arg):
         # source is an extraction path to use
         self.source = source
         # destination returns a simple path array for the destination
@@ -30,6 +30,7 @@ class Rule:
         self.condition = _make_callable(condition)
         # link is a function that returns a link (by data item ID) or None, with type derived from destination
         self.link = _make_callable(link)
+        self.link_only = _make_callable(link_only)
         # transform is a function that transforms the value, if needed
         self.transform = _make_callable(transform)
 
@@ -43,7 +44,11 @@ class Rule:
                 destination = self.destination(value, data, **choices)
                 ordering = self.ordering(value, data, **choices)
                 link = self.link(value, data, **choices)
-                values.append((node, destination, self.transform(value, data, **choices), ordering, link))
+                if self.link_only(value, data, **choices):
+                    value = None
+                else:
+                    value = self.transform(value, data, **choices)
+                values.append((node, destination, value, ordering, link))
         return values
 
     def test(self, data):
