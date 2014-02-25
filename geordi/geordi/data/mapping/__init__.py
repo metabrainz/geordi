@@ -2,6 +2,11 @@ from .indexes import index_dict
 import re
 import collections
 import logging
+
+from os.path import dirname, abspath
+from jsonschema import Draft4Validator
+import json
+
 logger = logging.getLogger('geordi.data.mapping')
 
 class InvalidInsertion(Exception):
@@ -105,3 +110,9 @@ def map_data_item(data_id, data):
                         # data item ID, node, destination, linked data item
                         links.append((node, value[1], value[4]))
         return (res,links)
+
+def verify_mapping(data):
+    with open(dirname(abspath(__file__)) + '/../../schema/mapping.json') as sch_file:
+        schema = json.load(sch_file)
+    validator = Draft4Validator(schema)
+    return validator.iter_errors(data)
