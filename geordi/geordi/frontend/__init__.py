@@ -20,6 +20,14 @@ def item(item_id):
         abort(404)
     return render_template('item.html', item=item)
 
+#@frontend.route('/data/<index>')
+#def list_index(index):
+#    pass
+#
+#@frontend.route('/data/<index>/<item_type>')
+#def list_items(index, item_type):
+#    pass
+
 @frontend.route('/data/<index>/<item_type>/<data_id>')
 def data_item(index, item_type, data_id):
     item_id = data.data_to_item('/'.join([index, item_type, data_id]))
