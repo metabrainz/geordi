@@ -179,6 +179,7 @@
             "type": "object",
             "properties": {
                 "name": {"type": "array"},
+                "recording": {"type": "array"},
                 "artists": {"$ref": "#/definitions/artists"},
                 "number": {"type": "array"},
                 "length": {"type": "array"}
