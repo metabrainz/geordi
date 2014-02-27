@@ -1,21 +1,22 @@
 from __future__ import division, absolute_import
 from flask import Flask
-from flask.ext.login import LoginManager, UserMixin
+from flask.ext.login import LoginManager
 from geordi.frontend import frontend
 import geordi.settings
+from geordi.user import User
 import geordi.db as db
 import jinja2_highlight
 
-class User(UserMixin):
-    def __init__(self, id):
-        self.id = id
-
 login_manager = LoginManager()
-login_manager.login_view = "frontend.login"
+login_manager.login_view = "frontend.hello"
 
 @login_manager.user_loader
 def load_user(username):
-    return User(username)
+    with db.get_db().cursor() as curs:
+        curs.execute('SELECT name, tz FROM editor WHERE name = %s', (username,))
+        if curs.rowcount > 0:
+            row = curs.fetchone()
+            return User(row[0], row[1])
 
 class GeordiFlask(Flask):
     jinja_options = dict(Flask.jinja_options)

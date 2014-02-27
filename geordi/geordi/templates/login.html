@@ -1,0 +1,12 @@
+<div class="user-info">
+{%- if current_user.id -%}
+<a href="https://musicbrainz.org/user/{{ current_user.id }}">{{ current_user.id }}</a> (<a href="/logout">log out</a>)
+{%- else -%}
+  <form action="{{ url_for('frontend.login_redirect') }}" method="get">
+    <input type="hidden" name="csrf" value="{{ g.login_parameters.csrf }}" />
+    <input type="hidden" name="returnto" value="{{ g.login_parameters.returnto }}" />
+    <button type="submit" value="log_in">Login</button>
+    <input type="checkbox" title="Remember Me" name="remember" checked="checked" />
+  </form>
+{%- endif -%}
+</div>

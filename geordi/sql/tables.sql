@@ -1,7 +1,7 @@
 BEGIN;
 
 -- Schema 'geordi' should already exist.
-CREATE TABLE geordi.csrf (ip text NOT NULL, csrf text NOT NULL);
+CREATE TABLE geordi.csrf (ip text NOT NULL, csrf text NOT NULL, opts text, timestamp TIMESTAMP WITH TIME ZONE NOT NULL);
 
 CREATE TABLE geordi.editor (name text PRIMARY KEY, tz text, internal boolean not null default false);
 

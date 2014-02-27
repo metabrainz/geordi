@@ -1,22 +1,28 @@
 <!DOCTYPE html>
 <html>
   <head>
-    {% block head %}
+    {%- block head -%}
       <title>{% block title %}{% endblock %} - geordi</title>
-    {% endblock %}
-    {% block css %}{% endblock %}
+    {%- endblock -%}
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/geordi.css') }}">
+    {%- block css %}{% endblock -%}
   </head>
   <body>
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <ul class=flashes>
-          {% for message in messages %}
-            <li>{{ message }}</li>
-          {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
+    <div id="container">
+      <div id="header">
+        {%- include "login.html" -%}
+        {%- with messages = get_flashed_messages() -%}
+          {%- if messages -%}
+            <ul class="flashes">
+              {%- for message in messages -%}
+                <li>{{ message }}</li>
+              {%- endfor -%}
+            </ul>
+          {%- endif -%}
+        {%- endwith -%}
+      </div>
     <div id="content">{% block content %}{% endblock %}</div>
-    {% block js %}{% endblock %}
+    </div>
+    {%- block js %}{% endblock -%}
   </body>
 </html>

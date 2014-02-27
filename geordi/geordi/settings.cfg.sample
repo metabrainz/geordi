@@ -1,4 +1,4 @@
 SECRET_KEY = 'seriously, change this'
 OAUTH_CLIENT_ID = 'XXXXXXXXXXXXXXXXXXXXXX'
 OAUTH_CLIENT_SECRET = 'XXXXXXXXXXXXXXXXXXXXXX'
-OAUTH_REDIRECT_URI = 'http://localhost:5000/internal/oauth'
+OAUTH_REDIRECT_URI = 'http://localhost:5000/oauth/callback'
