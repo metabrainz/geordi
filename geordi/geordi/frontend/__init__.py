@@ -103,10 +103,10 @@ def oauth_callback():
 def check_mb_account(auth_code):
     url = 'https://musicbrainz.org/oauth2/token'
     data = urlencode({'grant_type': 'authorization_code',
-                             'code': auth_code,
-                             'client_id': current_app.config['OAUTH_CLIENT_ID'],
-                             'client_secret': current_app.config['OAUTH_CLIENT_SECRET'],
-                             'redirect_uri': current_app.config['OAUTH_REDIRECT_URI']})
+                      'code': auth_code,
+                      'client_id': current_app.config['OAUTH_CLIENT_ID'],
+                      'client_secret': current_app.config['OAUTH_CLIENT_SECRET'],
+                      'redirect_uri': current_app.config['OAUTH_REDIRECT_URI']})
     json_data = json.load(urllib2.urlopen(url, data))
 
     url = 'https://beta.musicbrainz.org/oauth2/userinfo'
