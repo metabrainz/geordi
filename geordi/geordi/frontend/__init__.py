@@ -71,11 +71,11 @@ def oauth_callback():
             code = request.args.get('code')
             # look up CSRF token for remember value, returnto URI, and to confirm validity
             with conn.cursor() as curs:
-                curs.execute('SELECT ip, opts FROM csrf WHERE csrf = %s', (csrf,))
-                (ip, opts) = curs.fetchone()
-                if ip != get_ip():
+                curs.execute('SELECT opts FROM csrf WHERE csrf = %s AND ip = %s', (csrf,get_ip()))
+                if curs.rowcount == 0:
                     flash("CSRF token mismatch. Please try again.")
                     return redirect(url, code=307)
+                (opts,) = curs.fetchone()
                 curs.execute('DELETE FROM csrf WHERE csrf = %s', (csrf,))
             opts = json.loads(opts)
             remember = opts.get('remember', False)
