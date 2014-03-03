@@ -1,4 +1,4 @@
-from flask import Blueprint, current_app, render_template, request, abort, redirect, url_for, g, flash
+from flask import Blueprint, current_app, render_template, request, abort, redirect, url_for, g, flash, jsonify
 from flask.ext.login import current_user, login_required, login_user, logout_user
 from ..db import get_db
 import geordi.data as data
@@ -135,6 +135,31 @@ def item(item_id):
     if item is None:
         abort(404)
     return render_template('item.html', item=item)
+
+@frontend.route('/item/<item_id>/match', methods=['POST'])
+@login_required
+def match_item(item_id):
+    '''This endpoint is passed a set of type + mbid pairs.
+    For each, it sees if that match with this user is already in the DB
+    (and non-superseded). Those that aren't are inserted, and any other
+    non-superseded matches are marked as superseded. Two extra options
+    control this behavior: 'empty' set to something truthy will allow
+    an empty list of pairs (to allow superseding all matches), and
+    'additive' to something truthy means that it won't supersede
+    existing matches.
+    '''
+    additive = request.form.get('additive', False)
+    empty = request.form.get('empty', False)
+    pairs = [tuple(pair.split('|')) for pair in request.form.getlist('matches')]
+    if len(pairs) == 0 and not empty:
+        return jsonify({'error': 'No matches provided.'})
+    if len([True for pair in pairs if (not isinstance(pair, tuple)) or (len(pair) != 2)]) > 0:
+        return jsonify({'error': 'Matches improperly formatted.'})
+    # fetch existing matches from the DB
+    # add new matches
+    # if not additive, remove old matches
+    # return JSON success value and matches preserved/added/superseded
+    return jsonify({})
 
 #@frontend.route('/data/<index>')
 #def list_index(index):
