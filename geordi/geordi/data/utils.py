@@ -104,8 +104,8 @@ def _map_item(item_id, conn):
     # generate map
     (mapped, links) = map_item(item)
     this_mapped = mapped[None]
-    if verify_map(this_mapped):
-        print "Validation errors in mapping item %s: %r, continuing." % (item_id, verify_map(this_mapped))
+    if list(verify_map(this_mapped)):
+        print "Validation errors in mapping item %s: %r, continuing." % (item_id, list(verify_map(this_mapped)))
     # First, update this item's map
     with conn.cursor() as curs:
         curs.execute('UPDATE item SET map = %s WHERE id = %s', (json.dumps(this_mapped,separators=(',', ':')), item_id))
