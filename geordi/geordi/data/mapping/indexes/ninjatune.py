@@ -20,7 +20,7 @@ ninjatune = {
     'release': list(chain.from_iterable([
                    both(['release', 'title'], 'PRODUCT TITLE', 'Product Title'),
                    both(['release', 'comment'], 'PRODUCT VERSION', 'Product Version'),
-                   both(['release', 'artists', 'split', 'names'], 'ARTIST', 'Artist'),
+                   both(['release', 'artists', 'split', 'names'], 'ARTIST', 'Artist', suffix=[('i2', True), ('index', True, lambda val, *args, **kwargs: val.split('|'))]),
                    both(['release', 'artists', 'unsplit'], 'DISPLAY ARTIST', 'Display Artist'),
                    both(['release', 'barcode'], 'BARCODE', 'Barcode', transform=lambda val, *args, **kwargs: str(int(val))),
                    both(['release', 'release_group'], 'CATALOGUE NUMBER', 'Catalogue Number', link=lambda value, data, *args, **kwargs: 'ninjatune/release/%s:rg' % value, link_only=True),

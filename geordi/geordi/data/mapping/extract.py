@@ -6,6 +6,136 @@ logger = logging.getLogger('geordi.data.mapping.extract')
 class PathTraversalFailure(Exception):
     pass
 
+def _make_callable(value):
+    if not callable(value):
+        return lambda *args, **kwargs: value
+    else:
+        return value
+
+def _no_op_value(value, *args, **kwargs):
+    return value
+
+class PathExtractor(object):
+    def __init__(self, path):
+        self.path = self._process_path(path)
+
+    def process_data(self, data):
+        produced = [({}, data)]
+        for part in self.path:
+            produced = part.produce_values(produced)
+        return produced
+
+    def _process_path(self, path):
+        grouped_path = []
+        last_was_choice = True
+        tmp = []
+        for entry in path:
+            if last_was_choice:
+                if isinstance(entry, tuple):
+                    grouped_path.append(_tuple_to_choice(entry))
+                elif isinstance(entry, PathPart):
+                    grouped_path.append(entry)
+                else:
+                    tmp.append(entry)
+                    last_was_choice = False
+            else:
+                if isinstance(entry, tuple) or isinstance(entry, PathPart):
+                    grouped_path.append(PlainPathPart(tmp))
+                    tmp = []
+                    if isinstance(entry, tuple):
+                        grouped_path.append(_tuple_to_choice(entry))
+                    else:
+                        grouped_path.append(entry)
+                    last_was_choice = True
+                else:
+                    tmp.append(entry)
+        if len(tmp) > 0:
+            grouped_path.append(PlainPathPart(tmp))
+        return grouped_path
+
+class PathPart(object):
+    def __init__(self, before=_no_op_value, after=_no_op_value):
+        self.before = _make_callable(before)
+        self.after = _make_callable(after)
+
+    def produce_values(self, data):
+        logger.info('PathPart.produce_values %r', data)
+        values = []
+        for value in data:
+            try:
+                vals = self.produce_value((value[0], self.before(value[1])))
+                values.extend([(val[0], self.after(val[1])) for val in vals])
+            except PathTraversalFailure as failure:
+                logger.info('A choice (%r) produced nothing internally: %s', value[0], failure)
+        if len(values) == 0:
+            raise PathTraversalFailure('No results from any choice made thus far.')
+        return values
+
+    def produce_value(self, item):
+        raise Exception('Unimplemented.')
+
+class PlainPathPart(PathPart):
+    def __init__(self, keys, **kwargs):
+        self.keys = keys
+        super(PlainPathPart, self).__init__(**kwargs)
+
+    def __repr__(self):
+        return '<PlainPathPart %s>' % self.keys
+
+    def produce_value(self, item):
+        logger.info('PlainPathPart.produce_value (%s) %r', self.keys, item)
+        tmp_value = item[1]
+        for key in self.keys:
+            if isinstance(tmp_value, collections.Mapping):
+                if key in tmp_value:
+                    tmp_value = tmp_value[key]
+                else:
+                    raise PathTraversalFailure('Missing key in dict-like data')
+            elif isinstance(tmp_value, collections.Sized) and isinstance(key, int):
+                if len(tmp_value) > key:
+                    tmp_value = tmp_value[key]
+                else:
+                    raise PathTraversalFailure('Missing key in list-like data')
+            else:
+                raise PathTraversalFailure('Data is neither mapping nor sized, or key for list-like data is not integer')
+        return [(item[0], tmp_value)]
+
+class ChoicePathPart(PathPart):
+    def __init__(self, name, condition, **kwargs):
+        self.name = name
+        self.condition = _make_callable(condition)
+        self.has_before = kwargs.get('before')  # really only needs truthy or falsy, but eh
+        super(ChoicePathPart, self).__init__(**kwargs)
+
+    def __repr__(self):
+        if self.has_before:
+            return '<ChoicePathPart (%s, %s, %s)>' % (self.name, self.condition, self.before)
+        else:
+            return '<ChoicePathPart (%s, %s)>' % (self.name, self.condition)
+
+    def produce_value(self, item):
+        logger.info('ChoicePathPart.produce_value (%s) %r', self.name, item)
+        if isinstance(item[1], collections.Mapping):
+            all_choices = item[1].keys()
+        elif isinstance(item[1], collections.Sized):
+            all_choices = range(0,len(item[1]))
+        else:
+            raise PathTraversalFailure('Cannot determine choices for non-dict-like/non-list-like data')
+        values = []
+        for c in all_choices:
+            if self.condition(c):
+                new_dict = copy.copy(item[0])    
+                new_dict[self.name] = c
+                values.append((new_dict, item[1][c]))
+        return values
+
+def _tuple_to_choice(choice_tuple):
+    if len(choice_tuple) > 2:
+        choice = ChoicePathPart(choice_tuple[0], choice_tuple[1], before=choice_tuple[2])
+    else:
+        choice = ChoicePathPart(choice_tuple[0], choice_tuple[1])
+    return choice
+
 def extract_value(data, path):
     '''
     Extract a value from a JSON data structure by path.
@@ -45,89 +175,5 @@ def extract_value(data, path):
     Errors will raise PathTraversalFailure with a descriptive message.
     '''
     logger.debug('extract_value %r %r', data, path)
-    grouped_path = []
-    last_was_choice = True
-    tmp = []
-    for entry in path:
-        if last_was_choice:
-            if isinstance(entry, tuple):
-                grouped_path.append((True, entry))
-            else:
-                tmp.append(entry)
-                last_was_choice = False
-        else:
-            if isinstance(entry, tuple):
-                grouped_path.append((False, tmp))
-                tmp = []
-                grouped_path.append((True, entry))
-                last_was_choice = True
-            else:
-                tmp.append(entry)
-    if len(tmp) > 0:
-        grouped_path.append((False, tmp))
-    return _extract_inner(data, grouped_path)
-
-def _extract_inner(data, grouped_path):
-    logger.debug('_extract_inner: %r %r', data, grouped_path)
-    if len(grouped_path) > 0:
-        this_path = grouped_path[0]
-        grouped_path = grouped_path[1:]
-        if this_path[0]:
-            choices = _extract_choice_array(data, this_path[1])
-            inners = []
-            for choice in choices:
-                try:
-                    inner_val = _extract_inner(choice[1], copy.copy(grouped_path))
-                    inners.append((choice[0], inner_val))
-                except PathTraversalFailure as failure:
-                    logger.info('A choice (%r) produced nothing internally: %s', choice[0], failure)
-            if len(inners) == 0:
-                raise PathTraversalFailure('Choice produced no results')
-            ret = []
-            for choice_pair in inners:
-                for previous_value in choice_pair[1]:
-                    new_dict = previous_value[0]
-                    new_dict.update(choice_pair[0])
-                    ret.append((new_dict, previous_value[1]))
-            return ret
-        else:
-            return _extract_inner(_extract_plain_value(data, this_path[1]), grouped_path)
-    else:
-        return [({}, data)]
-
-def _make_callable(value):
-    if not callable(value):
-        return lambda *args, **kwargs: value
-    else:
-        return value
-
-def _extract_choice_array(data, choice):
-    logger.debug('_extract_choice_array %r %r', data, choice)
-    (name, pred) = choice
-    pred = _make_callable(pred)
-    if isinstance(data, collections.Mapping):
-        all_choices = data.keys()
-    elif isinstance(data, collections.Sized):
-        all_choices = range(0,len(data))
-    else:
-        raise PathTraversalFailure('Cannot determine choices for non-dict-like/non-list-like data')
-    return [({name: c}, data[c]) for c in all_choices if pred(c)]
-
-def _extract_plain_value(data, path):
-    logger.debug('_extract_plain_value %r %r', data, path)
-    path = list(path)
-    tmp_value = data
-    for key in path:
-        if isinstance(tmp_value, collections.Mapping):
-            if key in tmp_value:
-                tmp_value = tmp_value[key]
-            else:
-                raise PathTraversalFailure('Missing key in dict-like data')
-        elif isinstance(tmp_value, collections.Sized) and isinstance(key, int):
-            if len(tmp_value) > key:
-                tmp_value = tmp_value[key]
-            else:
-                raise PathTraversalFailure('Missing key in list-like data')
-        else:
-            raise PathTraversalFailure('Data is neither mapping nor sized, or key for list-like data is not integer')
-    return tmp_value
+    extractor = PathExtractor(path)
+    return extractor.process_data(data)
