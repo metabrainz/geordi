@@ -3,17 +3,10 @@ import copy
 import logging
 logger = logging.getLogger('geordi.data.mapping.extract')
 
+from .pathutils import make_callable, no_op_value
+
 class PathTraversalFailure(Exception):
     pass
-
-def _make_callable(value):
-    if not callable(value):
-        return lambda *args, **kwargs: value
-    else:
-        return value
-
-def _no_op_value(value, *args, **kwargs):
-    return value
 
 class PathExtractor(object):
     def __init__(self, path):
@@ -54,9 +47,9 @@ class PathExtractor(object):
         return grouped_path
 
 class PathPart(object):
-    def __init__(self, before=_no_op_value, after=_no_op_value):
-        self.before = _make_callable(before)
-        self.after = _make_callable(after)
+    def __init__(self, before=no_op_value, after=no_op_value):
+        self.before = make_callable(before)
+        self.after = make_callable(after)
 
     def produce_values(self, data):
         logger.info('PathPart.produce_values %r', data)
@@ -103,7 +96,7 @@ class PlainPathPart(PathPart):
 class ChoicePathPart(PathPart):
     def __init__(self, name, condition, **kwargs):
         self.name = name
-        self.condition = _make_callable(condition)
+        self.condition = make_callable(condition)
         self.has_before = kwargs.get('before')  # really only needs truthy or falsy, but eh
         super(ChoicePathPart, self).__init__(**kwargs)
 
