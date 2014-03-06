@@ -5,8 +5,9 @@ from itertools import chain
 def both(dest, *opts, **kwargs):
     prefix = kwargs.get('prefix', [])
     suffix = kwargs.get('suffix', [('index', True)])
-    rule_opts = dict([(x, kwargs[x]) for x in kwargs.keys() if x not in ['prefix', 'suffix']])
-    return [Rule(prefix + [('r', lambda x, *args, **kwargs: x in opts)] + suffix, dest, **rule_opts)]
+    condition = kwargs.get('condition', lambda x, *args, **kwargs: x != '')
+    rule_opts = dict([(x, kwargs[x]) for x in kwargs.keys() if x not in ['prefix', 'suffix', 'condition']])
+    return [Rule(prefix + [('r', lambda x, *args, **kwargs: x in opts)] + suffix, dest, condition=condition, **rule_opts)]
 
 def track_name(track, *args, **kwargs):
     title = track.get('MAIN TITLE', track.get('Main Title'))
@@ -23,7 +24,7 @@ ninjatune = {
                    both(['release', 'artists', 'split', 'names'], 'ARTIST', 'Artist', suffix=[('i2', True), ('index', True, lambda val, *args, **kwargs: val.split('|'))]),
                    both(['release', 'artists', 'unsplit'], 'DISPLAY ARTIST', 'Display Artist'),
                    both(['release', 'barcode'], 'BARCODE', 'Barcode', transform=lambda val, *args, **kwargs: str(int(val))),
-                   both(['release', 'release_group'], 'CATALOGUE NUMBER', 'Catalogue Number', link=lambda value, data, *args, **kwargs: 'ninjatune/release/%s:rg' % value, link_only=True),
+                   #both(['release', 'release_group'], 'CATALOGUE NUMBER', 'Catalogue Number', link=lambda value, data, *args, **kwargs: 'ninjatune/release/%s:rg' % value, link_only=True),
                    both(['release', 'tag'], 'MAIN GENRE', 'Main Genre', 'SUB_GENRE', 'Sub_Genre', condition=lambda x, *args, **kwargs: x != ''),
 
                    both(lambda x, *args, **kwargs: ['release', 'mediums', 'split', 'tracks', kwargs.get('t_index'), 'number'], 'TRACK NUMBER', 'track number',
