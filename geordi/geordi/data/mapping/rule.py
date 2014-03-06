@@ -1,38 +1,27 @@
 from .extract import extract_value, PathTraversalFailure
+from .pathutils import make_callable, no_op_value, none_or_index
 import logging
 logger = logging.getLogger('geordi.data.mapping.rule')
 
-def _none_or_index(*args, **kwargs):
-    return kwargs.get('index', None)
-
-def _no_op_arg(value, *args, **kwargs):
-    return value
-
-def _make_callable(value):
-    if not callable(value):
-        return lambda *args, **kwargs: value
-    else:
-        return value
-
 class Rule:
     def __init__(self, source, destination, condition=True,
-                       ordering=_none_or_index, node_destination=None,
-                       link=None, link_only=False, transform=_no_op_arg):
+                       ordering=none_or_index, node_destination=None,
+                       link=None, link_only=False, transform=no_op_value):
         # source is an extraction path to use
         self.source = source
         # destination returns a simple path array for the destination
-        self.destination = _make_callable(destination)
+        self.destination = make_callable(destination)
         # node_destination returns a node (or None, for "this one") the destination applies to
-        self.node_destination = _make_callable(node_destination)
+        self.node_destination = make_callable(node_destination)
         # ordering returns an ordering key
-        self.ordering = _make_callable(ordering)
+        self.ordering = make_callable(ordering)
         # condition is a function that returns True or False given rule, value, data inputs
-        self.condition = _make_callable(condition)
+        self.condition = make_callable(condition)
         # link is a function that returns a link (by data item ID) or None, with type derived from destination
-        self.link = _make_callable(link)
-        self.link_only = _make_callable(link_only)
+        self.link = make_callable(link)
+        self.link_only = make_callable(link_only)
         # transform is a function that transforms the value, if needed
-        self.transform = _make_callable(transform)
+        self.transform = make_callable(transform)
 
     def run(self, data):
         '''Runs the rule, producing an array of (node, destination, value, ordering, link) tuples'''
