@@ -1,4 +1,5 @@
 from .indexes import index_dict
+from .insert import insert_value, InvalidInsertion
 import re
 import collections
 import logging
@@ -8,41 +9,6 @@ from jsonschema import Draft4Validator
 import json
 
 logger = logging.getLogger('geordi.data.mapping')
-
-class InvalidInsertion(Exception):
-    pass
-
-def _insert(data, path, value):
-    '''Inserts data. Always to arrays.'''
-    logger.debug('_insert %r %r %r', data, path, value)
-    if len(path) == 0:
-        if data is None:
-            return [value]
-        elif isinstance(data, list):
-            data.append(value)
-            return data
-        else:
-            raise InvalidInsertion('Attempt to insert at an invalid point in a structure.')
-    else:
-        this_key = path[0]
-        path = path[1:]
-        if data is None:
-            if isinstance(this_key, int):
-                ret_list = [None for i in range(-1,this_key)]
-                ret_list[this_key] = _insert(None, path, value)
-                return ret_list
-            else:
-                return {this_key: _insert(None, path, value)}
-        elif isinstance(data, collections.Mapping):
-            data[this_key] = _insert(data.get(this_key), path, value)
-            return data
-        elif isinstance(data, list):
-            if len(data) <= this_key:
-                data.extend([None for i in range(-1,this_key-len(data))])
-            data[this_key] = _insert(data[this_key], path, value)
-            return data
-        else:
-            raise InvalidInsertion('Attempt to insert to something other than None, a mapping, or a list')
 
 def _flatten(data):
     logger.debug('_flatten %r', data)
@@ -99,7 +65,7 @@ def map_data_item(data_id, data):
                     # insert in a separate dict by node, then at provided path
                     if value[2] is not None:
                         try:
-                            res = _insert(res, [node] + value[1], tuple(value[2:4]))
+                            res = insert_value(res, [node] + value[1], tuple(value[2:4]))
                         except InvalidInsertion as failure:
                             if value[4] is not None:
                                 logger.info('ignoring an insertion failure since links are provided')
