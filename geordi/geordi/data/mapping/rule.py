@@ -1,11 +1,10 @@
 from .extract import extract_value, PathTraversalFailure
-from .pathutils import make_callable, no_op_value, none_or_index
+from .pathutils import make_callable, no_op_value
 import logging
 logger = logging.getLogger('geordi.data.mapping.rule')
 
 class Rule:
-    def __init__(self, source, destination, condition=True,
-                       ordering=none_or_index, node_destination=None,
+    def __init__(self, source, destination, condition=True, node_destination=None,
                        link=None, link_only=False, transform=no_op_value):
         # source is an extraction path to use
         self.source = source
@@ -13,8 +12,6 @@ class Rule:
         self.destination = make_callable(destination)
         # node_destination returns a node (or None, for "this one") the destination applies to
         self.node_destination = make_callable(node_destination)
-        # ordering returns an ordering key
-        self.ordering = make_callable(ordering)
         # condition is a function that returns True or False given rule, value, data inputs
         self.condition = make_callable(condition)
         # link is a function that returns a link (by data item ID) or None, with type derived from destination
@@ -24,20 +21,19 @@ class Rule:
         self.transform = make_callable(transform)
 
     def run(self, data):
-        '''Runs the rule, producing an array of (node, destination, value, ordering, link) tuples'''
+        '''Runs the rule, producing an array of (node, destination, value, link) tuples'''
         extracted_values = extract_value(data, self.source)
         values = []
         for (choices, value) in extracted_values:
             if self.condition(value, data, **choices):
                 node = self.node_destination(value, data, **choices)
                 destination = self.destination(value, data, **choices)
-                ordering = self.ordering(value, data, **choices)
                 link = self.link(value, data, **choices)
                 if self.link_only(value, data, **choices):
                     value = None
                 else:
                     value = self.transform(value, data, **choices)
-                values.append((node, destination, value, ordering, link))
+                values.append((node, destination, value, link))
         return values
 
     def test(self, data):

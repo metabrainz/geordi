@@ -27,11 +27,11 @@ ninjatune = {
                    #both(['release', 'release_group'], 'CATALOGUE NUMBER', 'Catalogue Number', link=lambda value, data, *args, **kwargs: 'ninjatune/release/%s:rg' % value, link_only=True),
                    both(['release', 'tag'], 'MAIN GENRE', 'Main Genre', 'SUB_GENRE', 'Sub_Genre', condition=lambda x, *args, **kwargs: x != ''),
 
-                   both(lambda x, *args, **kwargs: ['release', 'mediums', 'split', 'tracks', kwargs.get('t_index'), 'number'], 'TRACK NUMBER', 'track number',
+                   both(lambda x, *args, **kwargs: ['release', 'mediums', 'split', 'tracks', (kwargs.get('t_index'),), 'number'], 'TRACK NUMBER', 'track number',
                         prefix=['tracks', ('t_index', True)], suffix=[],
                         transform=lambda val, *args, **kwargs: str(int(val))),
                    [Rule(['tracks', ('t_index', True)],
-                        lambda x, *args, **kwargs: ['release', 'mediums', 'split', 'tracks', kwargs.get('t_index'), 'name'],
+                        lambda x, *args, **kwargs: ['release', 'mediums', 'split', 'tracks', (kwargs.get('t_index'),), 'name'],
                         transform=track_name
                     )]
                ]))

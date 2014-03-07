@@ -56,25 +56,25 @@ def map_data_item(data_id, data):
         for rule in rules:
             if rule.test(data):
                 values = rule.run(data)
-                # these are (node, destination, value, ordering, link) tuples
+                # these are (node, destination, value, link) tuples
                 for value in values:
-                    # put (value, ordering) pair at destination in node
+                    # put value at destination in node
                     node = data_id
                     if value[0] is not None:
                         node = node + ':' + value[0]
                     # insert in a separate dict by node, then at provided path
                     if value[2] is not None:
                         try:
-                            res = insert_value(res, [node] + value[1], tuple(value[2:4]))
+                            res = insert_value(res, [node] + value[1], value[2])
                         except InvalidInsertion as failure:
-                            if value[4] is not None:
+                            if value[3] is not None:
                                 logger.info('ignoring an insertion failure since links are provided')
                             else:
                                 raise failure
                     # add to links
-                    if value[4] is not None:
+                    if value[3] is not None:
                         # data item ID, node, destination, linked data item
-                        links.append((node, value[1], value[4]))
+                        links.append((node, value[1], value[3]))
         return (res,links)
 
 def verify_map(data):

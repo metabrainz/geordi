@@ -19,8 +19,9 @@ class PathInserter(object):
             tmp = part.prepare(tmp)
 
         if tmp is None:
-            supr = [value]
+            supr = value
         elif isinstance(tmp, list):
+            logger.warning("Inserting to something that's already a list (%s) is deprecated", tmp)
             tmp.append(value)
             supr = tmp
         else:
@@ -31,8 +32,21 @@ class PathInserter(object):
 
         self.data = supr
     
+    def get_data(self):
+        return self.data
+
     def _process_path(self, path):
-        return [SimplePathPart(k) for k in path]
+        final = []
+        for entry in path:
+            if isinstance(entry, tuple):
+                final.append(OrderedPathPart(*entry))
+            elif isinstance(entry, PathPart):
+                final.append(entry)
+            else:
+                final.append(SimplePathPart(entry))
+        if not (isinstance(path[-1], tuple) or isinstance(path[-1], PathPart)):
+            final.append(OrderedPathPart())
+        return final
 
 class PathPart(object):
     def __init__(self, before=no_op_value, after=no_op_value):
@@ -45,7 +59,7 @@ class PathPart(object):
     def insert(self, supr):
         raise Exception('unimplemented')
 
-class SimplePathPart(object):
+class SimplePathPart(PathPart):
     def __init__(self, key, **kwargs):
         self.key = key
         super(SimplePathPart, self).__init__(**kwargs)
@@ -62,6 +76,7 @@ class SimplePathPart(object):
             self.data = data
             return data.get(self.key)
         elif isinstance(data, list):
+            logger.warning("Inserting to something that's already a list (%s) is deprecated", data)
             self.data = data
             if len(data) <= self.key:
                 return None
@@ -83,6 +98,7 @@ class SimplePathPart(object):
             self.data[self.key] = supr
             return self.data
         elif isinstance(self.data, list):
+            logger.warning("Inserting to something that's already a list (%s) is deprecated", self.data)
             if len(self.data) <= self.key:
                 self.data.extend([None for i in range(-1,self.key-len(self.data))])
             self.data[self.key] = supr
@@ -90,7 +106,65 @@ class SimplePathPart(object):
         else:
             raise InvalidInsertion('Cannot insert data to things that are neither None, a mapping, or a list. Got %r' % data)
 
+class OrderedPathPart(PathPart):
+    def __init__(self, ordering=None, identifier=None, **kwargs):
+        self.ordering = ordering
+        self.identifier = identifier
+        if identifier is None and ordering is not None:
+            self.identifier = ordering
+        super(OrderedPathPart, self).__init__(**kwargs)
+
+    def __repr__(self):
+        return '<OrderedPathPart (%s, %s)>' % (self.ordering, self.identifier)
+
+    def prepare(self, data):
+        logger.info('OrderedPathPart.prepare (%s, %s) %r', self.ordering, self.identifier , data)
+        if not (isinstance(data, list) or data is None):
+            raise InvalidInsertion('Cannot insert an ordered element to things other than lists/None. Got %r' % data)
+        elif isinstance(data, list):
+            if len([True for item in data if not isinstance(item, tuple)]) > 0:
+                raise InvalidInsertion('Attempt to insert an ordering tuple to a list with non-ordered values: %r' % data)
+            self.data = data
+            for item in data:
+                if item[2] == self.identifier and self.identifier is not None:
+                    if self.ordering is not None and item[1] != self.ordering:
+                        raise InvalidInsertion('Bad identifier/ordering: provided identifier %s has ordering %s, but we were given ordering %s' % (self.identifier, item[1], self.ordering))
+                    return item[0]
+            return None
+        else:
+            self.data = []
+            return None
+
+    def insert(self, supr):
+        logger.info('OrderedPathPart.insert (%s, %s) %r', self.ordering, self.identifier , supr)
+        if not isinstance(self.data, list):
+            raise InvalidInsertion('Cannot insert an ordered element to things other than lists. Got %r' % self.data)
+        else:
+            if len([True for item in self.data if not isinstance(item, tuple)]) > 0:
+                raise InvalidInsertion('Attempt to insert an ordering tuple to a list with non-ordered values: %r' % self.data)
+            if self.identifier is not None:
+                self.inserted = False
+                ret = [self._insert_item(item, supr) for item in self.data]
+                if not self.inserted:
+                    ret.append((supr, self.ordering, self.identifier))
+                return ret
+            else:
+                ret = self.data
+                ret.append((supr, self.ordering, self.identifier))
+                return ret
+
+    def _insert_item(self, item, supr):
+        (current, ordering, identifier) = item
+        if not self.inserted and identifier == self.identifier:
+            if self.ordering is not None and ordering != self.ordering:
+                raise InvalidInsertion('Bad identifier/ordering: provided identifier %s has ordering %s, but we were given ordering %s' % (self.identifier, ordering, self.ordering))
+            return (supr, ordering, identifier)
+        elif self.inserted and identifier == self.identifier:
+            raise InvalidInsertion('Duplicate identifier: %s', identifier)
+        else:
+            return item
+
 def insert_value(data, path, value):
     inserter = PathInserter(data)
     inserter.insert_data(path, value)
-    return inserter.data
+    return inserter.get_data()
