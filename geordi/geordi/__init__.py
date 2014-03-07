@@ -6,6 +6,7 @@ import geordi.settings
 from geordi.user import User
 import geordi.db as db
 import jinja2_highlight
+import logging
 
 login_manager = LoginManager()
 login_manager.login_view = "frontend.hello"
@@ -22,7 +23,15 @@ class GeordiFlask(Flask):
     jinja_options = dict(Flask.jinja_options)
     jinja_options.setdefault('extensions', []).append('jinja2_highlight.HighlightExtension')
 
-def create_app():
+def create_app(*args, **kwargs):
+    if kwargs.get('log_debug'):
+        logger = logging.getLogger('geordi')
+        logger.setLevel(logging.DEBUG)
+        ch = logging.StreamHandler()
+        ch.setLevel(logging.DEBUG)
+        formatter = logging.Formatter('%(asctime)s (%(levelname)s) %(name)s:  %(message)s')
+        ch.setFormatter(formatter)
+        logger.addHandler(ch)
     app = GeordiFlask(__name__)
     app.config.from_object('geordi.settings')
     app.config.from_pyfile('settings.cfg', silent=True)
