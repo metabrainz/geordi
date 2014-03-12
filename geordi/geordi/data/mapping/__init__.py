@@ -36,6 +36,7 @@ def map_item(item):
     else:
         raise Exception('unimplemented')
     # merge XXX: implement along with merging of items
+    # XXX: links for ordering-tuple entries
     return (_flatten(mapped_data), links)
 
 def map_data_item(data_id, data):
