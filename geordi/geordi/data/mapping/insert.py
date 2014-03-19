@@ -8,6 +8,11 @@ logger = logging.getLogger('geordi.data.mapping.insert')
 class InvalidInsertion(Exception):
     pass
 
+def fix_path(path):
+    ins = PathInserter({})
+    path = ins._process_path(path)
+    return [entry.source_value() for entry in path]
+
 class PathInserter(object):
     def __init__(self, data):
         self.data = data
@@ -59,6 +64,9 @@ class PathPart(object):
     def insert(self, supr):
         raise Exception('unimplemented')
 
+    def source_value(self):
+        raise Exception('unimplemented')
+
 class SimplePathPart(PathPart):
     def __init__(self, key, **kwargs):
         self.key = key
@@ -66,6 +74,9 @@ class SimplePathPart(PathPart):
 
     def __repr__(self):
         return '<SimplePathPart %s>' % self.key
+
+    def source_value(self):
+        return self.key
 
     def prepare(self, data):
         logger.info('SimplePathPart.prepare (%s) %r', self.key, data)
@@ -116,6 +127,9 @@ class OrderedPathPart(PathPart):
 
     def __repr__(self):
         return '<OrderedPathPart (%s, %s)>' % (self.ordering, self.identifier)
+
+    def source_value(self):
+        return (self.ordering, self.identifier)
 
     def prepare(self, data):
         logger.info('OrderedPathPart.prepare (%s, %s) %r', self.ordering, self.identifier , data)

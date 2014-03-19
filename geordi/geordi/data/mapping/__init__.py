@@ -1,5 +1,5 @@
 from .indexes import index_dict
-from .insert import insert_value, InvalidInsertion
+from .insert import InvalidInsertion, PathInserter, fix_path
 import re
 import collections
 import logging
@@ -26,7 +26,8 @@ def _partition_links(links, path, known_keys):
     part[None] = []
     for l in links:
         cmp_path = [l[0]] + l[1]
-        if cmp_path[:len(path)] == path and cmp_path[len(path)] in known_keys:
+        logger.debug('path for comparison: %r', cmp_path)
+        if len(cmp_path) > len(path) and cmp_path[:len(path)] == path and cmp_path[len(path)] in known_keys:
             part[cmp_path[len(path)]].append(l)
         else:
             part[None].append(l)
@@ -101,7 +102,7 @@ def map_data_item(data_id, data):
         return ({data_id: data},[]) # XXX: inflate with orderings, when implementing merging (links?)
     else:
         # initial datastructure assumes at least data for this node
-        res = {data_id: {}}
+        inserter = PathInserter({data_id: {}})
         links = []
         # determine index and item type to use
         # get rules to use
@@ -115,12 +116,13 @@ def map_data_item(data_id, data):
                 for value in values:
                     # put value at destination in node
                     node = data_id
+                    path = fix_path([node] + value[1])
                     if value[0] is not None:
                         node = node + ':' + value[0]
                     # insert in a separate dict by node, then at provided path
                     if value[2] is not None:
                         try:
-                            res = insert_value(res, [node] + value[1], value[2])
+                            inserter.insert_data(path, value[2])
                         except InvalidInsertion as failure:
                             if value[3] is not None:
                                 logger.info('ignoring an insertion failure since links are provided')
@@ -129,8 +131,8 @@ def map_data_item(data_id, data):
                     # add to links
                     if value[3] is not None:
                         # data item ID, node, destination, linked data item
-                        links.append((node, value[1], value[3]))
-        return (res,links)
+                        links.append((path[0], path[1:], value[3]))
+        return (inserter.get_data(),links)
 
 def verify_map(data):
     with open(dirname(abspath(__file__)) + '/../../schema/mapping.json') as sch_file:
