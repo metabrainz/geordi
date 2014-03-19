@@ -158,6 +158,7 @@ class OrderedPathPart(PathPart):
         if not self.inserted and identifier == self.identifier:
             if self.ordering is not None and ordering != self.ordering:
                 raise InvalidInsertion('Bad identifier/ordering: provided identifier %s has ordering %s, but we were given ordering %s' % (self.identifier, ordering, self.ordering))
+            self.inserted = True
             return (supr, ordering, identifier)
         elif self.inserted and identifier == self.identifier:
             raise InvalidInsertion('Duplicate identifier: %s', identifier)

@@ -3,12 +3,12 @@ test_index = {
     'album': [
               Rule(['title'], ['release', 'name']),
               Rule(['tracks', ('t_index', True), 'title'],
-                   lambda *args, **kwargs: ['release','tracks', kwargs.get('t_index'), 'name']),
+                   lambda *args, **kwargs: ['release','mediums', 'split', 'tracks', (kwargs.get('t_index'),), 'name']),
               Rule(['tracks', ('t_index', True), 'duration'],
-                   lambda *args, **kwargs: ['release','tracks', kwargs.get('t_index'), 'length'],
+                   lambda *args, **kwargs: ['release','mediums', 'split', 'tracks', (kwargs.get('t_index'),), 'length'],
                    transform=lambda a, *args, **kwargs: int(a) * 1000),
               Rule(['artists', ('a_index', True)],
-                   lambda *args, **kwargs: ['release', 'artists', 'combined', kwargs.get('a_index')],
+                   lambda *args, **kwargs: ['release', 'artists', 'combined', (kwargs.get('a_index'),)],
                    transform=lambda value, *args, **kwargs: {'name': value['name'], 'credit': value.get('credit', value['name'])},
                    link=lambda value, data, *args, **kwargs: 'test_index/artist/%s' % value.get('id'))
               # alternately, remove 'transform' above and use:
