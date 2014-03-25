@@ -28,6 +28,7 @@ def get_renderable(item_id):
     item = get_item(item_id)
     if item is not None:
         item['data_formatted'] = dict([(d_id, json.dumps(data, indent=4)) for d_id, data in item.get('data', {}).iteritems()])
+        item['map_formatted'] = json.dumps(item['map'], indent=4)
     return item
 
 def data_to_item(data_id, conn=None):
