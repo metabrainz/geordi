@@ -19,7 +19,7 @@ def track_name(track, *args, **kwargs):
 
 ninjatune = {
     'release': list(chain.from_iterable([
-                   both(['release', 'title'], 'PRODUCT TITLE', 'Product Title'),
+                   both(['release', 'name'], 'PRODUCT TITLE', 'Product Title'),
                    both(['release', 'comment'], 'PRODUCT VERSION', 'Product Version'),
                    both(['release', 'artists', 'split', 'names'], 'ARTIST', 'Artist', suffix=[('i2', True), ('index', True, lambda val, *args, **kwargs: val.split('|'))]),
                    both(['release', 'artists', 'unsplit'], 'DISPLAY ARTIST', 'Display Artist'),
