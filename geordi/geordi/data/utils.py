@@ -21,6 +21,11 @@ def get_item(item_id, conn=None):
                 ret['map'] = json.loads(row[0])
             if row[1] is not None:
                 ret['type'] = row[1]
+        # XXX: backwards links
+        curs.execute('SELECT type, linked FROM item_link WHERE item = %s', (item_id,))
+        if curs.rowcount > 0:
+            links = dict([(d[0], d[1]) for d in curs.fetchall()])
+            ret['links'] = links
         return ret
 
 def get_renderable(item_id):
