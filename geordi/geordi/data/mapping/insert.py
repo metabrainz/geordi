@@ -50,13 +50,15 @@ class PathInserter(object):
             else:
                 final.append(SimplePathPart(entry))
         if not (isinstance(path[-1], tuple) or isinstance(path[-1], PathPart)):
+            logger.debug("Inserting an OrderedPathPart since %s is neither tuple nor PathPart", path[-1])
             final.append(OrderedPathPart())
         return final
 
 class PathPart(object):
-    def __init__(self, before=no_op_value, after=no_op_value):
+    def __init__(self, before=no_op_value, after=no_op_value, no_manip=False):
         self.before = make_callable(before)
         self.after = make_callable(after)
+        self.no_manip = no_manip
         
     def prepare(self, data):
         raise Exception('unimplemented')
@@ -76,7 +78,10 @@ class SimplePathPart(PathPart):
         return '<SimplePathPart %s>' % self.key
 
     def source_value(self):
-        return self.key
+        if not self.no_manip:
+            return self.key
+        else:
+            return self
 
     def prepare(self, data):
         logger.info('SimplePathPart.prepare (%s) %r', self.key, data)

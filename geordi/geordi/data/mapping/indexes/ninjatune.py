@@ -1,6 +1,7 @@
 from __future__ import print_function
 from ..rule import Rule
 from itertools import chain
+from ..insert import SimplePathPart
 
 def both(dest, *opts, **kwargs):
     prefix = kwargs.get('prefix', [])
@@ -21,8 +22,15 @@ ninjatune = {
     'release': list(chain.from_iterable([
                    both(['release', 'name'], 'PRODUCT TITLE', 'Product Title'),
                    both(['release', 'comment'], 'PRODUCT VERSION', 'Product Version'),
+
                    both(['release', 'artists', 'split', 'names'], 'ARTIST', 'Artist', suffix=[('i2', True), ('index', True, lambda val, *args, **kwargs: val.split('|'))]),
                    both(['release', 'artists', 'unsplit'], 'DISPLAY ARTIST', 'Display Artist'),
+
+                   both(lambda x, *args, **kwargs: ['release', 'labels', 'combined', (kwargs.get('index'),), SimplePathPart('label', no_manip=True)], 'MAIN LABEL', 'Main Label'),
+                   both(lambda x, *args, **kwargs: ['release', 'labels', 'combined', (kwargs.get('index'),), SimplePathPart('catalog_number', no_manip=True)], 'CATALOGUE NUMBER', 'Catalogue Number'),
+                   both(lambda x, *args, **kwargs: ['release', 'labels', 'combined', (kwargs.get('index')+1,), SimplePathPart('label', no_manip=True)], 'SUB_LABEL', 'Sub_Label'),
+                   both(lambda x, *args, **kwargs: ['release', 'labels', 'combined', (kwargs.get('index')+1,), SimplePathPart('catalog_number', no_manip=True)], 'CATALOGUE NUMBER', 'Catalogue Number'),
+
                    both(['release', 'barcode'], 'BARCODE', 'Barcode', transform=lambda val, *args, **kwargs: str(int(val))),
                    #both(['release', 'release_group'], 'CATALOGUE NUMBER', 'Catalogue Number', link=lambda value, data, *args, **kwargs: 'ninjatune/release/%s:rg' % value, link_only=True),
                    both(['release', 'tag'], 'MAIN GENRE', 'Main Genre', 'SUB_GENRE', 'Sub_Genre', condition=lambda x, *args, **kwargs: x != ''),
