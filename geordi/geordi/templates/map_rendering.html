@@ -1,21 +1,22 @@
 {# Macros for rendering mapped data #}
 {%- macro render_map(item) -%}
   {%- if 'release' in item.map -%}
-    <h4>Release: {{ comma_list(item.map.release.name, before="“", after="”") }}</h4>{# Assume we have a name. #}
+    {%- set release = item.map.release -%}
+    <h4>Release: {{ comma_list(release.name, before="“", after="”") }}</h4>{# Assume we have a name. #}
     <table><tbody>
-        {%- if item.map.release.status -%}{{ info_table_row('Status:', comma_list(item.map.release.status)) }}{%- endif -%}
+        {%- if release.status -%}{{ info_table_row('Status:', comma_list(release.status)) }}{%- endif -%}
 
-        {%- if item.map.release.artists -%}{{ info_table_row('Artists:', render_artists(item.map.release.artists, item.links, 'release')) }}{%- endif -%}
-        {%- if item.map.release.labels -%}{{ info_table_row('Labels:', render_labels(item.map.release.labels, item.links)) }}{%- endif -%}
-        {%- if item.map.release.events -%}{{ info_table_row('Events:', render_events(item.map.release.events, item.links)) }}{%- endif -%}
+        {%- if release.artists -%}{{ info_table_row('Artists:', render_artists(release.artists, item.links, 'release')) }}{%- endif -%}
+        {%- if release.labels -%}{{ info_table_row('Labels:', render_labels(release.labels, item.links)) }}{%- endif -%}
+        {%- if release.events -%}{{ info_table_row('Events:', render_events(release.events, item.links)) }}{%- endif -%}
 
-        {%- if item.map.release.language -%}{{ info_table_row('Language:', comma_list(item.map.release.language)) }}{%- endif -%}
-        {%- if item.map.release.script -%}{{ info_table_row('Script:', comma_list(item.map.release.script)) }}{%- endif -%}
-        {%- if item.map.release.barcode -%}{{ info_table_row('Barcodes:', comma_list(item.map.release.barcode)) }}{%- endif -%}
+        {%- if release.language -%}{{ info_table_row('Language:', comma_list(release.language)) }}{%- endif -%}
+        {%- if release.script -%}{{ info_table_row('Script:', comma_list(release.script)) }}{%- endif -%}
+        {%- if release.barcode -%}{{ info_table_row('Barcodes:', comma_list(release.barcode)) }}{%- endif -%}
 
-        {%- if item.map.release.packaging -%}{{ info_table_row('Packaging:', comma_list(item.map.release.packaging)) }}{%- endif -%}
+        {%- if release.packaging -%}{{ info_table_row('Packaging:', comma_list(release.packaging)) }}{%- endif -%}
     </tbody></table>
-    {%- if item.map.release.mediums -%}{{ render_mediums(item.map.release.mediums) }}{%- endif -%}
+    {%- if release.mediums -%}{{ render_mediums(release.mediums) }}{%- endif -%}
   {%- endif -%}
 {%- endmacro -%}
 
