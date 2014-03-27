@@ -1,15 +1,17 @@
 {% extends "layout.html" %}
+{% from "map_rendering.html" import render_map %}
 {% block title %}Item {{ item.id }}{% endblock %}
 {% block css %}{{ super() }}<link rel="stylesheet" href="{{ url_for('static', filename='styles/pygments.css') }}">{% endblock %}
 {% block content %}
   <h2>Item {{ item.id }}</h2>
   <h3>Mapped Data</h3>
-  {% highlight 'json' %}{{ item.map_formatted }}{% endhighlight %}
+  {{ render_map(item) }}
 
   <h3>Raw Data</h3>
   <ul style="list-style-type: none; padding: 0">
     {% for id, data in item.data_formatted.iteritems() %}
       <li style="border: 1px solid grey"><h4>{{ id }}</h4>{% highlight 'json' %}{{ data }}{% endhighlight %}</li>
     {% endfor %}
+    <li style="border: 1px solid lightgrey"><h4>Raw item map</h4>{%- highlight 'json' %}{{ item.map_formatted }}{% endhighlight -%}</li>
   </ul>
 {% endblock %}

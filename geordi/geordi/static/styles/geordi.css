@@ -10,3 +10,5 @@ button.login-button:hover { background-color: #EEE; cursor: pointer; }
 p.hidden-doc { display: none; color: #666; }
 
 label:hover p.hidden-doc { display: inline }
+
+span.row { display: block }
