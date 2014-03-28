@@ -109,7 +109,8 @@
     {%- for medium in mediums.combined -%}
       <h6>{%- if medium.format -%}{{ format }}{%- else -%}Medium{%- endif %} {{ loop.index }}</h6>
       {%- if medium.tracks -%}
-      <table><tbody>
+      <table>{{ track_table_header() }}
+        <tbody>
         {%- for track in medium.tracks -%}{{ render_track(track, loop.index) }}{%- endfor -%}
       </tbody></table>
       {%- endif -%}
@@ -118,15 +119,26 @@
   {%- if mediums.split -%}
     {%- if mediums.split.tracks -%}
     <h6>Tracks</h6>
-    <table><tbody>
+    <table>{{ track_table_header() }}
+      <tbody>
       {%- for track in mediums.split.tracks -%}{{ render_track(track, loop.index) }}{%- endfor -%}
     </tbody></table>
     {%- endif -%}
   {%- endif -%}
 {%- endmacro -%}
+{%- macro track_table_header(tracks) -%}
+<thead><tr>
+  <th>#</th>
+  <th>Name</th>
+  <th>Artists</th>
+  <th>Length</th>
+</tr></thead>
+{%- endmacro -%}
 {%- macro render_track(track, position) -%}
 <tr>
-  <td>{{ position }}</td>
+  <td>{{ position }}{%- if track.number -%}: {{ comma_list(track.number) }}{%- endif -%}</td>
   <td>{{ comma_list(track.name) }}</td>
+  <td>{%- if track.artists -%}{{ render_artists(track.artists) }}{%- endif -%}</td>
+  <td>{{ comma_list(track.length) }}</td>
 </tr>
 {%- endmacro -%}
