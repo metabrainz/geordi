@@ -109,36 +109,40 @@
     {%- for medium in mediums.combined -%}
       <h6>{%- if medium.format -%}{{ format }}{%- else -%}Medium{%- endif %} {{ loop.index }}</h6>
       {%- if medium.tracks -%}
-      <table>{{ track_table_header() }}
+      {%- set artists = medium.tracks|selectattr("artists")|list|length > 0 -%}
+      {%- set lengths = medium.tracks|selectattr("length")|list|length > 0 -%}
+      <table>{{ track_table_header(artists=artists, lengths=lengths) }}
         <tbody>
-        {%- for track in medium.tracks -%}{{ render_track(track, loop.index) }}{%- endfor -%}
+        {%- for track in medium.tracks -%}{{ render_track(track, loop.index, artists=artists, lengths=lengths) }}{%- endfor -%}
       </tbody></table>
       {%- endif -%}
     {%- endfor -%}
   {%- endif -%}
   {%- if mediums.split -%}
     {%- if mediums.split.tracks -%}
+    {%- set artists = mediums.split.tracks|selectattr("artists")|list|length > 0 -%}
+    {%- set lengths = mediums.split.tracks|selectattr("length")|list|length > 0 -%}
     <h6>Tracks</h6>
-    <table>{{ track_table_header() }}
+    <table>{{ track_table_header(artists=artists, lengths=lengths) }}
       <tbody>
-      {%- for track in mediums.split.tracks -%}{{ render_track(track, loop.index) }}{%- endfor -%}
+      {%- for track in mediums.split.tracks -%}{{ render_track(track, loop.index, artists=artists, lengths=lengths) }}{%- endfor -%}
     </tbody></table>
     {%- endif -%}
   {%- endif -%}
 {%- endmacro -%}
-{%- macro track_table_header(tracks) -%}
+{%- macro track_table_header(artists=true, lengths=true) -%}
 <thead><tr>
   <th>#</th>
   <th>Name</th>
-  <th>Artists</th>
-  <th>Length</th>
+  {%- if artists -%}<th>Artists</th>{%- endif -%}
+  {%- if lengths -%}<th>Length</th>{%- endif -%}
 </tr></thead>
 {%- endmacro -%}
-{%- macro render_track(track, position) -%}
+{%- macro render_track(track, position, artists=true, lengths=true) -%}
 <tr>
   <td>{{ position }}{%- if track.number -%}: {{ comma_list(track.number) }}{%- endif -%}</td>
   <td>{{ comma_list(track.name) }}</td>
-  <td>{%- if track.artists -%}{{ render_artists(track.artists) }}{%- endif -%}</td>
-  <td>{{ comma_list(track.length) }}</td>
+  {%- if artists -%}<td>{%- if track.artists -%}{{ render_artists(track.artists) }}{%- endif -%}</td>{%- endif -%}
+  {%- if lengths -%}<td>{{ comma_list(track.length) }}</td>{%- endif -%}
 </tr>
 {%- endmacro -%}
