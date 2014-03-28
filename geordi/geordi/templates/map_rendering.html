@@ -15,6 +15,7 @@
         {%- if release.barcode -%}{{ info_table_row('Barcodes:', comma_list(release.barcode)) }}{%- endif -%}
 
         {%- if release.packaging -%}{{ info_table_row('Packaging:', comma_list(release.packaging)) }}{%- endif -%}
+        {%- if release.mediums.split.formats -%}{{ info_table_row('Formats:', comma_list(release.mediums.split.formats)) }}{%- endif -%}{# Yeah, it's not in render_mediums, shoot me #}
     </tbody></table>
     {%- if release.mediums -%}{{ render_mediums(release.mediums) }}{%- endif -%}
   {%- endif -%}
@@ -103,4 +104,29 @@
 {%- endmacro -%}
 
 {%- macro render_mediums(mediums) -%}
+  <h5>Mediums</h5>
+  {%- if mediums.combined -%}
+    {%- for medium in mediums.combined -%}
+      <h6>{%- if medium.format -%}{{ format }}{%- else -%}Medium{%- endif %} {{ loop.index }}</h6>
+      {%- if medium.tracks -%}
+      <table><tbody>
+        {%- for track in medium.tracks -%}{{ render_track(track, loop.index) }}{%- endfor -%}
+      </tbody></table>
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
+  {%- if mediums.split -%}
+    {%- if mediums.split.tracks -%}
+    <h6>Tracks</h6>
+    <table><tbody>
+      {%- for track in mediums.split.tracks -%}{{ render_track(track, loop.index) }}{%- endfor -%}
+    </tbody></table>
+    {%- endif -%}
+  {%- endif -%}
+{%- endmacro -%}
+{%- macro render_track(track, position) -%}
+<tr>
+  <td>{{ position }}</td>
+  <td>{{ comma_list(track.name) }}</td>
+</tr>
 {%- endmacro -%}
