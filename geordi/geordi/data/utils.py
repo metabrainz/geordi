@@ -93,6 +93,8 @@ def _create_item(data_type, conn):
 link_type_map = {
     'release%artists': 'artist',
     'release%release_group': 'release_group',
+    'release%events': 'area',
+    'release%labels': 'label',
 }
 def _link_type_to_item_type(link_type):
     '''First try the whole path, then take off the last element, etc.,
