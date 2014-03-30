@@ -32,7 +32,7 @@ ninjatune = {
                    both(lambda x, *args, **kwargs: ['release', 'labels', 'combined', (kwargs.get('index')+1,), SimplePathPart('catalog_number', no_manip=True)], 'CATALOGUE NUMBER', 'Catalogue Number'),
 
                    # XXX: sometimes non-numeric, need to handle this case
-                   both(['release', 'barcode'], 'BARCODE', 'Barcode', transform=lambda val, *args, **kwargs: str(int(val))),
+                   both(['release', 'barcode'], 'BARCODE', 'Barcode', transform=lambda val, *args, **kwargs: str(int(val)), condition=lambda x, *args, **kwargs: x not in ('', 'N/A')),
                    both(['release', 'tag'], 'MAIN GENRE', 'Main Genre', 'SUB_GENRE', 'Sub_Genre', condition=lambda x, *args, **kwargs: x != ''),
 
                    both(lambda x, *args, **kwargs: ['release', 'mediums', 'split', 'tracks', (kwargs.get('t_index'),), 'number'], 'TRACK NUMBER', 'track number',
@@ -55,6 +55,7 @@ ninjatune = {
 
                    both(['recording', 'isrcs'], 'ISRC CODE', 'ISRC Code',
                         prefix=['tracks', ('t_index', True)], suffix=[],
+                        transform=lambda val, *args, **kwargs: val.replace('-', ''),
                         node_destination=lambda val, *args, **kwargs: 'recording-%s' % kwargs.get('t_index')),
                    [
                     Rule(['tracks', ('t_index', True)],

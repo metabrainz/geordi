@@ -18,6 +18,12 @@
         {%- if release.mediums.split.formats -%}{{ info_table_row('Formats:', comma_list(release.mediums.split.formats)) }}{%- endif -%}{# Yeah, it's not in render_mediums, shoot me #}
     </tbody></table>
     {%- if release.mediums -%}{{ render_mediums(release.mediums, links=item.links) }}{%- endif -%}
+  {%- elif 'recording' in item.map -%}
+    {%- set recording = item.map.recording -%}
+    <h4>Recording: {{ comma_list(recording.name, before="“", after="”") }}</h4>{# Assume we have a name. #}
+    <table><tbody>
+        {%- if recording.isrcs -%}{{ info_table_row('ISRCs:', comma_list(recording.isrcs)) }}{%- endif -%}
+    </tbody></table>
   {%- endif -%}
 {%- endmacro -%}
 
