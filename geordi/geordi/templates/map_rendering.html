@@ -17,7 +17,7 @@
         {%- if release.packaging -%}{{ info_table_row('Packaging:', comma_list(release.packaging)) }}{%- endif -%}
         {%- if release.mediums.split.formats -%}{{ info_table_row('Formats:', comma_list(release.mediums.split.formats)) }}{%- endif -%}{# Yeah, it's not in render_mediums, shoot me #}
     </tbody></table>
-    {%- if release.mediums -%}{{ render_mediums(release.mediums) }}{%- endif -%}
+    {%- if release.mediums -%}{{ render_mediums(release.mediums, links=item.links) }}{%- endif -%}
   {%- endif -%}
 {%- endmacro -%}
 
@@ -103,46 +103,56 @@
   {%- if event.date %} ({{ event.date }}){% endif -%}
 {%- endmacro -%}
 
-{%- macro render_mediums(mediums) -%}
+{%- macro render_mediums(mediums, links={}) -%}
   <h5>Mediums</h5>
   {%- if mediums.combined -%}
     {%- for medium in mediums.combined -%}
       <h6>{%- if medium.format -%}{{ format }}{%- else -%}Medium{%- endif %} {{ loop.index }}</h6>
       {%- if medium.tracks -%}
-      {%- set artists = medium.tracks|selectattr("artists")|list|length > 0 -%}
-      {%- set lengths = medium.tracks|selectattr("length")|list|length > 0 -%}
-      <table>{{ track_table_header(artists=artists, lengths=lengths) }}
-        <tbody>
-        {%- for track in medium.tracks -%}{{ render_track(track, loop.index, artists=artists, lengths=lengths) }}{%- endfor -%}
-      </tbody></table>
+        {{ render_tracklist(medium.tracks, links=links, prefix=['release', 'mediums', 'combined', loop.index0]|join('%')) }}
       {%- endif -%}
     {%- endfor -%}
   {%- endif -%}
   {%- if mediums.split -%}
     {%- if mediums.split.tracks -%}
-    {%- set artists = mediums.split.tracks|selectattr("artists")|list|length > 0 -%}
-    {%- set lengths = mediums.split.tracks|selectattr("length")|list|length > 0 -%}
-    <h6>Tracks</h6>
-    <table>{{ track_table_header(artists=artists, lengths=lengths) }}
-      <tbody>
-      {%- for track in mediums.split.tracks -%}{{ render_track(track, loop.index, artists=artists, lengths=lengths) }}{%- endfor -%}
-    </tbody></table>
+      <h6>Tracks</h6>
+      {{ render_tracklist(mediums.split.tracks, links=links, prefix=['release', 'mediums', 'split']|join('%')) }}
     {%- endif -%}
   {%- endif -%}
 {%- endmacro -%}
-{%- macro track_table_header(artists=true, lengths=true) -%}
+{%- macro render_tracklist(tracks, links={}, prefix='') -%}
+  {%- set artists = tracks|selectattr("artists")|list|length > 0 -%}
+  {%- set lengths = tracks|selectattr("length")|list|length > 0 -%}
+  {%- set recordings = tracks|selectattr("recording")|list|length > 0 -%}
+  <table>
+    {{ track_table_header(artists=artists, lengths=lengths, recordings=recordings) }}
+    <tbody>{%- for track in tracks -%}
+      {{ render_track(track, loop.index, artists=artists, lengths=lengths, recordings=recordings, links=links, prefix=[prefix, 'tracks', loop.index0]|join('%')) }}
+    {%- endfor -%}
+  </tbody></table>
+{%- endmacro -%}
+{%- macro track_table_header(artists=true, lengths=true, recordings=true) -%}
 <thead><tr>
   <th>#</th>
   <th>Name</th>
   {%- if artists -%}<th>Artists</th>{%- endif -%}
   {%- if lengths -%}<th>Length</th>{%- endif -%}
+  {%- if recordings -%}<th>Recording</th>{%- endif -%}
 </tr></thead>
 {%- endmacro -%}
-{%- macro render_track(track, position, artists=true, lengths=true) -%}
+{%- macro render_track(track, position, artists=true, lengths=true, recordings=true, links={}, prefix='') -%}
 <tr>
   <td>{{ position }}{%- if track.number -%}: {{ comma_list(track.number) }}{%- endif -%}</td>
   <td>{{ comma_list(track.name) }}</td>
-  {%- if artists -%}<td>{%- if track.artists -%}{{ render_artists(track.artists) }}{%- endif -%}</td>{%- endif -%}
+  {%- if artists -%}<td>{%- if track.artists -%}{{ render_artists(track.artists, links=links, prefix=prefix) }}{%- endif -%}</td>{%- endif -%}
   {%- if lengths -%}<td>{{ comma_list(track.length) }}</td>{%- endif -%}
+  {%- if recordings -%}<td>{%- if track.recording -%}{{ render_recordings(track.recording, links=links, prefix=prefix) }}{%- endif -%}</td>{%- endif -%}
 </tr>
+{%- endmacro -%}
+{%- macro render_recordings(recording_names, links={}, prefix='') -%}
+  {%- for name in recording_names -%}
+    {%- set link_key = [prefix, 'recording', loop.index0]|join('%') -%}
+    {%- if link_key in links -%}{{ linked(links[link_key], name) }}{%- else -%}{{ name }}{%- endif -%}
+    {%- if not loop.last -%}, {% endif -%}
+  {%- endfor -%}
 {%- endmacro -%}
