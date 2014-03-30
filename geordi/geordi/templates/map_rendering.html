@@ -46,7 +46,7 @@
   {%- endif -%} 
   {%- if artists.split -%}
     <span class="split-artists row">
-        {%- if artists.split.names -%}<span class="split-artists-names row"><strong>List of artist names:</strong> {{ comma_list(artists.split.names, before="“", after="”") }}</span>{%- endif -%}
+        {%- if artists.split.names -%}<span class="split-artists-names row"><strong>List of artist names:</strong> {{ render_name_links(artists.split.names, 'artists%split%names', prefix=prefix, links=links, before="“", after="”") }}</span>{%- endif -%}
         {%- if artists.split.credits -%}<span class="split-artists-credits row"><strong>List of artists as credited:</strong> {{ comma_list(artists.split.credits, before="“", after="”") }}</span>{%- endif -%}
         {%- if artists.split.join_phrases -%}<span class="split-artists-join_phrases row"><strong>List of artist join phrases:</strong> {{ comma_list(artists.split.join_phrases, before="“", after="”") }}</span>{%- endif -%}
      </span>
@@ -152,13 +152,16 @@
   <td>{{ comma_list(track.name) }}</td>
   {%- if artists -%}<td>{%- if track.artists -%}{{ render_artists(track.artists, links=links, prefix=prefix) }}{%- endif -%}</td>{%- endif -%}
   {%- if lengths -%}<td>{{ comma_list(track.length) }}</td>{%- endif -%}
-  {%- if recordings -%}<td>{%- if track.recording -%}{{ render_recordings(track.recording, links=links, prefix=prefix) }}{%- endif -%}</td>{%- endif -%}
+  {%- if recordings -%}<td>{%- if track.recording -%}{{ render_name_links(track.recording, 'recording', links=links, prefix=prefix) }}{%- endif -%}</td>{%- endif -%}
 </tr>
 {%- endmacro -%}
-{%- macro render_recordings(recording_names, links={}, prefix='') -%}
-  {%- for name in recording_names -%}
-    {%- set link_key = [prefix, 'recording', loop.index0]|join('%') -%}
+
+{%- macro render_name_links(names, intermix, links={}, prefix='', before='', after='') -%}
+  {%- for name in names -%}
+    {%- set link_key = [prefix, intermix, loop.index0]|join('%') -%}
+    {{ before }}
     {%- if link_key in links -%}{{ linked(links[link_key], name) }}{%- else -%}{{ name }}{%- endif -%}
+    {{ after }}
     {%- if not loop.last -%}, {% endif -%}
   {%- endfor -%}
 {%- endmacro -%}

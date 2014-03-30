@@ -23,7 +23,8 @@ ninjatune = {
                    both(['release', 'name'], 'PRODUCT TITLE', 'Product Title'),
                    both(['release', 'comment'], 'PRODUCT VERSION', 'Product Version'),
 
-                   both(['release', 'artists', 'split', 'names'], 'ARTIST', 'Artist', suffix=[('i2', True), ('index', True, lambda val, *args, **kwargs: val.split('|'))]),
+                   both(lambda *args, **kwargs: ['release', 'artists', 'split', 'names', (kwargs.get('index'),)], 'ARTIST', 'Artist', suffix=[('i2', True), ('index', True, lambda val, *args, **kwargs: val.split('|'))],
+                        link=lambda value, *args, **kwargs: 'ninjatune/artist/%s' % value),
                    both(['release', 'artists', 'unsplit'], 'DISPLAY ARTIST', 'Display Artist'),
 
                    both(lambda x, *args, **kwargs: ['release', 'labels', 'combined', (kwargs.get('index'),), SimplePathPart('label', no_manip=True)], 'MAIN LABEL', 'Main Label',
@@ -40,8 +41,9 @@ ninjatune = {
                    both(lambda x, *args, **kwargs: ['release', 'mediums', 'split', 'tracks', (kwargs.get('t_index'),), 'number'], 'TRACK NUMBER', 'track number',
                         prefix=['tracks', ('t_index', True)], suffix=[],
                         transform=lambda val, *args, **kwargs: str(int(val))),
-                   both(lambda x, *args, **kwargs: ['release', 'mediums', 'split', 'tracks', (kwargs.get('t_index'),), 'artists', 'split', 'names'], '_ARTIST', '_Artist',
-                        prefix=['tracks', ('t_index', True)], suffix=[('index', True, lambda val, *args, **kwargs: val.split('|'))]),
+                   both(lambda x, *args, **kwargs: ['release', 'mediums', 'split', 'tracks', (kwargs.get('t_index'),), 'artists', 'split', 'names', (kwargs.get('index'),)], '_ARTIST', '_Artist',
+                        prefix=['tracks', ('t_index', True)], suffix=[('index', True, lambda val, *args, **kwargs: val.split('|'))],
+                        link=lambda value, *args, **kwargs: 'ninjatune/artist/%s' % value),
                    both(lambda x, *args, **kwargs: ['release', 'mediums', 'split', 'tracks', (kwargs.get('t_index'),), 'artists', 'unsplit'], '_DISPLAY ARTIST', '_Display Artist',
                         prefix=['tracks', ('t_index', True)], suffix=[]),
                    [Rule(['tracks', ('t_index', True)],
