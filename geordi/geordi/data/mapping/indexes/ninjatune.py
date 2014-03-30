@@ -38,6 +38,9 @@ ninjatune = {
                    both(lambda x, *args, **kwargs: ['release', 'mediums', 'split', 'tracks', (kwargs.get('t_index'),), 'number'], 'TRACK NUMBER', 'track number',
                         prefix=['tracks', ('t_index', True)], suffix=[],
                         transform=lambda val, *args, **kwargs: str(int(val))),
+                   both(['recording', 'isrcs'], 'ISRC CODE', 'ISRC Code',
+                        prefix=['tracks', ('t_index', True)], suffix=[],
+                        node_destination=lambda val, *args, **kwargs: 'recording-%s' % kwargs.get('t_index')),
                    both(lambda x, *args, **kwargs: ['release', 'mediums', 'split', 'tracks', (kwargs.get('t_index'),), 'artists', 'split', 'names'], '_ARTIST', '_Artist',
                         prefix=['tracks', ('t_index', True)], suffix=[('index', True, lambda val, *args, **kwargs: val.split('|'))]),
                    both(lambda x, *args, **kwargs: ['release', 'mediums', 'split', 'tracks', (kwargs.get('t_index'),), 'artists', 'unsplit'], '_DISPLAY ARTIST', '_Display Artist',
@@ -45,6 +48,11 @@ ninjatune = {
                    [Rule(['tracks', ('t_index', True)],
                         lambda x, *args, **kwargs: ['release', 'mediums', 'split', 'tracks', (kwargs.get('t_index'),), 'name'],
                         transform=track_name
+                    ),
+                    Rule(['tracks', ('t_index', True)],
+                        lambda x, *args, **kwargs: ['release', 'mediums', 'split', 'tracks', (kwargs.get('t_index'),), 'recording'], 
+                        link=lambda value, data, *args, **kwargs: 'ninjatune/release/%s:recording-%s' % (data.get('CATALOGUE NUMBER', data['Catalogue Number'])[0],kwargs.get('t_index')),
+                        link_only=True
                     )]
                ]))
 }

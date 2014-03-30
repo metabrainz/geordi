@@ -1,6 +1,7 @@
 from ..db import get_db
 from .mapping import map_item, verify_map
 import json
+import re
 
 def get_item(item_id, conn=None):
     '''Fetch and return an item's data.'''
@@ -95,11 +96,16 @@ link_type_map = {
     'release%release_group': 'release_group',
     'release%events': 'area',
     'release%labels': 'label',
+
+    'release%mediums%combined%%tracks%%recording': 'recording',
+    'release%mediums%combined%%tracks%%artists': 'artist',
+    'release%mediums%split%tracks%%recording': 'recording',
+    'release%mediums%split%tracks%%artists': 'artist',
 }
 def _link_type_to_item_type(link_type):
     '''First try the whole path, then take off the last element, etc.,
        until one matches in link_type_map, or return None.'''
-    path = link_type.split('%')
+    path = re.sub('%[0-9]+(%|$)', '%\\1', link_type).split('%')
     for i in range(len(path),0,-1):
         prospect = link_type_map.get('%'.join(path[:i]))
         if prospect is not None:
@@ -140,7 +146,7 @@ def _map_item(item_id, conn):
     # Now that we can be assured any types set by links are already set on the items, insert the maps for other mapped nodes
     for data_id in mapped.keys():
         if data_id is not None:
-            verify = verify_map(mapped[data_id])
+            verify = list(verify_map(mapped[data_id]))
             if verify:
                 print "Validation errors in mapping data item %s: %r, continuing" % (data_id, verify)
             add_data_item(data_id, '', json.dumps(mapped[data_id]), conn=conn)

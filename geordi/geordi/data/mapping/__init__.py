@@ -16,7 +16,7 @@ def _filter_links(links, path):
 def _replace_ident(link, path, identifier, replace):
     relevant_entry = link[1][len(path)-1]
     if isinstance(relevant_entry, tuple) and relevant_entry[1] == identifier:
-        return tuple([link[0], link[1][:len(path)-1] + [replace] + link[1][len(path)+1:]] + list(link[2:]))
+        return tuple([link[0], link[1][:len(path)-1] + [replace] + link[1][len(path):]] + list(link[2:]))
 
 def _partition_links(links, path, known_keys):
     logger.debug('_partition_links %r %r %r', links, path, known_keys)
@@ -116,9 +116,9 @@ def map_data_item(data_id, data):
                 for value in values:
                     # put value at destination in node
                     node = data_id
-                    path = fix_path([node] + value[1])
                     if value[0] is not None:
                         node = node + ':' + value[0]
+                    path = fix_path([node] + value[1])
                     # insert in a separate dict by node, then at provided path
                     if value[2] is not None:
                         try:
