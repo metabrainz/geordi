@@ -76,9 +76,13 @@ class SimplePathPart(PathPart):
 
     def __repr__(self):
         return '<SimplePathPart %s>' % self.key
+    def __str__(self):
+        return self.source_value(no_manip_override=False)
 
-    def source_value(self):
-        if not self.no_manip:
+    def source_value(self, no_manip_override=None):
+        no_manip = self.no_manip
+        if no_manip_override is not None: no_manip = no_manip_override
+        if not no_manip:
             return self.key
         else:
             return self
