@@ -3,6 +3,6 @@
 {% block h1title %}{{ self.title() }}{% endblock %}
 {% block content %}
 <p>
-Welcome to geordi! You'll probably prefer to look at something like <a href="{{ url_for('frontend.item', item_id=1) }}">the page for item 1</a> instead of this page.
+Welcome to geordi! You'll probably prefer to look at something like <a href="{{ url_for('frontend.list_indexes') }}">the listing of indexes</a> to get started.
 </p>
 {% endblock %}
