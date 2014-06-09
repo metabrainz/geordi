@@ -1,4 +1,4 @@
-DEBUG = False
+DEBUG = False # Won't matter with manager.py, use -d option to set false, defaults true
 SECRET_KEY = 'seriously, change this'
 OAUTH_CLIENT_ID = 'XXXXXXXXXXXXXXXXXXXXXX'
 OAUTH_CLIENT_SECRET = 'XXXXXXXXXXXXXXXXXXXXXX'
