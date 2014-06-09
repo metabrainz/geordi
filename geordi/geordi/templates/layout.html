@@ -7,13 +7,17 @@
     {%- block head -%}
       <title>{% block title %}{% endblock %} - geordi</title>
     {%- endblock -%}
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/geordi.css') }}">
+    {%- if config.DEBUG -%}
+      <link rel="stylesheet/less" type="text/css" href="{{ url_for('static', filename='styles/geordi.less') }}" />
+      <script src="{{ url_for('static', filename='scripts/less.min.js') }}"></script>
+    {%- else -%}
+      <link rel="stylesheet" href="{{ url_for('static', filename='styles/geordi.css') }}">
+    {%- endif -%}
     {%- block css %}{% endblock -%}
   </head>
   <body>
     <div id="container">
-      <div id="header">
+      <div id="header" class="container-fluid">
         {%- include "login.html" -%}
         {%- with messages = get_flashed_messages() -%}
           {%- if messages -%}
@@ -25,7 +29,7 @@
           {%- endif -%}
         {%- endwith -%}
       </div>
-    <div id="content">{% block content %}{% endblock %}</div>
+    <div id="content" class="container-fluid">{% block content %}{% endblock %}</div>
     </div>
     {%- block js %}{% endblock -%}
   </body>
