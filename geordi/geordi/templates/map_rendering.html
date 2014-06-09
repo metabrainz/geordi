@@ -3,7 +3,7 @@
   {%- if 'release' in item.map -%}
     {%- set release = item.map.release -%}
     <h4>Release: {{ comma_list(release.name, before="“", after="”") }}</h4>{# Assume we have a name. #}
-    <table><tbody>
+    <table class="table table-striped"><tbody>
         {%- if release.status -%}{{ info_table_row('Status:', comma_list(release.status)) }}{%- endif -%}
 
         {%- if release.artists -%}{{ info_table_row('Artists:', render_artists(release.artists, item.links, 'release')) }}{%- endif -%}
@@ -21,7 +21,7 @@
   {%- elif 'recording' in item.map -%}
     {%- set recording = item.map.recording -%}
     <h4>Recording: {{ comma_list(recording.name, before="“", after="”") }}</h4>{# Assume we have a name. #}
-    <table><tbody>
+    <table class="table table-striped"><tbody>
         {%- if recording.isrcs -%}{{ info_table_row('ISRCs:', comma_list(recording.isrcs)) }}{%- endif -%}
     </tbody></table>
   {%- endif -%}
@@ -39,16 +39,16 @@
 
 {%- macro render_artists(artists, links={}, prefix='') -%}
   {%- if artists.combined -%}
-    <span class="combined-artists row">{%- for item in artists.combined -%}{{ render_combined_artist(item, links, prefix, loop.index0) }}{% endfor %}</span>
+    <span class="combined-artists geordi-row">{%- for item in artists.combined -%}{{ render_combined_artist(item, links, prefix, loop.index0) }}{% endfor %}</span>
   {%- endif -%}
   {%- if artists.unsplit -%}
-    <span class="unsplit-artists row"><strong>Full credits:</strong> {{ comma_list(artists.unsplit, before="“", after="”") }}</span>
+    <span class="unsplit-artists geordi-row"><strong>Full credits:</strong> {{ comma_list(artists.unsplit, before="“", after="”") }}</span>
   {%- endif -%} 
   {%- if artists.split -%}
-    <span class="split-artists row">
-        {%- if artists.split.names -%}<span class="split-artists-names row"><strong>List of artist names:</strong> {{ render_name_links(artists.split.names, 'artists%split%names', prefix=prefix, links=links, before="“", after="”") }}</span>{%- endif -%}
-        {%- if artists.split.credits -%}<span class="split-artists-credits row"><strong>List of artists as credited:</strong> {{ comma_list(artists.split.credits, before="“", after="”") }}</span>{%- endif -%}
-        {%- if artists.split.join_phrases -%}<span class="split-artists-join_phrases row"><strong>List of artist join phrases:</strong> {{ comma_list(artists.split.join_phrases, before="“", after="”") }}</span>{%- endif -%}
+    <span class="split-artists geordi-row">
+        {%- if artists.split.names -%}<span class="split-artists-names geordi-row"><strong>List of artist names:</strong> {{ render_name_links(artists.split.names, 'artists%split%names', prefix=prefix, links=links, before="“", after="”") }}</span>{%- endif -%}
+        {%- if artists.split.credits -%}<span class="split-artists-credits geordi-row"><strong>List of artists as credited:</strong> {{ comma_list(artists.split.credits, before="“", after="”") }}</span>{%- endif -%}
+        {%- if artists.split.join_phrases -%}<span class="split-artists-join_phrases geordi-row"><strong>List of artist join phrases:</strong> {{ comma_list(artists.split.join_phrases, before="“", after="”") }}</span>{%- endif -%}
      </span>
   {%- endif -%}
 {%- endmacro -%}
@@ -73,12 +73,12 @@
 
 {%- macro render_labels(labels, links={}) -%}
   {%- if labels.combined -%}
-    <span class="combined-labels row">{%- for item in labels.combined -%}{{ render_combined_label(item, links, loop.index0) }}{% if not loop.last%}, {% endif %}{% endfor %}</span>
+    <span class="combined-labels geordi-row">{%- for item in labels.combined -%}{{ render_combined_label(item, links, loop.index0) }}{% if not loop.last%}, {% endif %}{% endfor %}</span>
   {%- endif -%}
   {%- if labels.split -%}
-    <span class="split-labels row">
-        {%- if labels.split.labels -%}<span class="split-labels-labels row"><strong>List of labels:</strong> {{ comma_list(labels.split.labels, before="“", after="”") }}</span>{%- endif -%}
-        {%- if labels.split.catalog_numbers -%}<span class="split-labels-catalog_numbers row"><strong>List of catalog numbers:</strong> {{ comma_list(labels.split.catalog_numbers, before="“", after="”") }}</span>{%- endif -%}
+    <span class="split-labels geordi-row">
+        {%- if labels.split.labels -%}<span class="split-labels-labels geordi-row"><strong>List of labels:</strong> {{ comma_list(labels.split.labels, before="“", after="”") }}</span>{%- endif -%}
+        {%- if labels.split.catalog_numbers -%}<span class="split-labels-catalog_numbers geordi-row"><strong>List of catalog numbers:</strong> {{ comma_list(labels.split.catalog_numbers, before="“", after="”") }}</span>{%- endif -%}
     </span>
   {%- endif -%}
 {%- endmacro -%}
@@ -95,10 +95,10 @@
 
 {%- macro render_events(events, links={}) -%}
   {%- if events.combined -%}
-    <span class="combined-events row">{%- for item in events.combined -%}{{ render_combined_event(item) }}{% if not loop.last%}, {% endif %}{% endfor %}</span>
+    <span class="combined-events geordi-row">{%- for item in events.combined -%}{{ render_combined_event(item) }}{% if not loop.last%}, {% endif %}{% endfor %}</span>
   {%- endif -%}
   {%- if events.split -%}
-    <span class="split-events row">
+    <span class="split-events geordi-row">
         {%- if events.split.countries -%}<span class="split-events-countries"><strong>Countries:</strong> {{ comma_list(events.split.countries, before="“", after="”") }}</span>{%- endif -%}
         {%- if events.split.dates -%}<span class="split-events-dates"><strong>Dates:</strong> {{ comma_list(events.split.dates, before="“", after="”") }}</span>{%- endif -%}
     </span>
@@ -130,7 +130,7 @@
   {%- set artists = tracks|selectattr("artists")|list|length > 0 -%}
   {%- set lengths = tracks|selectattr("length")|list|length > 0 -%}
   {%- set recordings = tracks|selectattr("recording")|list|length > 0 -%}
-  <table>
+  <table class="table table-striped">
     {{ track_table_header(artists=artists, lengths=lengths, recordings=recordings) }}
     <tbody>{%- for track in tracks -%}
       {{ render_track(track, loop.index, artists=artists, lengths=lengths, recordings=recordings, links=links, prefix=[prefix, 'tracks', loop.index0]|join('%')) }}
