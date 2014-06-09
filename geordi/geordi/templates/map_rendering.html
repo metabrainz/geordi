@@ -2,7 +2,7 @@
 {%- macro render_map(item) -%}
   {%- if 'release' in item.map -%}
     {%- set release = item.map.release -%}
-    <h4>Release: {{ comma_list(release.name, before="“", after="”") }}</h4>{# Assume we have a name. #}
+    <h3>Release: {{ comma_list(release.name, before="“", after="”") }}</h3>{# Assume we have a name. #}
     <table class="table table-striped"><tbody>
         {%- if release.status -%}{{ info_table_row('Status:', comma_list(release.status)) }}{%- endif -%}
 
@@ -20,7 +20,7 @@
     {%- if release.mediums -%}{{ render_mediums(release.mediums, links=item.links) }}{%- endif -%}
   {%- elif 'recording' in item.map -%}
     {%- set recording = item.map.recording -%}
-    <h4>Recording: {{ comma_list(recording.name, before="“", after="”") }}</h4>{# Assume we have a name. #}
+    <h3>Recording: {{ comma_list(recording.name, before="“", after="”") }}</h3>{# Assume we have a name. #}
     <table class="table table-striped"><tbody>
         {%- if recording.isrcs -%}{{ info_table_row('ISRCs:', comma_list(recording.isrcs)) }}{%- endif -%}
     </tbody></table>
@@ -110,10 +110,10 @@
 {%- endmacro -%}
 
 {%- macro render_mediums(mediums, links={}) -%}
-  <h5>Mediums</h5>
+  <h4>Mediums</h4>
   {%- if mediums.combined -%}
     {%- for medium in mediums.combined -%}
-      <h6>{%- if medium.format -%}{{ format }}{%- else -%}Medium{%- endif %} {{ loop.index }}</h6>
+      <h5>{%- if medium.format -%}{{ format }}{%- else -%}Medium{%- endif %} {{ loop.index }}</h5>
       {%- if medium.tracks -%}
         {{ render_tracklist(medium.tracks, links=links, prefix=['release', 'mediums', 'combined', loop.index0]|join('%')) }}
       {%- endif -%}
@@ -121,7 +121,7 @@
   {%- endif -%}
   {%- if mediums.split -%}
     {%- if mediums.split.tracks -%}
-      <h6>Tracks</h6>
+      <h5>Tracks</h5>
       {{ render_tracklist(mediums.split.tracks, links=links, prefix=['release', 'mediums', 'split']|join('%')) }}
     {%- endif -%}
   {%- endif -%}
