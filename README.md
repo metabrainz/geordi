@@ -10,9 +10,7 @@ It's named after [Geordi La Forge](http://en.memory-alpha.org/wiki/Geordi_La_For
 Setup
 =====
 
-Shared dependencies: elasticsearch -- install and make available,
-presumably on localhost:9200 (the default).  See
-http://www.elasticsearch.org/download/ .
+Shared dependencies: postgresql
 
 You will also need to be able to install python packages, we recommend
 using virtualenvwrapper for this.  On Debian/Ubuntu systems you can
@@ -38,17 +36,26 @@ To install all the dependencies run:
 
 ----
 
-To run the server:
+Setup:
 
-`python geordi/run.py`
+In the geordi/geordi directory, copy settings.cfg.example to settings.cfg;
+edit to fix up configuration.
 
 ----
 
-To import data, from tools directory:
+To run the server:
 
-`./submit-dir.py some-index-name /some/directory/*`
+`cd geordi`
+`python manager.py runserver`
 
-Where * should be a bunch of directories named by identifier, containing XML and JSON files.
+(replace 'python' with 'python2' where applicable)
+
+----
+
+To import data, use the manager.py script in the 'geordi' directory. Various
+options exist under the 'data' subcommand, for which documentation exists.
+Source-specific import tools are in the geordi.data.importer module, mostly
+under the 'indexes' subdirectory.
 
 Tests
 =====
@@ -66,19 +73,6 @@ And then run the tests, you should see something like this:
     
     OK
 
-
-Code Layout
-===========
-
-geordi subdir: new python codebase (GPLv3+)
-
-tools subdir:
-
- * submit-dir.py
-
-    Submits files to the local elastic search server.
-
- * discogs updater and import formatting scripts, slightly outdated
 
 Further Documentation
 =====================
