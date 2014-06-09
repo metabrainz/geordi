@@ -37,6 +37,27 @@ def get_renderable(item_id):
         item['map_formatted'] = json.dumps(item['map'], indent=4)
     return item
 
+def get_indexes(conn=None):
+    if conn is None:
+        conn = get_db()
+    with conn.cursor() as curs:
+        curs.execute("SELECT DISTINCT regexp_replace(id, '/.*$', '') FROM item_data")
+        return [i[0] for i in curs.fetchall()]
+
+def get_item_types_by_index(index, conn=None):
+    if conn is None:
+        conn = get_db()
+    with conn.cursor() as curs:
+        curs.execute("SELECT DISTINCT regexp_replace(id, '^[^/]*/([^/]*)/.*$', '\\1') FROM item_data WHERE id ~ ('^' || %s || '/')", (index,))
+        return [i[0] for i in curs.fetchall()]
+
+def get_item_ids(index, item_type, conn=None):
+    if conn is None:
+        conn = get_db()
+    with conn.cursor() as curs:
+        curs.execute("SELECT DISTINCT regexp_replace(id, '^[^/]*/[^/]*/(.*)$', '\\1') FROM item_data WHERE id ~ ('^' || %s || '/' || %s || '/')", (index, item_type))
+        return [i[0] for i in curs.fetchall()]
+
 def data_to_item(data_id, conn=None):
     '''Resolve a data ID to its associated item ID, if it has one (it should!)'''
     item_id = None

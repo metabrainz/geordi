@@ -161,13 +161,20 @@ def match_item(item_id):
     # return JSON success value and matches preserved/added/superseded
     return jsonify({})
 
-#@frontend.route('/data/<index>')
-#def list_index(index):
-#    pass
-#
-#@frontend.route('/data/<index>/<item_type>')
-#def list_items(index, item_type):
-#    pass
+@frontend.route('/data')
+def list_indexes():
+    indexes = data.get_indexes()
+    return render_template('indexes.html', indexes=indexes)
+
+@frontend.route('/data/<index>')
+def list_index(index):
+    item_types = data.get_item_types_by_index(index)
+    return render_template('index.html', item_types=item_types, index=index)
+
+@frontend.route('/data/<index>/<item_type>')
+def list_items(index, item_type):
+    item_ids = data.get_item_ids(index, item_type)
+    return render_template('itemtype.html', items=item_ids, item_type=item_type, index=index)
 
 @frontend.route('/data/<index>/<item_type>/<data_id>')
 def data_item(index, item_type, data_id):
