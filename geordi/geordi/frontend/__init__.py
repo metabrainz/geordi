@@ -5,6 +5,7 @@ import geordi.data as data
 from geordi.user import User
 
 import json
+import re
 
 from urllib import urlencode
 import base64
@@ -136,29 +137,48 @@ def item(item_id):
         abort(404)
     return render_template('item.html', item=item)
 
+@frontend.route('/entity/<mbid>')
+@login_required
+def entity_data(mbid):
+    with get_db() as conn:
+        use_cache = not request.args.get('no_cache', False)
+        type_hint = request.args.get('type_hint', None)
+        if use_cache:
+            # entity = data.get_entities(mbid, conn=conn, cached=True, type_hint=type_hint)
+            # check DB for this MBID, return if present
+            pass
+        if not entity:
+            # entity = data.get_entities(mbid, conn=conn, cached=False, type_hint=type_hint)
+            # fetch remotely and put in DB.
+            pass
+        return jsonify({})
+
 @frontend.route('/item/<item_id>/match', methods=['POST'])
 @login_required
 def match_item(item_id):
-    '''This endpoint is passed a set of type + mbid pairs.
-    For each, it sees if that match with this user is already in the DB
-    (and non-superseded). Those that aren't are inserted, and any other
-    non-superseded matches are marked as superseded. Two extra options
-    control this behavior: 'empty' set to something truthy will allow
-    an empty list of pairs (to allow superseding all matches), and
-    'additive' to something truthy means that it won't supersede
-    existing matches.
+    '''This endpoint is passed a set of mbids, and an item.
+    It then checks if the set matches the current match for the item;
+    if so, it does nothing. If not, the submitted match becomes the
+    new match, superseding the former match. As a precaution, empty
+    sets will be ignored unless a special extra parameter is set.
     '''
-    additive = request.form.get('additive', False)
+    is_mbid = re.compile('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$')
     empty = request.form.get('empty', False)
-    pairs = [tuple(pair.split('|')) for pair in request.form.getlist('matches')]
-    if len(pairs) == 0 and not empty:
+    mbids = [mbid.lower() for mbid in request.form.getlist('matches')]
+    if len(mbids) == 0 and not empty:
         return jsonify({'error': 'No matches provided.'})
-    if len([True for pair in pairs if (not isinstance(pair, tuple)) or (len(pair) != 2)]) > 0:
-        return jsonify({'error': 'Matches improperly formatted.'})
-    # fetch existing matches from the DB
-    # add new matches
-    # if not additive, remove old matches
-    # return JSON success value and matches preserved/added/superseded
+    if len([True for mbid in mbids if (is_mbid.match(mbid) is None)]) > 0:
+        return jsonify({'error': 'MBIDs improperly formatted.'})
+    with get_db() as conn:
+        ## fetch existing matches from the DB
+        #existing = data.get_matches(item_id, conn=conn)
+        #if set(mbids) == set(existing):
+        #    return jsonify({'error': 'Matches not changed'})
+        ## add new matches if applicable
+        #entities = data.get_entities(mbids, conn=conn, cached=False) # check error condition?
+        #success = data.add_matches(item_id, mbids, conn=conn)
+        ## return JSON success value and matches preserved/added/superseded
+        pass
     return jsonify({})
 
 @frontend.route('/data')

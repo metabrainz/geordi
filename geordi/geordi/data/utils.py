@@ -93,10 +93,6 @@ def delete_data_item(data_id):
                         )''', (item,item))
         curs.execute('DELETE FROM item WHERE id = %s AND NOT EXISTS (SELECT true FROM item_data WHERE item = item.id)', (item,))
 
-def match_item(item_id, editor, mbid_type, mbid):
-    '''Register a match with an item ID, editor, entity type, and MBID.'''
-    pass
-
 def set_sequences():
     '''Set sequence values back to the max actual value in the tables.'''
     with get_db() as conn, conn.cursor() as curs:
@@ -184,3 +180,16 @@ def _register_data_item(item_id, data_id, data, conn, update=False):
             return curs.fetchone()
         else:
             raise Exception('No row created, or more than one created.')
+
+def get_entities(mbid_or_mbids, conn=None, cached=True, type_hint=None):
+    if isinstance(mbid_or_mbids, basestring):
+        mbids = [mbid_or_mbids]
+        one_result = True
+    else:
+        mbids = mbid_or_mbids
+        one_result = False
+    if conn is None:
+        conn = get_db()
+    with conn.cursor() as curs:
+        if cached:
+            curs.execute('SELECT mbid, type, data FROM entity WHERE mbid = any(%s)', (mbids,))
