@@ -10,6 +10,8 @@ CREATE TABLE geordi.item_data (id text PRIMARY KEY, item integer not null REFERE
 CREATE TABLE geordi.item_redirect (old integer PRIMARY KEY, new integer REFERENCES item(id));
 CREATE TABLE geordi.item_link (item integer not null REFERENCES item(id), linked integer not null REFERENCES item(id), type text not null);
 
-CREATE TABLE geordi.raw_match (item integer NOT NULL REFERENCES item(id), editor text NOT NULL REFERENCES editor(name), type text not null, mbid text not null, timestamp TIMESTAMP WITH TIME ZONE not null, superseded boolean not null default false);
+CREATE TABLE geordi.entity (mbid text not null primary key, type text not null, data text);
+CREATE TABLE geordi.raw_match (id serial PRIMARY KEY, item integer NOT NULL REFERENCES item(id), editor text NOT NULL REFERENCES editor(name), timestamp TIMESTAMP WITH TIME ZONE not null, superseded boolean not null default false);
+CREATE TABLE geordi.raw_match_entity (raw_match integer NOT NULL references raw_match(id), entity text NOT NULL REFERENCES entity(mbid));
 
 COMMIT;
