@@ -1,7 +1,6 @@
 {% extends "layout.html" %}
 {% from "map_rendering.html" import render_map %}
 {% block title %}Item {{ item.id }}{% endblock %}
-{% block css %}{{ super() }}<link rel="stylesheet" href="{{ url_for('static', filename='styles/pygments.css') }}">{% endblock %}
 {% block content %}
   <h2>Mapped Data</h2>
   {{ render_map(item) }}
