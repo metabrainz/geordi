@@ -1,0 +1,13 @@
+{
+  "name" : "geordi",
+  "version" : "0.0.0",
+  "description" : "package.json for keeping track of geordi nodejs dependencies",
+  "repository" : {
+      "type" : "git",
+      "url"  : "https://github.com/metabrainz/geordi.git"
+  },
+  "license": "GPLv2+",
+  "dependencies" : {
+      "less" : ">=1.4.0"
+  }
+}

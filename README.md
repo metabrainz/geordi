@@ -10,9 +10,7 @@ It's named after [Geordi La Forge](http://en.memory-alpha.org/wiki/Geordi_La_For
 Setup
 =====
 
-Shared dependencies: elasticsearch -- install and make available,
-presumably on localhost:9200 (the default).  See
-http://www.elasticsearch.org/download/ .
+Shared dependencies: postgresql
 
 You will also need to be able to install python packages, we recommend
 using virtualenvwrapper for this.  On Debian/Ubuntu systems you can
@@ -38,29 +36,26 @@ To install all the dependencies run:
 
 ----
 
+Setup:
+
+In the geordi/geordi directory, copy settings.cfg.example to settings.cfg;
+edit to fix up configuration.
+
+----
+
 To run the server:
 
-`python geordi/run.py`
+`cd geordi`
+`python manager.py runserver`
+
+(replace 'python' with 'python2' where applicable)
 
 ----
 
-For importing, perl dependencies:
-
-`cpanm XML::XML2JSON LWP::UserAgent HTTP::Request URI::Escape Encode JSON Try::Tiny File::Slurp`
-
-----
-
-To import data, from tools directory:
-
-`./submit-dir.pl --index some-index-name /some/directory/*`
-
-Where * should be a bunch of directories named by identifier, containing XML and JSON files.
-
-Usage
-=====
-
-Thus far, only displays data, updates when that's fixed!
-
+To import data, use the manager.py script in the 'geordi' directory. Various
+options exist under the 'data' subcommand, for which documentation exists.
+Source-specific import tools are in the geordi.data.importer module, mostly
+under the 'indexes' subdirectory.
 
 Tests
 =====
@@ -79,17 +74,7 @@ And then run the tests, you should see something like this:
     OK
 
 
-Code Layout
-===========
+Further Documentation
+=====================
 
-geordi subdir: new python codebase (GPLv3+)
-
-tools subdir:
-
- * submit-dir.pl
-
-    Submits files to the local elastic search server.
-
- * other largely outdated files for historical understanding
-
-ingestr-server-perl subdir: old perl codebase
+The geordi server has some [additional documentation](geordi/docs/index.md) as well.

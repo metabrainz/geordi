@@ -1,62 +1,45 @@
-# geordi
-# Copyright (C) 2012 Ian McEwen, MetaBrainz Foundation
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 from __future__ import division, absolute_import
 from flask import Flask
-from flask.ext.login import LoginManager, UserMixin
-from geordi.config import *
-
-from pyelasticsearch import ElasticSearch
-
-app = Flask(__name__)
-app.config.from_object(__name__)
-
-@app.before_first_request
-def setup_logging():
-    if not app.debug:
-        import logging
-        from logging.handlers import RotatingFileHandler
-        if app.config['ERROR_LOG']:
-            error_fh = RotatingFileHandler(app.config['ERROR_LOG'],
-                                           maxBytes=1024 * 1024 * 10,
-                                           backupCount=10,
-                                           encoding='utf_8')
-            error_fh.setLevel(logging.ERROR)
-            app.logger.addHandler(error_fh)
-        if app.config['WARNING_LOG']:
-            warning_fh = RotatingFileHandler(app.config['WARNING_LOG'],
-                                             maxBytes=1024 * 1024 * 10,
-                                             backupCount=10,
-                                             encoding='utf_8')
-            warning_fh.setLevel(logging.WARNING)
-            app.logger.addHandler(warning_fh)
-
-class User(UserMixin):
-    def __init__(self, id):
-        self.id = id
+from flask.ext.login import LoginManager
+from geordi.frontend import frontend
+import geordi.settings
+from geordi.user import User
+import geordi.db as db
+import jinja2_highlight
+import logging
 
 login_manager = LoginManager()
-login_manager.login_view = "ui.login"
+login_manager.login_view = "frontend.hello"
 
 @login_manager.user_loader
 def load_user(username):
-    return User(username)
+    with db.get_db().cursor() as curs:
+        curs.execute('SELECT name, tz FROM editor WHERE name = %s', (username,))
+        if curs.rowcount > 0:
+            row = curs.fetchone()
+            return User(row[0], row[1])
 
-login_manager.setup_app(app, add_context_processor=True)
+class GeordiFlask(Flask):
+    jinja_options = dict(Flask.jinja_options)
+    jinja_options.setdefault('extensions', []).append('jinja2_highlight.HighlightExtension')
 
-es = ElasticSearch(app.config['ELASTICSEARCH_ENDPOINT'], max_retries=2, timeout=10, revival_delay=0)
+def create_app(*args, **kwargs):
+    if kwargs.get('log_debug'):
+        logger = logging.getLogger('geordi')
+        logger.setLevel(logging.DEBUG)
+        ch = logging.StreamHandler()
+        ch.setLevel(logging.DEBUG)
+        formatter = logging.Formatter('%(asctime)s (%(levelname)s) %(name)s:  %(message)s')
+        ch.setFormatter(formatter)
+        logger.addHandler(ch)
+    app = GeordiFlask(__name__)
+    app.config.from_object('geordi.settings')
+    app.config.from_pyfile('settings.cfg', silent=True)
 
-import geordi.views
+    login_manager.init_app(app)
+
+    app.register_blueprint(frontend)
+
+    db.init_app(app)
+
+    return app

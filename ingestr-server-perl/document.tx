@@ -1,7 +1,0 @@
-: cascade 'layout.tx'
-
-: around content -> {
-<pre>
-<: json($document._source) :>
-</pre>
-: }

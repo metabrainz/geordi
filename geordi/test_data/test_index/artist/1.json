@@ -1,0 +1,9 @@
+{
+  "id": 1,
+  "name": "Mari and the Peaches",
+  "name-ja": "マリとモモ",
+  "members": [
+    {"id": 2, "name": "Mari", "role": "vocal"},
+    {"id": 3, "name": "Momo", "role": "drums"}
+  ]
+}
