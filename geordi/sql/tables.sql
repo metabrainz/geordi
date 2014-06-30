@@ -1,6 +1,6 @@
 BEGIN;
 
--- Schema 'geordi' should already exist.
+-- Schema 'geordi' should already exist, and it should be on the search path of the user this is run as.
 CREATE TABLE geordi.csrf (ip text NOT NULL, csrf text NOT NULL, opts text, timestamp TIMESTAMP WITH TIME ZONE NOT NULL);
 
 CREATE TABLE geordi.editor (name text PRIMARY KEY, tz text, internal boolean not null default false);
