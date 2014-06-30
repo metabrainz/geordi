@@ -44,6 +44,7 @@ class PathExtractor(object):
                     tmp.append(entry)
         if len(tmp) > 0:
             grouped_path.append(PlainPathPart(tmp))
+        logger.debug("Final path is %r", grouped_path)
         return grouped_path
 
 class PathPart(object):
