@@ -137,49 +137,49 @@ def item(item_id):
         abort(404)
     return render_template('item.html', item=item)
 
-@frontend.route('/entity/<mbid>')
-@login_required
-def entity_data(mbid):
-    with get_db() as conn:
-        use_cache = not request.args.get('no_cache', False)
-        type_hint = request.args.get('type_hint', None)
-        if use_cache:
-            # entity = data.get_entities(mbid, conn=conn, cached=True, type_hint=type_hint)
-            # check DB for this MBID, return if present
-            pass
-        if not entity:
-            # entity = data.get_entities(mbid, conn=conn, cached=False, type_hint=type_hint)
-            # fetch remotely and put in DB.
-            pass
-        return jsonify({})
-
-@frontend.route('/item/<item_id>/match', methods=['POST'])
-@login_required
-def match_item(item_id):
-    '''This endpoint is passed a set of mbids, and an item.
-    It then checks if the set matches the current match for the item;
-    if so, it does nothing. If not, the submitted match becomes the
-    new match, superseding the former match. As a precaution, empty
-    sets will be ignored unless a special extra parameter is set.
-    '''
-    is_mbid = re.compile('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$')
-    empty = request.form.get('empty', False)
-    mbids = [mbid.lower() for mbid in request.form.getlist('matches')]
-    if len(mbids) == 0 and not empty:
-        return jsonify({'error': 'No matches provided.'})
-    if len([True for mbid in mbids if (is_mbid.match(mbid) is None)]) > 0:
-        return jsonify({'error': 'MBIDs improperly formatted.'})
-    with get_db() as conn:
-        ## fetch existing matches from the DB
-        #existing = data.get_matches(item_id, conn=conn)
-        #if set(mbids) == set(existing):
-        #    return jsonify({'error': 'Matches not changed'})
-        ## add new matches if applicable
-        #entities = data.get_entities(mbids, conn=conn, cached=False) # check error condition?
-        #success = data.add_matches(item_id, mbids, conn=conn)
-        ## return JSON success value and matches preserved/added/superseded
-        pass
-    return jsonify({})
+#@frontend.route('/entity/<mbid>')
+#@login_required
+#def entity_data(mbid):
+#    with get_db() as conn:
+#        use_cache = not request.args.get('no_cache', False)
+#        type_hint = request.args.get('type_hint', None)
+#        if use_cache:
+#            # entity = data.get_entities(mbid, conn=conn, cached=True, type_hint=type_hint)
+#            # check DB for this MBID, return if present
+#            pass
+#        if not entity:
+#            # entity = data.get_entities(mbid, conn=conn, cached=False, type_hint=type_hint)
+#            # fetch remotely and put in DB.
+#            pass
+#        return jsonify({})
+#
+#@frontend.route('/item/<item_id>/match', methods=['POST'])
+#@login_required
+#def match_item(item_id):
+#    '''This endpoint is passed a set of mbids, and an item.
+#    It then checks if the set matches the current match for the item;
+#    if so, it does nothing. If not, the submitted match becomes the
+#    new match, superseding the former match. As a precaution, empty
+#    sets will be ignored unless a special extra parameter is set.
+#    '''
+#    is_mbid = re.compile('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$')
+#    empty = request.form.get('empty', False)
+#    mbids = [mbid.lower() for mbid in request.form.getlist('matches')]
+#    if len(mbids) == 0 and not empty:
+#        return jsonify({'error': 'No matches provided.'})
+#    if len([True for mbid in mbids if (is_mbid.match(mbid) is None)]) > 0:
+#        return jsonify({'error': 'MBIDs improperly formatted.'})
+#    with get_db() as conn:
+#        ## fetch existing matches from the DB
+#        #existing = data.get_matches(item_id, conn=conn)
+#        #if set(mbids) == set(existing):
+#        #    return jsonify({'error': 'Matches not changed'})
+#        ## add new matches if applicable
+#        #entities = data.get_entities(mbids, conn=conn, cached=False) # check error condition?
+#        #success = data.add_matches(item_id, mbids, conn=conn)
+#        ## return JSON success value and matches preserved/added/superseded
+#        pass
+#    return jsonify({})
 
 @frontend.route('/data')
 def list_indexes():

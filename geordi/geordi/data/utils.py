@@ -181,30 +181,30 @@ def _register_data_item(item_id, data_id, data, conn, update=False):
         else:
             raise Exception('No row created, or more than one created.')
 
-def get_entities(mbid_or_mbids, conn=None, cached=True, type_hint=None):
-    entities = []
-    if isinstance(mbid_or_mbids, basestring):
-        mbids = [mbid_or_mbids]
-        one_result = True
-    else:
-        mbids = mbid_or_mbids
-        one_result = False
-    if conn is None:
-        conn = get_db()
-    with conn.cursor() as curs:
-        if cached:
-            curs.execute('SELECT mbid, type, data FROM entity WHERE mbid = any(%s)', (mbids,))
-            if curs.rowcount > 0:
-                for row in curs.fetchall():
-                    (mbid, mbidtype, data) = row
-                    entity = json.loads(data)
-                    entity['mbid'] = mbid
-                    entity['type'] = mbidtype
-                    entities.push(entity)
-        pass
-    if one_result and len(entities) == 1:
-        return entities[0]
-    elif not one_result:
-        return entities
-    elif len(entities) > 1:
-        raise Exception('More than one result fetching entities, when one expected')
+#def get_entities(mbid_or_mbids, conn=None, cached=True, type_hint=None):
+#    entities = []
+#    if isinstance(mbid_or_mbids, basestring):
+#        mbids = [mbid_or_mbids]
+#        one_result = True
+#    else:
+#        mbids = mbid_or_mbids
+#        one_result = False
+#    if conn is None:
+#        conn = get_db()
+#    with conn.cursor() as curs:
+#        if cached:
+#            curs.execute('SELECT mbid, type, data FROM entity WHERE mbid = any(%s)', (mbids,))
+#            if curs.rowcount > 0:
+#                for row in curs.fetchall():
+#                    (mbid, mbidtype, data) = row
+#                    entity = json.loads(data)
+#                    entity['mbid'] = mbid
+#                    entity['type'] = mbidtype
+#                    entities.push(entity)
+#        pass
+#    if one_result and len(entities) == 1:
+#        return entities[0]
+#    elif not one_result:
+#        return entities
+#    elif len(entities) > 1:
+#        raise Exception('More than one result fetching entities, when one expected')
