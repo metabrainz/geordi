@@ -53,7 +53,7 @@ ninjatune = {
                     Rule(['tracks', ('t_index', True)],
                         lambda x, *args, **kwargs: ['release', 'mediums', 'split', 'tracks', (kwargs.get('t_index'),), 'recording'],
                         transform=track_name,
-                        link=lambda value, data, *args, **kwargs: 'ninjatune/release/%s:recording-%s' % (data.get('CATALOGUE NUMBER', data['Catalogue Number'])[0],kwargs.get('t_index')),
+                        link=lambda value, data, *args, **kwargs: 'ninjatune/release/%s:recording-%s' % (data.get('CATALOGUE NUMBER', data.get('Catalogue Number'))[0],kwargs.get('t_index')),
                     )
                    ],
 

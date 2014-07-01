@@ -66,6 +66,8 @@ def ninjatune_setup(add_folder, add_data_item, import_manager):
                     break;
             if key is None:
                 raise Exception('Couldn\'t figure out what to use as a key for this file.')
+            if key == '':
+                continue # empty catalogue number field
             data[key] = data.get(key, {})
             this_track = {}
             for cell_number in range(0, len(row)):
