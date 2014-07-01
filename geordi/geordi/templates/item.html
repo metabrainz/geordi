@@ -8,8 +8,8 @@
   <h2>Raw Data</h2>
   <ul style="list-style-type: none; padding: 0">
     {% for id, data in item.data_formatted.iteritems() %}
-      <li style="border: 1px solid grey"><h3>{{ id }}</h3>{% highlight 'json' %}{{ data }}{% endhighlight %}</li>
+      <li><h3>{{ id }}</h3>{% highlight 'json' %}{{ data }}{% endhighlight %}</li>
     {% endfor %}
-    <li style="border: 1px solid lightgrey"><h3>Raw item map</h3>{%- highlight 'json' %}{{ item.map_formatted }}{% endhighlight -%}</li>
+    <li><h3>Raw item map</h3>{%- highlight 'json' %}{{ item.map_formatted }}{% endhighlight -%}</li>
   </ul>
 {% endblock %}
