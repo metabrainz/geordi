@@ -9,7 +9,7 @@ import jinja2_highlight
 import logging
 
 login_manager = LoginManager()
-login_manager.login_view = "frontend.hello"
+login_manager.login_view = "frontend.homepage"
 
 @login_manager.user_loader
 def load_user(username):

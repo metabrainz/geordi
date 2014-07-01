@@ -16,9 +16,9 @@
     {%- block css %}{% endblock -%}
   </head>
   <body>
-    <div id="container">
-      <div id="header" class="container-fluid">
-        {%- include "login.html" -%}
+    {%- include "navbar.html" -%}
+    <div id="content" class="container-fluid">
+      <div class="clearfix">
         {%- with messages = get_flashed_messages() -%}
           {%- if messages -%}
             <ul class="flashes">
@@ -28,10 +28,16 @@
             </ul>
           {%- endif -%}
         {%- endwith -%}
-        <h1>{% block h1title %}{{ self.fulltitle() }}{% endblock %}</h1>
+        <h1 id="h1title">{% block h1title %}{{ self.title() }}{% endblock %}</h1>
       </div>
-    <div id="content" class="container-fluid">{% block content %}{% endblock %}</div>
+      {% block content %}{% endblock %}
     </div>
-    {%- block js %}{% endblock -%}
+    {%- block js %}
+    <script src="{{ url_for('static', filename='scripts/jquery-2.1.1.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='scripts/bootstrap.min.js') }}"></script>
+    <script>
+      $('#remember').tooltip() // Activates tooltip in the navbar
+    </script>
+    {% endblock -%}
   </body>
 </html>
