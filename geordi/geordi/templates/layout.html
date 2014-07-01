@@ -13,8 +13,6 @@
     {%- else -%}
       <link rel="stylesheet" href="{{ url_for('static', filename='styles/geordi.css') }}">
     {%- endif -%}
-    <script src="{{ url_for('static', filename='scripts/jquery-2.1.1.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='scripts/bootstrap.min.js') }}"></script>
     {%- block css %}{% endblock -%}
   </head>
   <body>
@@ -34,6 +32,12 @@
       </div>
       {% block content %}{% endblock %}
     </div>
-    {%- block js %}{% endblock -%}
+    {%- block js %}
+    <script src="{{ url_for('static', filename='scripts/jquery-2.1.1.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='scripts/bootstrap.min.js') }}"></script>
+    <script>
+      $('#remember').tooltip() // Activates tooltip in the navbar
+    </script>
+    {% endblock -%}
   </body>
 </html>

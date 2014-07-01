@@ -24,7 +24,6 @@
             <div class="input-group">
               <span class="input-group-addon">
                 <input id="remember" type="checkbox" data-toggle="tooltip" data-placement="bottom" title="Remember me?" name="remember" checked="checked" />
-                <script>$('#remember').tooltip()</script>
               </span>
               <input type="hidden" name="csrf" value="{{ g.login_parameters.csrf }}" />
               <input type="hidden" name="returnto" value="{{ g.login_parameters.returnto }}" />
