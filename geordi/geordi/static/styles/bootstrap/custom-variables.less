@@ -10,7 +10,7 @@
 @gray-darker:            lighten(#000, 13.5%); // #222
 @gray-dark:              lighten(#000, 20%);   // #333
 @gray:                   lighten(#000, 33.5%); // #555
-@gray-light:             lighten(#000, 46.7%); // #777
+@gray-light:             lighten(#000, 60%);   // #999
 @gray-lighter:           lighten(#000, 93.5%); // #eee
 
 @brand-primary:         #428bca;
@@ -84,14 +84,14 @@
 //
 //## Define common padding and border radius sizes and more. Values based on 14px text and 1.428 line-height (~20px to start).
 
-@padding-base-vertical:     6px;
-@padding-base-horizontal:   12px;
+@padding-base-vertical:     3px;
+@padding-base-horizontal:   6px;
 
-@padding-large-vertical:    10px;
-@padding-large-horizontal:  16px;
+@padding-large-vertical:    5px;
+@padding-large-horizontal:  8px;
 
-@padding-small-vertical:    5px;
-@padding-small-horizontal:  10px;
+@padding-small-vertical:    2.5px;
+@padding-small-horizontal:  5px;
 
 @padding-xs-vertical:       1px;
 @padding-xs-horizontal:     5px;
@@ -119,9 +119,9 @@
 //## Customizes the `.table` component with basic values, each used across all table variations.
 
 //** Padding for `<th>`s and `<td>`s.
-@table-cell-padding:            8px;
+@table-cell-padding:            4px;
 //** Padding for cells in `.table-condensed`.
-@table-condensed-cell-padding:  5px;
+@table-condensed-cell-padding:  2.5px;
 
 //** Default background color used for all tables.
 @table-bg:                      transparent;
@@ -302,7 +302,7 @@
 //** Number of columns in the grid.
 @grid-columns:              12;
 //** Padding between columns. Gets divided in half for the left and right.
-@grid-gutter-width:         30px;
+@grid-gutter-width:         16px;
 // Navbar collapse
 //** Point at which the navbar becomes uncollapsed.
 @grid-float-breakpoint:     @screen-sm-min;
@@ -822,8 +822,6 @@
 //
 //##
 
-//** Horizontal offset for forms and lists.
-@component-offset-horizontal: 180px;
 //** Text muted color
 @text-muted:                  @gray-light;
 //** Abbreviations and acronyms border color
@@ -838,9 +836,14 @@
 @blockquote-border-color:     @gray-lighter;
 //** Page header border color
 @page-header-border-color:    @gray-lighter;
-//** Width of horizontal description list titles
-@dl-horizontal-offset:        @component-offset-horizontal;
+
+
+//== Miscellaneous
+//
+//##
+
 //** Horizontal line color.
 @hr-border:                   @gray-lighter;
 
-
+//** Horizontal offset for forms and lists.
+@component-offset-horizontal: 180px;
