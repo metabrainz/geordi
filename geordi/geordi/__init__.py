@@ -9,7 +9,7 @@ import jinja2_highlight
 import logging
 
 login_manager = LoginManager()
-login_manager.login_view = "frontend.hello"
+login_manager.login_view = "frontend.homepage"
 
 @login_manager.user_loader
 def load_user(username):
@@ -42,4 +42,12 @@ def create_app(*args, **kwargs):
 
     db.init_app(app)
 
+    @app.before_first_request
+    def setup_logging():
+        if not app.debug:
+            from logging.handlers import RotatingFileHandler
+            if app.config.get('ERROR_LOG'):
+                error_fh = RotatingFileHandler(app.config['ERROR_LOG'], maxBytes=1024*1024*10, backupCount=10, encoding='utf_8')
+                error_fh.setLevel(logging.ERROR)
+                app.logger.addHandler(error_fh)
     return app

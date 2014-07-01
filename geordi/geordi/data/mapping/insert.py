@@ -52,6 +52,7 @@ class PathInserter(object):
         if not (isinstance(path[-1], tuple) or isinstance(path[-1], PathPart)):
             logger.debug("Inserting an OrderedPathPart since %s is neither tuple nor PathPart", path[-1])
             final.append(OrderedPathPart())
+        logger.debug("Final path is %r", final)
         return final
 
 class PathPart(object):
