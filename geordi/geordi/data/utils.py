@@ -1,33 +1,12 @@
 from ..db import get_db
+from model.item import Item
+from model.item_data import ItemData
 from .mapping import map_item, verify_map
 import json
 import re
 
-def get_item(item_id, conn=None):
-    '''Fetch and return an item's data.'''
-    ret = {'id': item_id, 'data': [], 'map': {}, 'type': ''}
-    if conn is None:
-        conn = get_db()
-    with conn.cursor() as curs:
-        curs.execute('SELECT id, data FROM item_data WHERE item = %s;', (item_id,))
-        if curs.rowcount > 0:
-            data = dict([(d[0], json.loads(d[1])) for d in curs.fetchall()])
-            ret['data'] = data
-        else:
-            return None
-        curs.execute('SELECT map, type FROM item WHERE id = %s', (item_id,))
-        if curs.rowcount > 0:
-            row = curs.fetchone()
-            if row[0] is not None:
-                ret['map'] = json.loads(row[0])
-            if row[1] is not None:
-                ret['type'] = row[1]
-        # XXX: backwards links
-        curs.execute('SELECT type, linked FROM item_link WHERE item = %s', (item_id,))
-        if curs.rowcount > 0:
-            links = dict([(d[0], d[1]) for d in curs.fetchall()])
-            ret['links'] = links
-        return ret
+def get_item(item_id):
+    return Item.get_item(item_id)
 
 def get_renderable(item_id):
     '''Fetch and return an item's data including a pretty-printed version of the data items.'''
@@ -37,39 +16,17 @@ def get_renderable(item_id):
         item['map_formatted'] = json.dumps(item['map'], indent=4)
     return item
 
-def get_indexes(conn=None):
-    if conn is None:
-        conn = get_db()
-    with conn.cursor() as curs:
-        curs.execute("SELECT DISTINCT regexp_replace(id, '/.*$', '') FROM item_data")
-        return [i[0] for i in curs.fetchall()]
+def get_indexes():
+    return ItemData.get_indexes()
 
-def get_item_types_by_index(index, conn=None):
-    if conn is None:
-        conn = get_db()
-    with conn.cursor() as curs:
-        curs.execute("SELECT DISTINCT regexp_replace(id, '^[^/]*/([^/]*)/.*$', '\\1') FROM item_data WHERE id ~ ('^' || %s || '/')", (index,))
-        return [i[0] for i in curs.fetchall()]
+def get_item_types_by_index(index):
+    return ItemData.get_item_types_by_index(index)
 
-def get_item_ids(index, item_type, conn=None):
-    if conn is None:
-        conn = get_db()
-    with conn.cursor() as curs:
-        curs.execute("SELECT DISTINCT regexp_replace(id, '^[^/]*/[^/]*/(.*)$', '\\1') FROM item_data WHERE id ~ ('^' || %s || '/' || %s || '/')", (index, item_type))
-        return [i[0] for i in curs.fetchall()]
+def get_item_ids(index, item_type):
+    return ItemData.get_item_ids(index, item_type)
 
-def data_to_item(data_id, conn=None):
-    '''Resolve a data ID to its associated item ID, if it has one (it should!)'''
-    item_id = None
-    if conn is None:
-        conn = get_db()
-    with conn.cursor() as curs:
-        curs.execute('SELECT item FROM item_data WHERE id = %s', (data_id,))
-        if curs.rowcount == 1:
-            (item_id,) = curs.fetchone()
-        elif curs.rowcount > 1:
-            raise Exception('More than one item found, that can\'t be right')
-    return item_id
+def data_to_item(data_id):
+    return ItemData.data_to_item(data_id)
 
 def add_data_item(data_id, data_type, data, conn=None):
     '''Add or update a data item given an ID, type, and data. Create a new item, for additions.'''
@@ -80,18 +37,11 @@ def add_data_item(data_id, data_type, data, conn=None):
         if item_id is None:
             item_id = _create_item(data_type, conn)
         _register_data_item(item_id, data_id, data, conn, update=original_item_id)
-        _map_item(item_id, conn)
+        _map_item(item_id)
     return item_id
 
 def delete_data_item(data_id):
-    with get_db() as conn, conn.cursor() as curs:
-        curs.execute('DELETE FROM item_data WHERE id = %s RETURNING item', (data_id,))
-        item = curs.fetchone()[0]
-        curs.execute('''DELETE FROM item_link WHERE (item = %s OR linked = %s) AND (
-                            NOT EXISTS (SELECT true FROM item_data WHERE item = item_link.item)
-                            OR NOT EXISTS (SELECT true FROM item_data WHERE item = item_link.linked)
-                        )''', (item,item))
-        curs.execute('DELETE FROM item WHERE id = %s AND NOT EXISTS (SELECT true FROM item_data WHERE item = item.id)', (item,))
+    ItemData.delete_data_item(data_id)
 
 def set_sequences():
     '''Set sequence values back to the max actual value in the tables.'''
@@ -131,7 +81,7 @@ def _link_type_to_item_type(link_type):
 
 def _map_item(item_id, conn):
     # fetch data
-    item = get_item(item_id, conn)
+    item = get_item(item_id)
     # generate map
     (mapped, links) = map_item(item)
     this_mapped = mapped[None]
@@ -146,8 +96,8 @@ def _map_item(item_id, conn):
         if node is None:
             node_item = item_id
         else:
-            node_item = data_to_item(node, conn=conn)
-        target_item = data_to_item(data_id, conn=conn)
+            node_item = data_to_item(node)
+        target_item = data_to_item(data_id)
         if target_item is None:
             target_item = _create_item(_link_type_to_item_type(link_type), conn)
             print "%s -> %s" % (data_id, target_item)

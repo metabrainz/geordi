@@ -1,4 +1,5 @@
 from . import db
+import json
 
 
 class Item(db.Model):
@@ -23,3 +24,33 @@ class Item(db.Model):
         db.session.delete(self)
         db.session.commit()
         return self
+
+    @staticmethod
+    def get_item(item_id):
+        """Fetch and return an item's data."""
+        ret = {'id': item_id, 'data': [], 'map': {}, 'type': ''}
+
+        result = db.session.execute('SELECT map, type FROM item WHERE id = :id;', {'id': item_id})
+        if result.rowcount > 0:
+            row = result.fetchone()
+            if row[0] is not None:
+                ret['map'] = json.loads(row[0])
+            if row[1] is not None:
+                ret['type'] = row[1]
+
+        # Getting data
+        result = db.session.execute('SELECT id, data FROM item_data WHERE item = :id;', {'id': item_id})
+        if result.rowcount > 0:
+            data = dict([(d[0], json.loads(d[1])) for d in result.fetchall()])
+            ret['data'] = data
+        else:
+            return None
+
+        # Getting links
+        # XXX: backwards links
+        result = db.session.execute('SELECT type, linked FROM item_link WHERE item = :id;', {'id': item_id})
+        if result.rowcount > 0:
+            links = dict([(d[0], d[1]) for d in result.fetchall()])
+            ret['links'] = links
+
+        return ret
