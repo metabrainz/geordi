@@ -6,6 +6,7 @@ import geordi.settings
 from geordi.user import User
 import geordi.db as db
 from geordi.data.model import db as _db
+from geordi.data.model.editor import Editor
 import jinja2_highlight
 import logging
 
@@ -14,11 +15,9 @@ login_manager.login_view = "frontend.homepage"
 
 @login_manager.user_loader
 def load_user(username):
-    with db.get_db().cursor() as curs:
-        curs.execute('SELECT name, tz FROM editor WHERE name = %s', (username,))
-        if curs.rowcount > 0:
-            row = curs.fetchone()
-            return User(row[0], row[1])
+    editor = Editor.get(username)
+    if editor is not None:
+        return User(editor.name, editor.tz)
 
 class GeordiFlask(Flask):
     jinja_options = dict(Flask.jinja_options)

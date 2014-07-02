@@ -11,6 +11,10 @@ class Editor(db.Model):
 
     matches = db.relationship('RawMatch', cascade='delete', backref='editor')
 
+    @classmethod
+    def get(cls, name, **kwargs):
+        return cls.query.filter_by(name=name, **kwargs).first()
+
     def delete(self):
         db.session.delete(self)
         db.session.commit()
