@@ -2,6 +2,7 @@ from __future__ import print_function
 from ..rule import Rule
 from itertools import chain
 from ..insert import SimplePathPart
+import re
 
 def both(dest, *opts, **kwargs):
     prefix = kwargs.get('prefix', [])
@@ -34,8 +35,7 @@ ninjatune = {
                         link=lambda value, *args, **kwargs: 'ninjatune/label/%s' % value),
                    both(lambda x, *args, **kwargs: ['release', 'labels', 'combined', (kwargs.get('index')+1,), SimplePathPart('catalog_number', no_manip=True)], 'CATALOGUE NUMBER', 'Catalogue Number'),
 
-                   # XXX: sometimes non-numeric, need to handle this case
-                   both(['release', 'barcode'], 'BARCODE', 'Barcode', transform=lambda val, *args, **kwargs: str(int(val)), condition=lambda x, *args, **kwargs: x not in ('', 'N/A')),
+                   both(['release', 'barcode'], 'BARCODE', 'Barcode', transform=lambda val, *args, **kwargs: str(int(val.strip())), condition=lambda x, *args, **kwargs: re.match('^\s*[0-9]+\s*$', x)),
                    both(['release', 'tag'], 'MAIN GENRE', 'Main Genre', 'SUB_GENRE', 'Sub_Genre', condition=lambda x, *args, **kwargs: x != ''),
 
                    both(lambda x, *args, **kwargs: ['release', 'mediums', 'split', 'tracks', (kwargs.get('t_index'),), 'number'], 'TRACK NUMBER', 'track number',
@@ -53,7 +53,7 @@ ninjatune = {
                     Rule(['tracks', ('t_index', True)],
                         lambda x, *args, **kwargs: ['release', 'mediums', 'split', 'tracks', (kwargs.get('t_index'),), 'recording'],
                         transform=track_name,
-                        link=lambda value, data, *args, **kwargs: 'ninjatune/release/%s:recording-%s' % (data.get('CATALOGUE NUMBER', data['Catalogue Number'])[0],kwargs.get('t_index')),
+                        link=lambda value, data, *args, **kwargs: 'ninjatune/release/%s:recording-%s' % (data.get('CATALOGUE NUMBER', data.get('Catalogue Number'))[0],kwargs.get('t_index')),
                     )
                    ],
 
