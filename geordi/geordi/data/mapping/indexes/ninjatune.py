@@ -43,7 +43,7 @@ ninjatune = {
                         transform=lambda val, *args, **kwargs: str(int(val))),
                    both(lambda x, *args, **kwargs: ['release', 'mediums', 'split', 'tracks', (kwargs.get('t_index'),), 'artists', 'split', 'names', (kwargs.get('index'),)], '_ARTIST', '_Artist',
                         prefix=['tracks', ('t_index', True)], suffix=[('index', True, lambda val, *args, **kwargs: val.split('|'))],
-                        link=lambda value, *args, **kwargs: 'ninjatune/artist/%s' % value.split()),
+                        link=lambda value, *args, **kwargs: 'ninjatune/artist/%s' % value.strip()),
                    both(lambda x, *args, **kwargs: ['release', 'mediums', 'split', 'tracks', (kwargs.get('t_index'),), 'artists', 'unsplit'], '_DISPLAY ARTIST', '_Display Artist',
                         prefix=['tracks', ('t_index', True)], suffix=[]),
                    [Rule(['tracks', ('t_index', True)],
