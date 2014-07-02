@@ -58,3 +58,4 @@ class ItemData(db.Model):
         db.session.execute("DELETE FROM item "
                            "WHERE id = :item AND NOT EXISTS (SELECT TRUE FROM item_data WHERE item = item.id)",
                            {'item': item})
+        db.session.commit()

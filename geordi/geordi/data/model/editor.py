@@ -15,6 +15,15 @@ class Editor(db.Model):
     def get(cls, name, **kwargs):
         return cls.query.filter_by(name=name, **kwargs).first()
 
+    @classmethod
+    def add_or_update(cls, name, tz):
+        editor = cls.query.filter_by(name=name).first()
+        if editor is None:
+            editor = cls(name=name)
+            db.session.add(editor)
+        editor.tz = tz
+        db.session.commit()
+
     def delete(self):
         db.session.delete(self)
         db.session.commit()

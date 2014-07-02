@@ -2,6 +2,8 @@ from flask import Blueprint, current_app, render_template, request, abort, redir
 from flask.ext.login import current_user, login_required, login_user, logout_user
 from ..db import get_db
 import geordi.data as data
+from geordi.data.model.csrf import CSRF
+from geordi.data.model.editor import Editor
 from geordi.user import User
 
 import json
@@ -37,9 +39,7 @@ def get_ip():
 def get_csrf():
     ip = get_ip()
     rand = base64.urlsafe_b64encode(os.urandom(30))
-    with get_db() as conn, conn.cursor() as curs:
-        curs.execute("DELETE FROM csrf WHERE ip = %s AND timestamp < NOW() - interval '1 hour'", (ip,))
-        curs.execute('INSERT INTO csrf (ip, csrf, timestamp) VALUES (%s, %s, now())', (ip, rand))
+    CSRF.update_csrf(ip, rand)
     return rand
 
 @frontend.route('/oauth/login_redirect')
@@ -58,8 +58,7 @@ def login_redirect():
         opts['remember'] = True
     if request.args.get('returnto'):
         opts['returnto'] = request.args.get('returnto')
-    with get_db() as conn, conn.cursor() as curs:
-        curs.execute('UPDATE csrf SET opts = %s WHERE csrf = %s', (json.dumps(opts), request.args['csrf']))
+    CSRF.update_opts(opts, request.args['csrf'])
     return redirect(redirect_uri, code=307)
 
 @frontend.route('/oauth/callback')
@@ -71,13 +70,12 @@ def oauth_callback():
             csrf = request.args.get('state')
             code = request.args.get('code')
             # look up CSRF token for remember value, returnto URI, and to confirm validity
-            with conn.cursor() as curs:
-                curs.execute('SELECT opts FROM csrf WHERE csrf = %s AND ip = %s', (csrf,get_ip()))
-                if curs.rowcount == 0:
-                    flash("CSRF token mismatch. Please try again.")
-                    return redirect(url, code=307)
-                (opts,) = curs.fetchone()
-                curs.execute('DELETE FROM csrf WHERE csrf = %s', (csrf,))
+            result = CSRF.get_opts(csrf, get_ip())
+            if result.rowcount == 0:
+                flash("CSRF token mismatch. Please try again.")
+                return redirect(url, code=307)
+            opts = result.fetchone()['opts']
+            CSRF.delete_csrf(csrf)
             opts = json.loads(opts)
             remember = opts.get('remember', False)
             url = opts.get('returnto', url)
@@ -85,13 +83,7 @@ def oauth_callback():
             user_data = check_mb_account(code)
             if user_data:
                 (username, tz) = user_data
-                # add name to DB if needed, update tz
-                with conn.cursor() as curs:
-                    curs.execute('SELECT tz from editor where name = %s', (username,))
-                    if curs.rowcount == 0:
-                        curs.execute('INSERT INTO editor (name, tz) VALUES (%s, %s)', (username, tz))
-                    elif curs.fetchone()[0] != tz:
-                        curs.execute('UPDATE editor SET tz = %s WHERE name = %s', (tz, username))
+                Editor.add_or_update(username, tz)
                 login_user(User(username, tz), remember=remember)
                 flash("Logged in successfully!")
             else:
