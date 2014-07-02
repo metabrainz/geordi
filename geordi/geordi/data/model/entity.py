@@ -9,7 +9,7 @@ class Entity(db.Model):
     type = db.Column(db.Text, nullable=False)
     data = db.Column(db.Text)
 
-    #raw_match_entities = db.relationship('RawMatchEntity', cascade='delete', backref='entity')
+    raw_match_entities = db.relationship('RawMatchEntity', cascade='delete', backref='entity')
 
     def delete(self):
         db.session.delete(self)
