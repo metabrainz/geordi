@@ -17,29 +17,34 @@ class ItemData(db.Model):
     def get_by_item_id(cls, item_id, **kwargs):
         return cls.query.filter_by(item_id=item_id, **kwargs).all()
 
+    @classmethod
+    def data_to_item(cls, data_id):
+        """Resolve a data ID to its associated item ID, if it has one (it should)."""
+        item_data = cls.get(data_id)
+        if item_data is not None:
+            return item_data.item_id
+        else:
+            return None
+
+    @classmethod
+    def create(cls, item_id, data, data_id):
+        item_data = cls(item_id=item_id, data=data, id=data_id)
+        db.session.add(item_data)
+        db.session.commit()
+        return item_data
+
+    @classmethod
+    def update(cls, item_id, data, data_id):
+        item_data = cls.get(data_id)
+        item_data.item_id = item_id
+        item_data.data = data
+        db.session.commit()
+        return item_data
+
     def delete(self):
         db.session.delete(self)
         db.session.commit()
         return self
-
-    @staticmethod
-    def insert(item_id, data, data_id):
-        result = db.session.execute("INSERT INTO item_data (item, data, id) "
-                                    "VALUES (:item, :data, :id) "
-                                    "RETURNING (item, id) ",
-                                    {'item': item_id, 'data': data, 'id': data_id})
-        db.session.commit()
-        return result
-
-    @staticmethod
-    def update(item_id, data, data_id):
-        result = db.session.execute("UPDATE item_data "
-                                    "SET item = :item, data = :data "
-                                    "WHERE id = :id "
-                                    "RETURNING (item, id)",
-                                    {'item': item_id, 'data': data, 'id': data_id})
-        db.session.commit()
-        return result
 
     @staticmethod
     def get_indexes():
@@ -63,24 +68,13 @@ class ItemData(db.Model):
         return [i[0] for i in result.fetchall()]
 
     @staticmethod
-    def data_to_item(data_id):
-        """Resolve a data ID to its associated item ID, if it has one (it should!)"""
-        item_id = None
-        result = db.session.execute("SELECT item FROM item_data WHERE id = :id", {'id': data_id})
-        if result.rowcount == 1:
-            (item_id,) = result.fetchone()
-        elif result.rowcount > 1:
-            raise Exception("More than one item found, that can't be right")
-        return item_id
-
-    @staticmethod
     def delete_data_item(data_id):
         result = db.session.execute("DELETE FROM item_data WHERE id = :id RETURNING item", {'id': data_id})
         item = result.fetchone()[0]
         db.session.execute("DELETE FROM item_link "
                            "WHERE (item = :item OR linked = :item) "
-                           "AND (NOT EXISTS (SELECT TRUE FROM item_data WHERE item = item_link.item) "
-                           "OR NOT EXISTS (SELECT TRUE FROM item_data WHERE item = item_link.linked))",
+                           "  AND (NOT EXISTS (SELECT TRUE FROM item_data WHERE item = item_link.item) "
+                           "  OR NOT EXISTS (SELECT TRUE FROM item_data WHERE item = item_link.linked))",
                            {'item': item})
         db.session.execute("DELETE FROM item "
                            "WHERE id = :item AND NOT EXISTS (SELECT TRUE FROM item_data WHERE item = item.id)",

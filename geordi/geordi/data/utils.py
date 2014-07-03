@@ -111,11 +111,9 @@ def _map_item(item_id):
 
 def _register_data_item(item_id, data_id, data, update=False):
     if not update:
-        result = ItemData.insert(item_id, data, data_id)
+        ItemData.create(item_id, data, data_id)
     else:
-        result = ItemData.update(item_id, data, data_id)
-    if result.rowcount != 1:
-        raise Exception('No row created, or more than one created.')
+        ItemData.update(item_id, data, data_id)
 
 #def get_entities(mbid_or_mbids, conn=None, cached=True, type_hint=None):
 #    entities = []
