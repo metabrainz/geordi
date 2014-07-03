@@ -100,7 +100,7 @@ def _map_item(item_id):
             node_item = _create_item('')
             print "%s -> %s" % (node, node_item)
             _register_data_item(node_item, node, '{}')
-        ItemLink.upsert(node_item, target_item, link_type)
+        ItemLink.find_or_insert(node_item, target_item, link_type)
     # Now that we can be assured any types set by links are already set on the items, insert the maps for other mapped nodes
     for data_id in mapped.keys():
         if data_id is not None:
