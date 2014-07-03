@@ -1,4 +1,6 @@
 from . import db
+from geordi.data.model.item_data import ItemData
+from geordi.data.model.item_link import ItemLink
 import json
 
 
@@ -26,43 +28,47 @@ class Item(db.Model):
         return self
 
     @classmethod
+    def get(cls, item_id, **kwargs):
+        return cls.query.filter_by(id=item_id, **kwargs).first()
+
+    @classmethod
     def create(cls, type=None, map=None):
         item = cls(type=type, map=map)
         db.session.add(item)
         db.session.commit()
         return item
 
-    @staticmethod
-    def get_item(item_id):
+    @classmethod
+    def update_map(cls, item_map, item_id):
+        item = cls.get(item_id)
+        item.map = item_map
+        db.session.commit()
+
+    @classmethod
+    def get_item_data(cls, item_id):
         """Fetch and return an item's data."""
         ret = {'id': item_id, 'data': [], 'map': {}, 'type': ''}
 
-        result = db.session.execute('SELECT map, type FROM item WHERE id = :id;', {'id': item_id})
-        if result.rowcount > 0:
-            row = result.fetchone()
-            if row[0] is not None:
-                ret['map'] = json.loads(row[0])
-            if row[1] is not None:
-                ret['type'] = row[1]
+        item = cls.get(item_id)
+        if item is not None:
+            if item.map is not None:
+                ret['map'] = json.loads(item.map)
+            if item.type is not None:
+                ret['type'] = item.type
 
         # Getting data
-        result = db.session.execute('SELECT id, data FROM item_data WHERE item = :id;', {'id': item_id})
-        if result.rowcount > 0:
-            data = dict([(d[0], json.loads(d[1])) for d in result.fetchall()])
+        result = ItemData.get_by_item_id(item_id)
+        if len(result) > 0:
+            data = dict([(d.id, json.loads(d.data)) for d in result])
             ret['data'] = data
         else:
             return None
 
         # Getting links
         # XXX: backwards links
-        result = db.session.execute('SELECT type, linked FROM item_link WHERE item = :id;', {'id': item_id})
-        if result.rowcount > 0:
-            links = dict([(d[0], d[1]) for d in result.fetchall()])
+        result = ItemLink.get_by_item_id(item_id)
+        if len(result) > 0:
+            links = dict([(d.type, d.linked_id) for d in result])
             ret['links'] = links
 
         return ret
-
-    @staticmethod
-    def update_map(item_map, item_id):
-        db.session.execute('UPDATE item SET map = :map WHERE id = :id', {'map': item_map, 'id': item_id})
-        db.session.commit()

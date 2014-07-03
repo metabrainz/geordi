@@ -13,6 +13,10 @@ class ItemLink(db.Model):
     def get(cls, type, item_id, linked_id, **kwargs):
         return cls.query.filter_by(type=type, item_id=item_id, linked_id=linked_id, **kwargs).first()
 
+    @classmethod
+    def get_by_item_id(cls, item_id, **kwargs):
+        return cls.query.filter_by(item_id=item_id, **kwargs).all()
+
     def delete(self):
         db.session.delete(self)
         db.session.commit()

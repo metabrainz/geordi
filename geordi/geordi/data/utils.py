@@ -6,7 +6,7 @@ import json
 import re
 
 def get_item(item_id):
-    return Item.get_item(item_id)
+    return Item.get_item_data(item_id)
 
 def get_renderable(item_id):
     '''Fetch and return an item's data including a pretty-printed version of the data items.'''

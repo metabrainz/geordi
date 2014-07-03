@@ -9,6 +9,14 @@ class ItemData(db.Model):
     item_id = db.Column('item', db.Integer, db.ForeignKey('geordi.item.id', ondelete='CASCADE'), nullable=False)
     data = db.Column(db.Text)
 
+    @classmethod
+    def get(cls, id, **kwargs):
+        return cls.query.filter_by(id=id, **kwargs).first()
+
+    @classmethod
+    def get_by_item_id(cls, item_id, **kwargs):
+        return cls.query.filter_by(item_id=item_id, **kwargs).all()
+
     def delete(self):
         db.session.delete(self)
         db.session.commit()
