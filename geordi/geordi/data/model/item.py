@@ -25,6 +25,13 @@ class Item(db.Model):
         db.session.commit()
         return self
 
+    @classmethod
+    def create(cls, type=None, map=None):
+        item = cls(type=type, map=map)
+        db.session.add(item)
+        db.session.commit()
+        return item
+
     @staticmethod
     def get_item(item_id):
         """Fetch and return an item's data."""
@@ -54,3 +61,8 @@ class Item(db.Model):
             ret['links'] = links
 
         return ret
+
+    @staticmethod
+    def update_map(item_map, item_id):
+        db.session.execute('UPDATE item SET map = :map WHERE id = :id', {'map': item_map, 'id': item_id})
+        db.session.commit()

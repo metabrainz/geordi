@@ -1,6 +1,7 @@
 from ..db import get_db
 from model.item import Item
 from model.item_data import ItemData
+from model.item_link import ItemLink
 from .mapping import map_item, verify_map
 import json
 import re
@@ -28,16 +29,13 @@ def get_item_ids(index, item_type):
 def data_to_item(data_id):
     return ItemData.data_to_item(data_id)
 
-def add_data_item(data_id, data_type, data, conn=None):
+def add_data_item(data_id, data_type, data):
     '''Add or update a data item given an ID, type, and data. Create a new item, for additions.'''
     item_id = original_item_id = data_to_item(data_id)
-    if conn is None:
-        conn = get_db()
-    with conn as conn:
-        if item_id is None:
-            item_id = _create_item(data_type, conn)
-        _register_data_item(item_id, data_id, data, conn, update=original_item_id)
-        _map_item(item_id)
+    if item_id is None:
+        item_id = _create_item(data_type)
+    _register_data_item(item_id, data_id, data, update=original_item_id)
+    _map_item(item_id)
     return item_id
 
 def delete_data_item(data_id):
@@ -45,18 +43,16 @@ def delete_data_item(data_id):
 
 def set_sequences():
     '''Set sequence values back to the max actual value in the tables.'''
-    with get_db() as conn, conn.cursor() as curs:
-        curs.execute("select coalesce(max(id),0) + 1 from item")
-        (restart,) = curs.fetchone()
-        curs.execute("ALTER SEQUENCE item_id_seq RESTART %s", (restart,))
+    from model import db
+    result = db.session.execute("select coalesce(max(id),0) + 1 from item")
+    (restart,) = result.fetchone()
+    db.session.execute("ALTER SEQUENCE item_id_seq RESTART %s", (restart,))
 
-def _create_item(data_type, conn):
-    with conn.cursor() as curs:
-        curs.execute('INSERT INTO item (type) VALUES (%s) RETURNING id', (data_type,))
-        if curs.rowcount == 1:
-            return curs.fetchone()[0]
-        else:
-            raise Exception('No row created, or more than one.')
+def _create_item(data_type):
+    item = Item.create(type=data_type)
+    if not item.id:
+        raise Exception('No row created')
+    return item.id
 
 link_type_map = {
     'release%artists': 'artist',
@@ -79,7 +75,7 @@ def _link_type_to_item_type(link_type):
             return prospect
     return None
 
-def _map_item(item_id, conn):
+def _map_item(item_id):
     # fetch data
     item = get_item(item_id)
     # generate map
@@ -88,8 +84,7 @@ def _map_item(item_id, conn):
     if list(verify_map(this_mapped)):
         print "Validation errors in mapping item %s: %r, continuing." % (item_id, list(verify_map(this_mapped)))
     # First, update this item's map
-    with conn.cursor() as curs:
-        curs.execute('UPDATE item SET map = %s WHERE id = %s', (json.dumps(this_mapped,separators=(',', ':')), item_id))
+    Item.update_map(json.dumps(this_mapped, separators=(',', ':')), item_id)
     # Then, go through the links, creating items as needed with the types designated by their mapping paths
     for (node, destination, data_id) in links:
         link_type = '%'.join([str(d) for d in destination])
@@ -99,37 +94,29 @@ def _map_item(item_id, conn):
             node_item = data_to_item(node)
         target_item = data_to_item(data_id)
         if target_item is None:
-            target_item = _create_item(_link_type_to_item_type(link_type), conn)
+            target_item = _create_item(_link_type_to_item_type(link_type))
             print "%s -> %s" % (data_id, target_item)
-            _register_data_item(target_item, data_id, '{}', conn)
+            _register_data_item(target_item, data_id, '{}')
         if node_item is None:
-            node_item = _create_item('', conn)
+            node_item = _create_item('')
             print "%s -> %s" % (node, node_item)
-            _register_data_item(node_item, node, '{}', conn)
-        with conn.cursor() as curs:
-            curs.execute('SELECT TRUE from item_link WHERE item = %s AND linked = %s AND type = %s', (node_item, target_item, link_type))
-            if curs.rowcount == 0:
-                curs.execute('INSERT INTO item_link (item, linked, type) VALUES (%s, %s, %s)', (node_item, target_item, link_type))
+            _register_data_item(node_item, node, '{}')
+        ItemLink.upsert(node_item, target_item, link_type)
     # Now that we can be assured any types set by links are already set on the items, insert the maps for other mapped nodes
     for data_id in mapped.keys():
         if data_id is not None:
             verify = list(verify_map(mapped[data_id]))
             if verify:
                 print "Validation errors in mapping data item %s: %r, continuing" % (data_id, verify)
-            add_data_item(data_id, '', json.dumps(mapped[data_id]), conn=conn)
+            add_data_item(data_id, '', json.dumps(mapped[data_id]))
 
-def _register_data_item(item_id, data_id, data, conn, update=False):
-    with conn.cursor() as curs:
-        if not update:
-            query = 'INSERT INTO item_data (item, data, id) VALUES (%s, %s, %s) RETURNING (item, id)'
-        else:
-            query = 'UPDATE item_data SET item = %s, data = %s WHERE id = %s RETURNING (item, id)'
-
-        curs.execute(query, (item_id, data, data_id))
-        if curs.rowcount == 1:
-            return curs.fetchone()
-        else:
-            raise Exception('No row created, or more than one created.')
+def _register_data_item(item_id, data_id, data, update=False):
+    if not update:
+        result = ItemData.insert(item_id, data, data_id)
+    else:
+        result = ItemData.update(item_id, data, data_id)
+    if result.rowcount != 1:
+        raise Exception('No row created, or more than one created.')
 
 #def get_entities(mbid_or_mbids, conn=None, cached=True, type_hint=None):
 #    entities = []

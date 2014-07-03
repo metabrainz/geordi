@@ -15,6 +15,25 @@ class ItemData(db.Model):
         return self
 
     @staticmethod
+    def insert(item_id, data, data_id):
+        result = db.session.execute("INSERT INTO item_data (item, data, id) "
+                                    "VALUES (:item, :data, :id) "
+                                    "RETURNING (item, id) ",
+                                    {'item': item_id, 'data': data, 'id': data_id})
+        db.session.commit()
+        return result
+
+    @staticmethod
+    def update(item_id, data, data_id):
+        result = db.session.execute("UPDATE item_data "
+                                    "SET item = :item, data = :data "
+                                    "WHERE id = :id "
+                                    "RETURNING (item, id)",
+                                    {'item': item_id, 'data': data, 'id': data_id})
+        db.session.commit()
+        return result
+
+    @staticmethod
     def get_indexes():
         result = db.session.execute("SELECT DISTINCT regexp_replace(id, '/.*$', '') FROM item_data")
         return [i[0] for i in result]
