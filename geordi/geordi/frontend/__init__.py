@@ -68,13 +68,12 @@ def oauth_callback():
         csrf = request.args.get('state')
         code = request.args.get('code')
         # look up CSRF token for remember value, returnto URI, and to confirm validity
-        result = CSRF.get_opts(csrf, get_ip())
-        if result.rowcount == 0:
+        stored_csrf = CSRF.get(csrf=csrf, ip=get_ip())
+        if stored_csrf is None:
             flash("CSRF token mismatch. Please try again.")
             return redirect(url, code=307)
-        opts = result.fetchone()['opts']
-        CSRF.delete_csrf(csrf)
-        opts = json.loads(opts)
+        opts = json.loads(stored_csrf.opts)
+        stored_csrf.delete()
         remember = opts.get('remember', False)
         url = opts.get('returnto', url)
         # hit oauth2/token for an authorization code, then hit oauth2/userinfo to get a name/tz
