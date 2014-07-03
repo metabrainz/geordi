@@ -1,4 +1,3 @@
-from ..db import get_db
 from model.item import Item
 from model.item_data import ItemData
 from model.item_link import ItemLink

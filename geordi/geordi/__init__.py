@@ -4,8 +4,7 @@ from flask.ext.login import LoginManager
 from geordi.frontend import frontend
 import geordi.settings
 from geordi.user import User
-import geordi.db as db
-from geordi.data.model import db as _db
+from geordi.data.model import db
 from geordi.data.model.editor import Editor
 import jinja2_highlight
 import logging
@@ -41,7 +40,6 @@ def create_app(*args, **kwargs):
     app.register_blueprint(frontend)
 
     db.init_app(app)
-    _db.init_app(app)
 
     @app.before_first_request
     def setup_logging():

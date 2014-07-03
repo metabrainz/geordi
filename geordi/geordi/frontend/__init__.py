@@ -1,6 +1,5 @@
 from flask import Blueprint, current_app, render_template, request, abort, redirect, url_for, g, flash, jsonify
 from flask.ext.login import current_user, login_required, login_user, logout_user
-from ..db import get_db
 import geordi.data as data
 from geordi.data.model.csrf import CSRF
 from geordi.data.model.editor import Editor
@@ -66,29 +65,28 @@ def oauth_callback():
     error = request.args.get('error')
     url = url_for('.homepage')
     if not error:
-        with get_db() as conn:
-            csrf = request.args.get('state')
-            code = request.args.get('code')
-            # look up CSRF token for remember value, returnto URI, and to confirm validity
-            result = CSRF.get_opts(csrf, get_ip())
-            if result.rowcount == 0:
-                flash("CSRF token mismatch. Please try again.")
-                return redirect(url, code=307)
-            opts = result.fetchone()['opts']
-            CSRF.delete_csrf(csrf)
-            opts = json.loads(opts)
-            remember = opts.get('remember', False)
-            url = opts.get('returnto', url)
-            # hit oauth2/token for an authorization code, then hit oauth2/userinfo to get a name/tz
-            user_data = check_mb_account(code)
-            if user_data:
-                (username, tz) = user_data
-                Editor.add_or_update(username, tz)
-                login_user(User(username, tz), remember=remember)
-                flash("Logged in successfully!")
-            else:
-                flash('We couldn\'t log you in D:')
-                url = url_for('.homepage')
+        csrf = request.args.get('state')
+        code = request.args.get('code')
+        # look up CSRF token for remember value, returnto URI, and to confirm validity
+        result = CSRF.get_opts(csrf, get_ip())
+        if result.rowcount == 0:
+            flash("CSRF token mismatch. Please try again.")
+            return redirect(url, code=307)
+        opts = result.fetchone()['opts']
+        CSRF.delete_csrf(csrf)
+        opts = json.loads(opts)
+        remember = opts.get('remember', False)
+        url = opts.get('returnto', url)
+        # hit oauth2/token for an authorization code, then hit oauth2/userinfo to get a name/tz
+        user_data = check_mb_account(code)
+        if user_data:
+            (username, tz) = user_data
+            Editor.add_or_update(username, tz)
+            login_user(User(username, tz), remember=remember)
+            flash("Logged in successfully!")
+        else:
+            flash('We couldn\'t log you in D:')
+            url = url_for('.homepage')
     else:
         flash('There was an error: %s' % error)
     return redirect(url, code=307)
