@@ -23,11 +23,10 @@ class CSRF(db.Model):
 
     @classmethod
     def update_csrf(cls, ip, rand):
-        old_csrf = db.session.query(cls).\
+        db.session.query(cls).\
             filter(cls.ip == ip).\
-            filter(cls.timestamp < datetime.today() - timedelta(hours=1)).all()
-        for csrf in old_csrf:
-            csrf.delete()
+            filter(cls.timestamp < datetime.today() - timedelta(hours=1)).\
+            delete()
         db.session.add(cls(ip=ip, csrf=rand))
         db.session.commit()
 
