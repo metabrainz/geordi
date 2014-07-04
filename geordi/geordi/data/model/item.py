@@ -49,14 +49,6 @@ class Item(db.Model):
         """Fetch and return an item's data."""
         ret = {'id': item_id, 'data': [], 'map': {}, 'type': ''}
 
-        item = cls.get(item_id)
-        if item is not None:
-            if item.map is not None:
-                ret['map'] = json.loads(item.map)
-            if item.type is not None:
-                ret['type'] = item.type
-
-        # Getting data
         result = ItemData.get_by_item_id(item_id)
         if len(result) > 0:
             data = dict([(d.id, json.loads(d.data)) for d in result])
@@ -64,7 +56,13 @@ class Item(db.Model):
         else:
             return None
 
-        # Getting links
+        item = cls.get(item_id)
+        if item is not None:
+            if item.map is not None:
+                ret['map'] = json.loads(item.map)
+            if item.type is not None:
+                ret['type'] = item.type
+
         # XXX: backwards links
         result = ItemLink.get_by_item_id(item_id)
         if len(result) > 0:

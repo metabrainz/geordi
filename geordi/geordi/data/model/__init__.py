@@ -18,4 +18,3 @@ from .item_link import ItemLink
 from .entity import Entity
 from .raw_match import RawMatch
 from .raw_match_entity import RawMatchEntity
-
