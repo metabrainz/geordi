@@ -6,4 +6,3 @@ SQLALCHEMY_DATABASE_URI = 'postgresql://geordi:geordi@localhost:5432/geordi'
 
 OAUTH_CLIENT_ID = 'XXXXXXXXXXXXXXXXXXXXXX'
 OAUTH_CLIENT_SECRET = 'XXXXXXXXXXXXXXXXXXXXXX'
-OAUTH_REDIRECT_URI = 'http://localhost:5000/oauth/callback'
