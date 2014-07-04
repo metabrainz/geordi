@@ -9,8 +9,8 @@ class Item(db.Model):
     __table_args__ = {'schema': 'geordi'}
 
     id = db.Column(db.Integer, primary_key=True)
-    type = db.Column(db.Text)
-    map = db.Column(db.Text)
+    type = db.Column(db.Unicode)
+    map = db.Column(db.UnicodeText)
 
     item_data = db.relationship('ItemData', cascade='delete', backref='item')
     item_redirects = db.relationship('ItemRedirect', cascade='delete', backref='new')

@@ -7,8 +7,8 @@ class Entity(db.Model):
     __table_args__ = {'schema': 'geordi'}
 
     mbid = db.Column(UUID, primary_key=True)
-    type = db.Column(db.Text, nullable=False)
-    data = db.Column(db.Text)
+    type = db.Column(db.Unicode, nullable=False)
+    data = db.Column(db.UnicodeText)
 
     raw_match_entities = db.relationship('RawMatchEntity', cascade='delete', backref='entity')
 
