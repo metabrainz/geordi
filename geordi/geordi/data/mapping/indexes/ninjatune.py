@@ -54,9 +54,10 @@ ninjatune = {
                    both(lambda x, *args, **kwargs: ['release', 'labels', 'combined', (kwargs.get('index')+1,), SimplePathPart('catalog_number', no_manip=True)], 'CATALOGUE NUMBER', 'Catalogue Number'),
 
                    # Release events, old format (dd/mm/yyyy)
-                   both(['release', 'events', 'combined', (0, 'Main'), SimplePathPart('date', no_manip=True)], 'MAIN RELEASE DATE',
+                   [Rule(['MAIN RELEASE DATE', ('index', True)],
+                         ['release', 'events', 'split', 'dates'],
                         transform=oldstyle_release_event,
-                        condition=lambda val, *args, **kwargs: isinstance(val, basestring) and re.match('^\d{1,2}/\d{1,2}/\d{4}$', val)),
+                        condition=lambda val, *args, **kwargs: isinstance(val, basestring) and re.match('^\d{1,2}/\d{1,2}/\d{4}$', val))],
 
                    # Release events, new format
                    both(['release', 'events', 'combined', (0, 'Main'), SimplePathPart('date', no_manip=True)], 'Main Release Date', 'Main Release date',
