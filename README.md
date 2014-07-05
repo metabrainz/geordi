@@ -1,5 +1,5 @@
 geordi
--------
+------
 
 This project allows the consumption of arbitrary data, for use as a data source and matching tool.
 
@@ -10,59 +10,69 @@ It's named after [Geordi La Forge](http://en.memory-alpha.org/wiki/Geordi_La_For
 Setup
 =====
 
-Shared dependencies: postgresql
+### Shared dependencies:
+
+* postgresql
 
 You will also need to be able to install python packages, we recommend
 using virtualenvwrapper for this.  On Debian/Ubuntu systems you can
 install that with:
 
-`sudo apt-get install virtualenvwrapper`
+    sudo apt-get install virtualenvwrapper
 
-----
+### Python dependencies:
 
-Python dependencies:
-
-`mkvirtualenv geordi`
+    mkvirtualenv geordi
 
 The mkvirtualenv command will create and activate a virtual
 environment in which python modules will be installed.  You can
 re-active this environment with the following command:
 
-`workon geordi`
+    workon geordi
 
 To install all the dependencies run:
 
-`pip install -r requirements.txt`
+    pip install -r requirements.txt
 
-----
-
-Setup:
+### Configuration
 
 In the geordi/geordi directory, copy settings.cfg.example to settings.cfg;
-edit to fix up configuration.
+modify database connection settings, set MusicBrainz OAuth configuration,
+and make any other needed changes.
 
-----
+### Creating tables
 
-To run the server:
+To create tables in existing database run:
 
-`cd geordi`
-`python manager.py runserver`
+    python manager.py create_tables
 
-(replace 'python' with 'python2' where applicable)
+*(replace 'python' with 'python2' where applicable)*
 
-----
+Importing Data
+==============
 
 To import data, use the manager.py script in the 'geordi' directory. Various
 options exist under the 'data' subcommand, for which documentation exists.
 Source-specific import tools are in the geordi.data.importer module, mostly
 under the 'indexes' subdirectory.
 
-Tests
-=====
+Running server
+==============
+
+To run the server:
+
+    cd geordi
+    python manager.py runserver
+
+*(replace 'python' with 'python2' where applicable)*
+
+
+Testing
+=======
 
 To run tests, install nose (remember to enable your virtualenv!):
 
-`pip install nose`
+    pip install nose
 
 And then run the tests, you should see something like this:
 
