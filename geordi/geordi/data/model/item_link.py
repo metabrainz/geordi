@@ -29,3 +29,8 @@ class ItemLink(db.Model):
             link = db.session.add(cls(type=link_type, item_id=node_item, linked_id=target_item))
             db.session.flush()
         return link
+
+    @classmethod
+    def delete_by_item_id(cls, item_id, **kwargs):
+        cls.query.filter_by(item_id=item_id, **kwargs).delete()
+        db.session.flush()
