@@ -22,7 +22,9 @@ class Editor(db.Model):
             editor = cls(name=name)
             db.session.add(editor)
         editor.tz = tz
+        db.session.flush()
 
     def delete(self):
         db.session.delete(self)
+        db.session.flush()
         return self

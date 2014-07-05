@@ -24,6 +24,7 @@ class Item(db.Model):
 
     def delete(self):
         db.session.delete(self)
+        db.session.flush()
         return self
 
     @classmethod
@@ -34,12 +35,14 @@ class Item(db.Model):
     def create(cls, type=None, map=None):
         item = cls(type=type, map=map)
         db.session.add(item)
+        db.session.flush()
         return item
 
     @classmethod
     def update_map(cls, item_map, item_id):
         item = cls.get(item_id)
         item.map = item_map
+        db.session.flush()
 
     @classmethod
     def get_item_data(cls, item_id):

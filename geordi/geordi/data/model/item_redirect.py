@@ -10,4 +10,5 @@ class ItemRedirect(db.Model):
 
     def delete(self):
         db.session.delete(self)
+        db.session.flush()
         return self

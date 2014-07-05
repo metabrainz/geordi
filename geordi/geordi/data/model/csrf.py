@@ -18,6 +18,7 @@ class CSRF(db.Model):
 
     def delete(self):
         db.session.delete(self)
+        db.session.flush()
         return self
 
     @classmethod
@@ -27,8 +28,10 @@ class CSRF(db.Model):
             filter(cls.timestamp < datetime.today() - timedelta(hours=1)).\
             delete()
         db.session.add(cls(ip=ip, csrf=rand))
+        db.session.flush()
 
     @classmethod
     def update_opts(cls, opts, csrf):
         csrf = cls.get(csrf)
         csrf.opts = json.dumps(opts)
+        db.session.flush()

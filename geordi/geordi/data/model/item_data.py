@@ -30,6 +30,7 @@ class ItemData(db.Model):
     def create(cls, item_id, data, data_id):
         item_data = cls(item_id=item_id, data=data, id=data_id)
         db.session.add(item_data)
+        db.session.flush()
         return item_data
 
     @classmethod
@@ -37,10 +38,12 @@ class ItemData(db.Model):
         item_data = cls.get(data_id)
         item_data.item_id = item_id
         item_data.data = data
+        db.session.flush()
         return item_data
 
     def delete(self):
         db.session.delete(self)
+        db.session.flush()
         return self
 
     @staticmethod
@@ -76,3 +79,4 @@ class ItemData(db.Model):
         db.session.execute("DELETE FROM item "
                            "WHERE id = :item AND NOT EXISTS (SELECT TRUE FROM item_data WHERE item = item.id)",
                            {'item': item})
+        db.session.flush()
