@@ -35,7 +35,7 @@ ninjatune = {
                         link=lambda value, *args, **kwargs: 'ninjatune/label/%s' % value.strip()),
                    both(lambda x, *args, **kwargs: ['release', 'labels', 'combined', (kwargs.get('index')+1,), SimplePathPart('catalog_number', no_manip=True)], 'CATALOGUE NUMBER', 'Catalogue Number'),
 
-                   both(['release', 'barcode'], 'BARCODE', 'Barcode', transform=lambda val, *args, **kwargs: str(int(val.strip())), condition=lambda x, *args, **kwargs: re.match('^\s*[0-9]+\s*$', x)),
+                   both(['release', 'barcode'], 'BARCODE', 'Barcode', transform=lambda val, *args, **kwargs: str(int(str(val).strip())), condition=lambda x, *args, **kwargs: re.match('^\s*[0-9]+\s*$', str(x))),
                    both(['release', 'tag'], 'MAIN GENRE', 'Main Genre', 'SUB_GENRE', 'Sub_Genre', condition=lambda x, *args, **kwargs: x != ''),
 
                    both(lambda x, *args, **kwargs: ['release', 'mediums', 'split', 'tracks', (kwargs.get('t_index'),), 'number'], 'TRACK NUMBER', 'track number',
