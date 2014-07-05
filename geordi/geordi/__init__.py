@@ -22,15 +22,20 @@ class GeordiFlask(Flask):
     jinja_options = dict(Flask.jinja_options)
     jinja_options.setdefault('extensions', []).append('jinja2_highlight.HighlightExtension')
 
+def _setup_logger(name, level):
+    logger = logging.getLogger(name)
+    logger.setLevel(level)
+    ch = logging.StreamHandler()
+    ch.setLevel(level)
+    formatter = logging.Formatter('%(asctime)s (%(levelname)s) %(name)s:  %(message)s')
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
+
 def create_app(*args, **kwargs):
+    if kwargs.get('log_sql'):
+        _setup_logger('sqlalchemy.engine', logging.INFO)
     if kwargs.get('log_debug'):
-        logger = logging.getLogger('geordi')
-        logger.setLevel(logging.DEBUG)
-        ch = logging.StreamHandler()
-        ch.setLevel(logging.DEBUG)
-        formatter = logging.Formatter('%(asctime)s (%(levelname)s) %(name)s:  %(message)s')
-        ch.setFormatter(formatter)
-        logger.addHandler(ch)
+        _setup_logger('geordi', logging.DEBUG)
     app = GeordiFlask(__name__)
     app.config.from_object('geordi.settings')
     app.config.from_pyfile('settings.cfg', silent=True)
