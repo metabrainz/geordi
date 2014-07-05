@@ -19,6 +19,11 @@ def track_name(track, *args, **kwargs):
     else:
         return title
 
+def oldstyle_release_event(val, *args, **kwargs):
+    def format_oldstyle(match):
+        return "%04d-%02d-%02d" % (int(match.group(3)), int(match.group(2)), int(match.group(1)))
+    return re.sub('^(\d{1,2})/(\d{1,2})/(\d{4})$', format_oldstyle, val)
+
 _ninjatune_countries = [
     {'code': 'UK', 'name': 'UK'},
     {'code': 'US', 'name': 'US'},
@@ -48,7 +53,12 @@ ninjatune = {
                         link=lambda value, *args, **kwargs: 'ninjatune/label/%s' % value.strip()),
                    both(lambda x, *args, **kwargs: ['release', 'labels', 'combined', (kwargs.get('index')+1,), SimplePathPart('catalog_number', no_manip=True)], 'CATALOGUE NUMBER', 'Catalogue Number'),
 
-                   # Release events
+                   # Release events, old format (dd/mm/yyyy)
+                   both(['release', 'events', 'combined', (0, 'Main'), SimplePathPart('date', no_manip=True)], 'MAIN RELEASE DATE',
+                        transform=oldstyle_release_event,
+                        condition=lambda val, *args, **kwargs: isinstance(val, basestring) and re.match('^\d{1,2}/\d{1,2}/\d{4}$', val)),
+
+                   # Release events, new format
                    both(['release', 'events', 'combined', (0, 'Main'), SimplePathPart('date', no_manip=True)], 'Main Release Date', 'Main Release date',
                         transform=lambda val, *args, **kwargs: '-'.join([str(x) for x in val[0:3]]),
                         condition=lambda val, *args, **kwargs: val != '' and isinstance(val, list)),
