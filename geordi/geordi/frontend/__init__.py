@@ -1,6 +1,7 @@
 from flask import Blueprint, current_app, render_template, request, abort, redirect, url_for, g, flash, jsonify
 from flask.ext.login import current_user, login_required, login_user, logout_user
 import geordi.data as data
+from geordi.data.model import db
 from geordi.data.model.csrf import CSRF
 from geordi.data.model.editor import Editor
 from geordi.user import User
@@ -39,6 +40,7 @@ def get_csrf():
     ip = get_ip()
     rand = base64.urlsafe_b64encode(os.urandom(30))
     CSRF.update_csrf(ip, rand)
+    db.session.commit()
     return rand
 
 @frontend.route('/oauth/login_redirect')
@@ -58,6 +60,7 @@ def login_redirect():
     if request.args.get('returnto'):
         opts['returnto'] = request.args.get('returnto')
     CSRF.update_opts(opts, request.args['csrf'])
+    db.session.commit()
     return redirect(redirect_uri, code=307)
 
 @frontend.route('/oauth/callback')
@@ -84,10 +87,11 @@ def oauth_callback():
             login_user(User(username, tz), remember=remember)
             flash("Logged in successfully!")
         else:
-            flash('We couldn\'t log you in D:')
+            flash("We couldn't log you in D:")
             url = url_for('.homepage')
     else:
         flash('There was an error: %s' % error)
+    db.session.commit()
     return redirect(url, code=307)
 
 def check_mb_account(auth_code):

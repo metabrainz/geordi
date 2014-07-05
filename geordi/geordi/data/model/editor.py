@@ -22,9 +22,7 @@ class Editor(db.Model):
             editor = cls(name=name)
             db.session.add(editor)
         editor.tz = tz
-        db.session.commit()
 
     def delete(self):
         db.session.delete(self)
-        db.session.commit()
         return self

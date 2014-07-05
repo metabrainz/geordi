@@ -19,7 +19,6 @@ class ItemLink(db.Model):
 
     def delete(self):
         db.session.delete(self)
-        db.session.commit()
         return self
 
     @classmethod
@@ -27,5 +26,4 @@ class ItemLink(db.Model):
         link = cls.get(type=link_type, item_id=node_item, linked_id=target_item)
         if link is None:
             link = db.session.add(cls(type=link_type, item_id=node_item, linked_id=target_item))
-            db.session.commit()
         return link

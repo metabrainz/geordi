@@ -1,3 +1,4 @@
+from model import db
 from model.item import Item
 from model.item_data import ItemData
 from model.item_link import ItemLink
@@ -35,10 +36,12 @@ def add_data_item(data_id, data_type, data):
         item_id = _create_item(data_type)
     _register_data_item(item_id, data_id, data, update=original_item_id)
     _map_item(item_id)
+    db.session.commit()
     return item_id
 
 def delete_data_item(data_id):
     ItemData.delete_data_item(data_id)
+    db.session.commit()
 
 def set_sequences():
     '''Set sequence values back to the max actual value in the tables.'''
@@ -46,6 +49,7 @@ def set_sequences():
     result = db.session.execute("select coalesce(max(id),0) + 1 from item")
     (restart,) = result.fetchone()
     db.session.execute("ALTER SEQUENCE item_id_seq RESTART %s", (restart,))
+    db.session.commit()
 
 def _create_item(data_type):
     item = Item.create(type=data_type)
