@@ -2,3 +2,8 @@ DEBUG = False # Won't matter with manager.py, use -d option to set false, defaul
 SECRET_KEY = 'seriously, change this'
 OAUTH_CLIENT_ID = 'XXXXXXXXXXXXXXXXXXXXXX'
 OAUTH_CLIENT_SECRET = 'XXXXXXXXXXXXXXXXXXXXXX'
+
+# These settings have default values in settings.py, but can be overridden in this file.
+# DB_CONNECTION = 'dbname=geordi user=geordi'
+# TRUSTED_PROXIES = ['127.0.0.1']
+# OAUTH_REDIRECT_URI = 'http://localhost:5000/oauth/callback'
