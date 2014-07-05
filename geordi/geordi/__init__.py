@@ -4,7 +4,8 @@ from flask.ext.login import LoginManager
 from geordi.frontend import frontend
 import geordi.settings
 from geordi.user import User
-import geordi.db as db
+from geordi.data.model import db
+from geordi.data.model.editor import Editor
 import jinja2_highlight
 import logging
 
@@ -13,25 +14,28 @@ login_manager.login_view = "frontend.homepage"
 
 @login_manager.user_loader
 def load_user(username):
-    with db.get_db().cursor() as curs:
-        curs.execute('SELECT name, tz FROM editor WHERE name = %s', (username,))
-        if curs.rowcount > 0:
-            row = curs.fetchone()
-            return User(row[0], row[1])
+    editor = Editor.get(username)
+    if editor is not None:
+        return User(editor.name, editor.tz)
 
 class GeordiFlask(Flask):
     jinja_options = dict(Flask.jinja_options)
     jinja_options.setdefault('extensions', []).append('jinja2_highlight.HighlightExtension')
 
+def _setup_logger(name, level):
+    logger = logging.getLogger(name)
+    logger.setLevel(level)
+    ch = logging.StreamHandler()
+    ch.setLevel(level)
+    formatter = logging.Formatter('%(asctime)s (%(levelname)s) %(name)s:  %(message)s')
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
+
 def create_app(*args, **kwargs):
+    if kwargs.get('log_sql'):
+        _setup_logger('sqlalchemy.engine', logging.INFO)
     if kwargs.get('log_debug'):
-        logger = logging.getLogger('geordi')
-        logger.setLevel(logging.DEBUG)
-        ch = logging.StreamHandler()
-        ch.setLevel(logging.DEBUG)
-        formatter = logging.Formatter('%(asctime)s (%(levelname)s) %(name)s:  %(message)s')
-        ch.setFormatter(formatter)
-        logger.addHandler(ch)
+        _setup_logger('geordi', logging.DEBUG)
     app = GeordiFlask(__name__)
     app.config.from_object('geordi.settings')
     app.config.from_pyfile('settings.cfg', silent=True)
