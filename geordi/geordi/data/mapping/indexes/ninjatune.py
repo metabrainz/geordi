@@ -82,7 +82,7 @@ ninjatune = {
                        for d in _ninjatune_countries
                    ])),
 
-                   both(['release', 'barcode'], 'BARCODE', 'Barcode', transform=lambda val, *args, **kwargs: str(int(str(val).strip())), condition=lambda x, *args, **kwargs: re.match('^\s*[0-9]+\s*$', str(x))),
+                   both(['release', 'barcode'], 'BARCODE', 'Barcode', transform=lambda val, *args, **kwargs: str(int(unicode(val).strip())), condition=lambda x, *args, **kwargs: re.match('^\s*[0-9]+\s*$', unicode(x))),
                    both(['release', 'tag'], 'MAIN GENRE', 'Main Genre', 'SUB_GENRE', 'Sub_Genre', condition=lambda x, *args, **kwargs: x != ''),
 
                    both(lambda x, *args, **kwargs: ['release', 'mediums', 'split', 'tracks', (kwargs.get('t_index'),), 'number'], 'TRACK NUMBER', 'track number',
