@@ -41,7 +41,8 @@
             "type": "object",
             "properties": {
                 "name": {"type": "array"},
-                "artists": {"$ref": "#/definitions/artists"}
+                "artists": {"$ref": "#/definitions/artists"},
+                "length": {"type": "array"}
             }
         },
         "release": {
@@ -76,7 +77,7 @@
                             "properties": {
                                 "labels": {"type": "array"},
                                 "catalog_numbers": {"type": "array"}
-                            } 
+                            }
                         }
                     }
                 },

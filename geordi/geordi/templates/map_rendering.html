@@ -15,7 +15,7 @@
         {%- if release.barcode -%}{{ info_table_row('Barcodes:', comma_list(release.barcode)) }}{%- endif -%}
 
         {%- if release.packaging -%}{{ info_table_row('Packaging:', comma_list(release.packaging)) }}{%- endif -%}
-        {%- if release.mediums.split.formats -%}{{ info_table_row('Formats:', comma_list(release.mediums.split.formats)) }}{%- endif -%}{# Yeah, it's not in render_mediums, shoot me #}
+        {%- if release.mediums and release.mediums.split.formats -%}{{ info_table_row('Formats:', comma_list(release.mediums.split.formats)) }}{%- endif -%}{# Yeah, it's not in render_mediums, shoot me #}
     </tbody></table>
     {%- if release.mediums -%}{{ render_mediums(release.mediums, links=item.links) }}{%- endif -%}
   {%- elif 'recording' in item.map -%}
@@ -43,7 +43,7 @@
   {%- endif -%}
   {%- if artists.unsplit -%}
     <span class="unsplit-artists geordi-row"><strong>Full credits:</strong> {{ comma_list(artists.unsplit, before="“", after="”") }}</span>
-  {%- endif -%} 
+  {%- endif -%}
   {%- if artists.split -%}
     <span class="split-artists geordi-row">
         {%- if artists.split.names -%}<span class="split-artists-names geordi-row"><strong>List of artist names:</strong> {{ render_name_links(artists.split.names, 'artists%split%names', prefix=prefix, links=links, before="“", after="”") }}</span>{%- endif -%}
