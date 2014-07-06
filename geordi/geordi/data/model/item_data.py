@@ -48,22 +48,24 @@ class ItemData(db.Model):
 
     @staticmethod
     def get_indexes():
-        result = db.session.execute("SELECT DISTINCT regexp_replace(id, '/.*$', '') FROM item_data")
+        result = db.session.execute("SELECT DISTINCT regexp_replace(id, '/.*$', '') n FROM item_data ORDER BY n")
         return [i[0] for i in result]
 
     @staticmethod
     def get_item_types_by_index(index):
-        result = db.session.execute("SELECT DISTINCT regexp_replace(id, '^[^/]*/([^/]*)/.*$', '\\1') "
+        result = db.session.execute("SELECT DISTINCT regexp_replace(id, '^[^/]*/([^/]*)/.*$', '\\1') n "
                                     "FROM item_data "
-                                    "WHERE id ~ ('^' || :index || '/')",
+                                    "WHERE id ~ ('^' || :index || '/') "
+                                    "ORDER BY n",
                                     {'index': index})
         return [i[0] for i in result.fetchall()]
 
     @staticmethod
     def get_item_ids(index, item_type):
-        result = db.session.execute("SELECT DISTINCT regexp_replace(id, '^[^/]*/[^/]*/(.*)$', '\\1') "
+        result = db.session.execute("SELECT DISTINCT regexp_replace(id, '^[^/]*/[^/]*/(.*)$', '\\1') n "
                                     "FROM item_data "
-                                    "WHERE id ~ ('^' || :index || '/' || :item_type || '/')",
+                                    "WHERE id ~ ('^' || :index || '/' || :item_type || '/') "
+                                    "ORDER BY n",
                                     {'index': index, 'item_type': item_type})
         return [i[0] for i in result.fetchall()]
 
