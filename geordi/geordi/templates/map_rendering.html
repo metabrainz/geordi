@@ -22,6 +22,7 @@
     {%- set recording = item.map.recording -%}
     <h3>Recording: {{ comma_list(recording.name, before="“", after="”") }}</h3>{# Assume we have a name. #}
     <table class="table table-striped"><tbody>
+        {%- if recording.length -%}{{ info_table_row('Length:', comma_list(recording.length)) }}{%- endif -%}
         {%- if recording.isrcs -%}{{ info_table_row('ISRCs:', comma_list(recording.isrcs)) }}{%- endif -%}
     </tbody></table>
   {%- endif -%}
