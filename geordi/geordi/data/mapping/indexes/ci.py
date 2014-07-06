@@ -42,13 +42,13 @@ ci_index = {
         Rule(['SoundRecordingId', 'ISRC', 'text'], ['recording', 'isrc']),
         Rule(
             ['SoundRecordingDetailsByTerritory', 'DisplayArtist', ('index', True)],
-            ['release', 'artists', 'unsplit'],
+            ['recording', 'artists', 'unsplit'],
             condition=is_full_credit,
             transform=get_artist_name
         ),
         Rule(
             ['SoundRecordingDetailsByTerritory', 'DisplayArtist', ('index', True)],
-            ['release', 'artists', 'split', 'names'],
+            ['recording', 'artists', 'split', 'names'],
             condition=is_artist_name,
             transform=get_artist_name
         )
