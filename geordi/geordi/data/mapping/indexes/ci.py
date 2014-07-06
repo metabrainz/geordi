@@ -71,6 +71,11 @@ ci_index = {
             link=lambda value, data, *args, **kwargs: 'ci/recording/' + value['_ProprietaryId']
         ),
         Rule(
+            ['ReleaseResourceReferenceList', 'ReleaseResourceReference', ('t_index', True)],
+            lambda *args, **kwargs: ['release', 'mediums', 'split', 'tracks', (kwargs.get('t_index'),), 'length'],
+            transform=lambda value, *args, **kwargs: transform_duration(value['_RecordingDuration'])
+        ),
+        Rule(
             ['ReleaseDetailsByTerritory', 'DisplayArtist', ('index', True)],
             ['release', 'artists', 'unsplit'],
             condition=is_full_credit,

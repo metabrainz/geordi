@@ -91,6 +91,7 @@ def xml_setup(add_folder, add_data_item, import_manager):
                 recording = recordings_by_reference[ref['text']]
                 ref['_ProprietaryId'] = get_pid(recording['SoundRecordingId'])
                 ref['_RecordingName'] = recording['ReferenceTitle']['TitleText']['text']
+                ref['_RecordingDuration'] = recording['Duration']['text']
 
             # All the dumps seem to have only one Worldwide territory for all
             # Releases, so the code assumes that to be a constant and would
