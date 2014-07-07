@@ -57,3 +57,5 @@ def create_app(*args, **kwargs):
                 error_fh.setLevel(logging.ERROR)
                 app.logger.addHandler(error_fh)
     return app
+
+app = create_app()
