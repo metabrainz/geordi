@@ -44,7 +44,7 @@ def create_app(*args, **kwargs):
     login_manager.init_app(app)
 
     app.register_blueprint(frontend)
-    app.register_blueprint(api, url_prefix='/api')
+    app.register_blueprint(api, url_prefix='/api/1')
 
     db.init_app(app)
 
