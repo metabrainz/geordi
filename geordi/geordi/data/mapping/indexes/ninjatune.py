@@ -19,6 +19,24 @@ def track_name(track, *args, **kwargs):
     else:
         return title
 
+def oldstyle_release_event(val, *args, **kwargs):
+    def format_oldstyle(match):
+        return "%04d-%02d-%02d" % (int(match.group(3)), int(match.group(2)), int(match.group(1)))
+    return re.sub('^(\d{1,2})/(\d{1,2})/(\d{4})$', format_oldstyle, val)
+
+_ninjatune_countries = [
+    {'code': 'UK', 'name': 'UK'},
+    {'code': 'US', 'name': 'US'},
+    {'code': 'DE', 'name': 'Germany'},
+    {'code': 'FR', 'name': 'France'},
+    {'code': 'AU', 'name': 'Australia'},
+    {'code': 'JP', 'name': 'Japan'},
+    {'code': 'IE', 'name': 'Eire'},
+    {'code': 'BE', 'name': 'Benelux'},
+    {'code': 'NL', 'name': 'Benelux'},
+    {'code': 'LU', 'name': 'Benelux'}
+]
+
 ninjatune = {
     'release': list(chain.from_iterable([
                    both(['release', 'name'], 'PRODUCT TITLE', 'Product Title'),
@@ -34,6 +52,35 @@ ninjatune = {
                    both(lambda x, *args, **kwargs: ['release', 'labels', 'combined', (kwargs.get('index')+1,), SimplePathPart('label', no_manip=True)], 'SUB_LABEL', 'Sub_Label',
                         link=lambda value, *args, **kwargs: 'ninjatune/label/%s' % value.strip()),
                    both(lambda x, *args, **kwargs: ['release', 'labels', 'combined', (kwargs.get('index')+1,), SimplePathPart('catalog_number', no_manip=True)], 'CATALOGUE NUMBER', 'Catalogue Number'),
+
+                   # Release events, old format (dd/mm/yyyy)
+                   [Rule(['MAIN RELEASE DATE', ('index', True)],
+                         ['release', 'events', 'split', 'dates'],
+                        transform=oldstyle_release_event,
+                        condition=lambda val, *args, **kwargs: isinstance(val, basestring) and re.match('^\d{1,2}/\d{1,2}/\d{4}$', val))],
+
+                   # Release events, new format
+                   both(['release', 'events', 'combined', (0, 'Main'), SimplePathPart('date', no_manip=True)], 'Main Release Date', 'Main Release date',
+                        transform=lambda val, *args, **kwargs: '-'.join([str(x) for x in val[0:3]]),
+                        condition=lambda val, *args, **kwargs: val != '' and isinstance(val, list)),
+
+                   # list-chain-deal since both() returns lists, which we want to flatten a level
+                   # all countries are in the same format given a mapping between the name (as ninjatune sees it) and code, which is in _ninjatune_countries
+                   list(chain.from_iterable([
+                       both(['release', 'events', 'combined', (0, d['code']), SimplePathPart('date', no_manip=True)], d['name'] + ' Release Date', d['name'] + ' Release date',
+                        transform=lambda val, *args, **kwargs: '-'.join([str(x) for x in val[0:3]]),
+                        condition=lambda val, *args, **kwargs: val != '' and isinstance(val, list))
+
+                       for d in _ninjatune_countries
+                   ])),
+
+                   list(chain.from_iterable([
+                       both(['release', 'events', 'combined', (0, d['code']), SimplePathPart('country', no_manip=True)], d['name'] + ' Release Date', d['name'] + ' Release date',
+                        transform=d['code'],
+                        condition=lambda val, *args, **kwargs: val != '' and isinstance(val, list))
+
+                       for d in _ninjatune_countries
+                   ])),
 
                    both(['release', 'barcode'], 'BARCODE', 'Barcode', transform=lambda val, *args, **kwargs: str(int(unicode(val).strip())), condition=lambda x, *args, **kwargs: re.match('^\s*[0-9]+\s*$', unicode(x))),
                    both(['release', 'tag'], 'MAIN GENRE', 'Main Genre', 'SUB_GENRE', 'Sub_Genre', condition=lambda x, *args, **kwargs: x != ''),
