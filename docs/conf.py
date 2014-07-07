@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-# geordi documentation build configuration file, created by
-# sphinx-quickstart on Sun Jul  6 23:53:28 2014.
-#
 # This file is execfile()d with the current directory set to its
 # containing dir.
 #
@@ -18,7 +15,7 @@ import os
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-sys.path.insert(0, os.path.abspath('..'))
+sys.path.insert(0, os.path.abspath('../geordi'))
 
 # -- General configuration ------------------------------------------------
 
