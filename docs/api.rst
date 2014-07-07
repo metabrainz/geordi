@@ -1,7 +1,7 @@
 API
 ===
 
-.. autoflask:: geordi:app
+.. autoflask:: geordi:create_app()
    :blueprints: api
    :include-empty-docstring:
    :undoc-static:
