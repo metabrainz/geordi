@@ -4,6 +4,7 @@ import geordi.data as data
 from geordi.data.model import db
 from geordi.data.model.csrf import CSRF
 from geordi.data.model.editor import Editor
+from geordi.data.model.item_data import ItemData
 from geordi.user import User
 
 import json
@@ -176,22 +177,22 @@ def item(item_id):
 
 @frontend.route('/data')
 def list_indexes():
-    indexes = data.get_indexes()
+    indexes = ItemData.get_indexes()
     return render_template('indexes.html', indexes=indexes)
 
 @frontend.route('/data/<index>')
 def list_index(index):
-    item_types = data.get_item_types_by_index(index)
+    item_types = ItemData.get_item_types_by_index(index)
     return render_template('index.html', item_types=item_types, index=index)
 
 @frontend.route('/data/<index>/<item_type>')
 def list_items(index, item_type):
-    item_ids = data.get_item_ids(index, item_type)
+    item_ids = ItemData.get_item_ids(index, item_type)
     return render_template('itemtype.html', items=item_ids, item_type=item_type, index=index)
 
 @frontend.route('/data/<index>/<item_type>/<data_id>')
 def data_item(index, item_type, data_id):
-    item_id = data.data_to_item('/'.join([index, item_type, data_id]))
+    item_id = ItemData.data_to_item('/'.join([index, item_type, data_id]))
     if item_id is None:
         abort(404)
     else:

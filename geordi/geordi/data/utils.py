@@ -6,32 +6,17 @@ from .mapping import map_item, verify_map
 import json
 import re
 
-def get_item(item_id):
-    return Item.get_item_data(item_id)
-
 def get_renderable(item_id):
     '''Fetch and return an item's data including a pretty-printed version of the data items.'''
-    item = get_item(item_id)
+    item = Item.get_item_data(item_id)
     if item is not None:
         item['data_formatted'] = dict([(d_id, json.dumps(data, indent=4)) for d_id, data in item.get('data', {}).iteritems()])
         item['map_formatted'] = json.dumps(item['map'], indent=4)
     return item
 
-def get_indexes():
-    return ItemData.get_indexes()
-
-def get_item_types_by_index(index):
-    return ItemData.get_item_types_by_index(index)
-
-def get_item_ids(index, item_type):
-    return ItemData.get_item_ids(index, item_type)
-
-def data_to_item(data_id):
-    return ItemData.data_to_item(data_id)
-
 def add_data_item(data_id, data_type, data):
     '''Add or update a data item given an ID, type, and data. Create a new item, for additions.'''
-    item_id = original_item_id = data_to_item(data_id)
+    item_id = original_item_id = ItemData.data_to_item(data_id)
     if item_id is None:
         item_id = _create_item(data_type)
     _register_data_item(item_id, data_id, data, update=original_item_id)
@@ -80,7 +65,7 @@ def _link_type_to_item_type(link_type):
 
 def _map_item(item_id):
     # fetch data
-    item = get_item(item_id)
+    item = Item.get_item_data(item_id)
     # generate map
     (mapped, links) = map_item(item)
     this_mapped = mapped[None]
@@ -94,8 +79,8 @@ def _map_item(item_id):
         if node is None:
             node_item = item_id
         else:
-            node_item = data_to_item(node)
-        target_item = data_to_item(data_id)
+            node_item = ItemData.data_to_item(node)
+        target_item = ItemData.data_to_item(data_id)
         if target_item is None:
             target_item = _create_item(_link_type_to_item_type(link_type))
             print "%s -> %s" % (data_id, target_item)
