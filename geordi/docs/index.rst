@@ -1,9 +1,13 @@
 geordi
 ======
 
-Indices and tables
-==================
+Contents
+--------
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. toctree::
+   :maxdepth: 2
+
+   data
+   data-lifecycle
+   mapping
+   mapping-format
