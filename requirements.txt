@@ -8,3 +8,4 @@ SQLAlchemy == 0.9.4
 jsonschema >= 2.3.0
 jinja2-highlight >= 0.4.0
 xlrd
+xmltodict
