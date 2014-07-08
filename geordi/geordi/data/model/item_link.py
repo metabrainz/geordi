@@ -29,10 +29,11 @@ class ItemLink(db.Model):
         return self
 
     @classmethod
-    def find_or_insert(cls, node_item, target_item, link_type):
-        link = cls.get(type=link_type, item_id=node_item, linked_id=target_item)
+    def find_or_insert(cls, node_item_id, target_item_id, link_type):
+        link = cls.get(type=link_type, item_id=node_item_id, linked_id=target_item_id)
         if link is None:
-            link = db.session.add(cls(type=link_type, item_id=node_item, linked_id=target_item))
+            link = cls(type=link_type, item_id=node_item_id, linked_id=target_item_id)
+            db.session.add(link)
             db.session.flush()
         return link
 
