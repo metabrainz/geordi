@@ -7,8 +7,8 @@ from . import db
 class ItemLinkTestCase(GeordiTestCase):
 
     def test_find_or_insert(self):
-        items = ItemLink.query.all()
-        assert len(items) == 0
+        links = ItemLink.query.all()
+        assert len(links) == 0
 
         link_type = 'test'
         test_item_1 = Item.create()
@@ -16,15 +16,15 @@ class ItemLinkTestCase(GeordiTestCase):
 
         link_1 = ItemLink.find_or_insert(test_item_1.id, test_item_2.id, link_type)
 
-        items = ItemLink.query.all()
-        assert len(items) == 1
-        assert items[0] == link_1
+        links = ItemLink.query.all()
+        assert len(links) == 1
+        assert links[0] == link_1
 
         link_2 = ItemLink.find_or_insert(test_item_1.id, test_item_2.id, link_type)
 
-        items = ItemLink.query.all()
-        assert len(items) == 1
-        assert items[0] == link_2
+        links = ItemLink.query.all()
+        assert len(links) == 1
+        assert links[0] == link_2
         assert link_1 == link_2
 
     def test_delete_by_item_id(self):
