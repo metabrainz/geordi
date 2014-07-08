@@ -35,6 +35,13 @@ def get_recording_title(recording, *args, **kwargs):
     return recording['ReferenceTitle']['TitleText']['text']
 
 
+def is_non_empty(x, *args, **kwargs):
+    return x != ''
+
+
+_genre_fields = ('r', lambda x, *args, **kwargs: x in ('GenreText', 'SubGenre'))
+
+
 ci_index = {
     'recording': [
         Rule(['ReferenceTitle', 'TitleText', 'text'], ['recording', 'name']),
@@ -51,6 +58,11 @@ ci_index = {
             ['recording', 'artists', 'split', 'names'],
             condition=is_artist_name,
             transform=get_artist_name
+        ),
+        Rule(
+            ['SoundRecordingDetailsByTerritory', 'Genre', _genre_fields, 'text'],
+            ['recording', 'tag'],
+            condition=is_non_empty
         )
     ],
     'release': [
@@ -86,6 +98,11 @@ ci_index = {
             ['release', 'artists', 'split', 'names'],
             condition=is_artist_name,
             transform=get_artist_name
+        ),
+        Rule(
+            ['ReleaseDetailsByTerritory', 'Genre', _genre_fields, 'text'],
+            ['release', 'tag'],
+            condition=is_non_empty
         )
     ]
 }
