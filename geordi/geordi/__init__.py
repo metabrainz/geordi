@@ -6,7 +6,7 @@ from geordi.api.views import api
 from geordi.user import User
 from geordi.data.model import db
 from geordi.data.model.editor import Editor
-import geordi.base_config
+import geordi.base_settings
 import jinja2_highlight
 import logging
 
@@ -44,7 +44,7 @@ def create_app(config_file='settings.cfg', *args, **kwargs):
         _setup_logger('geordi', logging.DEBUG)
 
     # Config
-    app.config.from_object(geordi.base_config)
+    app.config.from_object(geordi.base_settings)
     app.config.from_pyfile(config_file, silent=True)
 
     # Extensions
