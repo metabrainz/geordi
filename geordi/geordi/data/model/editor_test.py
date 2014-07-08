@@ -45,7 +45,9 @@ class EditorTestCase(GeordiTestCase):
         editors = Editor.query.all()
         assert len(editors) == 0
 
-        editor = Editor.add_or_update('Tester')
+        editor = Editor(name='Tester')
+        db.session.add(editor)
+        db.session.flush()
 
         editors = Editor.query.all()
         assert len(editors) == 1
