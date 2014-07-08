@@ -76,7 +76,7 @@ def xml_setup(add_folder, add_data_item, import_manager):
             # So even though we're skipping it here (so that it's not indexed
             # as a release), the recording info for it will have already been
             # indexed above.
-            if release['ReleaseType'] == 'TrackRelease':
+            if release['ReleaseType']['text'] == 'TrackRelease':
                 continue
 
             resource_references = release['ReleaseResourceReferenceList']['ReleaseResourceReference']
