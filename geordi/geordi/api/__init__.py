@@ -10,7 +10,10 @@ def item_data(item_id):
 
     :resheader Content-Type: *application/json*
     """
-    return jsonify(Item.get(item_id).to_dict())
+    item = Item.get(item_id)
+    if item is None:
+        abort(404)
+    return jsonify(item.to_dict())
 
 @api.route('/data')
 def list_indexes():
