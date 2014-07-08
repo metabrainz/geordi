@@ -27,3 +27,17 @@ class EditorTestCase(GeordiTestCase):
         assert len(editors) == 2
         assert editor_3 in editors
         assert editor_2 != editor_3
+
+    def test_delete(self):
+        editors = Editor.query.all()
+        assert len(editors) == 0
+
+        editor = Editor.add_or_update('Tester')
+
+        editors = Editor.query.all()
+        assert len(editors) == 1
+
+        editor.delete()
+
+        editors = Editor.query.all()
+        assert len(editors) == 0
