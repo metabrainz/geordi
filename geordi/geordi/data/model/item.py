@@ -24,8 +24,8 @@ class Item(db.Model):
         response = dict(id=self.id,
                         type=self.type,
                         map=json.loads(self.map),
-                        item_data=dict([(i.id, json.loads(i.data)) for i in self.item_data]),
-                        item_links=dict([(i.type, i.linked_id) for i in self.item_links]))
+                        data=dict([(i.id, json.loads(i.data)) for i in self.item_data]),
+                        links=dict([(i.type, i.linked_id) for i in self.item_links]))
         return response
 
     def delete(self):
