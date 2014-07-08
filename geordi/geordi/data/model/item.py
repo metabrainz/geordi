@@ -23,7 +23,7 @@ class Item(db.Model):
     def to_dict(self):
         response = dict(id=self.id,
                         type=self.type,
-                        map=json.loads(self.map) if self.map is not None else None,
+                        map=json.loads(self.map) if self.map is not None else dict(),
                         data=dict([(i.id, json.loads(i.data)) for i in self.item_data]),
                         links=dict([(i.type, i.linked_id) for i in self.item_links]))
         return response
