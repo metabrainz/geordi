@@ -49,14 +49,17 @@ class Item(db.Model):
         """Fetch and return an item's data."""
         ret = {'id': item_id, 'data': [], 'map': {}, 'type': ''}
 
-        result = ItemData.get_by_item_id(item_id)
-        if len(result) > 0:
-            data = dict([(d.id, json.loads(d.data)) for d in result])
+        item = cls.query.\
+                   options(db.joinedload('item_data')).\
+                   options(db.joinedload('item_links')).\
+                   filter(cls.id==item_id).first()
+
+        if len(item.item_data) > 0:
+            data = dict([(d.id, json.loads(d.data)) for d in item.item_data])
             ret['data'] = data
         else:
             return None
 
-        item = cls.get(item_id)
         if item is not None:
             if item.map is not None:
                 ret['map'] = json.loads(item.map)
@@ -64,9 +67,8 @@ class Item(db.Model):
                 ret['type'] = item.type
 
         # XXX: backwards links
-        result = ItemLink.get_by_item_id(item_id)
-        if len(result) > 0:
-            links = dict([(d.type, d.linked_id) for d in result])
+        if len(item.item_links) > 0:
+            links = dict([(d.type, d.linked_id) for d in item.item_links])
             ret['links'] = links
 
         return ret
