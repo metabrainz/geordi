@@ -65,7 +65,7 @@ def xml_setup(add_folder, add_data_item, import_manager):
 
         for recording in sound_recordings:
             recordings_by_reference[recording['ResourceReference']['text']] = recording
-            add_data_item('ci/recording/' + get_pid(recording['SoundRecordingId']), 'recording', entity2json(recording))
+            print add_data_item('ci/recording/' + get_pid(recording['SoundRecordingId']), 'recording', entity2json(recording))
 
         for release in root['ReleaseList']['Release']:
             # Releases of type "TrackRelease" contain a single recording.
@@ -100,7 +100,7 @@ def xml_setup(add_folder, add_data_item, import_manager):
             if isinstance(details, (list, tuple)):
                 raise Exception('Multiple ReleaseDetailsByTerritory nodes')
 
-            add_data_item('ci/release/' + get_pid(release['ReleaseId']), 'release', entity2json(release))
+            print add_data_item('ci/release/' + get_pid(release['ReleaseId']), 'release', entity2json(release))
 
     @import_manager.command
     def ci(path):
