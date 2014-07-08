@@ -5,6 +5,7 @@ from geordi.data.mapping.extract import extract_value
 from geordi.data.model import db
 from geordi.data.model.csrf import CSRF
 from geordi.data.model.editor import Editor
+from geordi.data.model.entity import Entity
 from geordi.data.model.item import Item
 from geordi.data.model.item_data import ItemData
 from geordi.user import User
@@ -143,22 +144,20 @@ def item_links(item_id):
         abort(404)
     return render_template('item_links.html', item=item)
 
-#@frontend.route('/entity/<mbid>')
-#@login_required
-#def entity_data(mbid):
-#    with get_db() as conn:
-#        use_cache = not request.args.get('no_cache', False)
-#        type_hint = request.args.get('type_hint', None)
-#        if use_cache:
-#            # entity = data.get_entities(mbid, conn=conn, cached=True, type_hint=type_hint)
-#            # check DB for this MBID, return if present
-#            pass
-#        if not entity:
-#            # entity = data.get_entities(mbid, conn=conn, cached=False, type_hint=type_hint)
-#            # fetch remotely and put in DB.
-#            pass
-#        return jsonify({})
-#
+@frontend.route('/entity/<mbid>')
+@login_required
+def entity_data(mbid):
+    use_cache = not request.args.get('no_cache', False)
+    type_hint = request.args.get('type_hint', None)
+    if use_cache:
+        entity = Entity.get(mbid=mbid)
+    if not entity:
+        entity = Entity.get_remote(mbid=mbid, type_hint=type_hint)
+        db.session.commit()
+    if not entity:
+        return jsonify(entity=None) # XXX: 404?
+    return jsonify(entity=entity.to_dict())
+
 #@frontend.route('/item/<item_id>/match', methods=['POST'])
 #@login_required
 #def match_item(item_id):
