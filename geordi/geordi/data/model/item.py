@@ -43,32 +43,3 @@ class Item(db.Model):
         db.session.add(item)
         db.session.flush()
         return item
-
-    @classmethod
-    def get_item_data(cls, item_id):
-        """Fetch and return an item's data."""
-        ret = {'id': item_id, 'data': [], 'map': {}, 'type': ''}
-
-        item = cls.query.\
-                   options(db.joinedload('item_data')).\
-                   options(db.joinedload('item_links')).\
-                   filter(cls.id == item_id).first()
-
-        if len(item.item_data) > 0:
-            data = dict([(d.id, json.loads(d.data)) for d in item.item_data])
-            ret['data'] = data
-        else:
-            return None
-
-        if item is not None:
-            if item.map is not None:
-                ret['map'] = json.loads(item.map)
-            if item.type is not None:
-                ret['type'] = item.type
-
-        # XXX: backwards links
-        if len(item.item_links) > 0:
-            links = dict([(d.type, d.linked_id) for d in item.item_links])
-            ret['links'] = links
-
-        return ret

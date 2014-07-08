@@ -22,7 +22,7 @@ def setup_logger():
 @data_manager.command
 def show_item(item_id):
     '''Show data for an item given an ID.'''
-    print json.dumps(Item.get_item_data(item_id), indent=4)
+    print json.dumps(Item.get(item_id).to_dict(), indent=4)
 
 @data_manager.command
 def show_data_item(data_id):
@@ -31,7 +31,7 @@ def show_data_item(data_id):
 
 @data_manager.command
 def show_item_map(item_id):
-    item = Item.get_item_data(item_id)
+    item = Item.get(item_id).to_dict()
     data = map_item(item)
     print json.dumps({'data': data[0], 'links': data[1]}, indent=4)
 
@@ -47,7 +47,7 @@ def add_data_item(data_id, data_type, data_filename):
     with open(data_filename) as f:
         data = f.read()
     item_id = geordi.data.add_data_item(data_id, data_type, data)
-    print json.dumps(Item.get_item_data(item_id), indent=4)
+    print json.dumps(Item.get(item_id).to_dict(), indent=4)
 
 @data_manager.command
 def add_folder(folder):

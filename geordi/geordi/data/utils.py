@@ -8,7 +8,7 @@ import re
 
 def get_renderable(item_id):
     '''Fetch and return an item's data including a pretty-printed version of the data items.'''
-    item = Item.get_item_data(item_id)
+    item = Item.get(item_id).to_dict()
     if item is not None:
         item['data_formatted'] = dict([(d_id, json.dumps(data, indent=4)) for d_id, data in item.get('data', {}).iteritems()])
         item['map_formatted'] = json.dumps(item['map'], indent=4)
