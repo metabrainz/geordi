@@ -42,7 +42,8 @@
             "properties": {
                 "name": {"type": "array"},
                 "artists": {"$ref": "#/definitions/artists"},
-                "length": {"type": "array"}
+                "length": {"type": "array"},
+                "tag": {"type": "array"}
             }
         },
         "release": {
@@ -58,6 +59,8 @@
                 "release_group": {"type": "array"},
 
                 "artists": {"$ref": "#/definitions/artists"},
+
+                "tag": {"type": "array"},
 
                 "labels": {
                     "type": "object",

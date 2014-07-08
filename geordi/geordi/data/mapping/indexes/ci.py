@@ -60,7 +60,7 @@ ci_index = {
             transform=get_artist_name
         ),
         Rule(
-            ['SoundRecordingDetailsByTerritory', 'Genre', _genre_fields, 'text'],
+            ['SoundRecordingDetailsByTerritory', 'Genre', ('index', True), _genre_fields, 'text'],
             ['recording', 'tag'],
             condition=is_non_empty
         )
@@ -100,7 +100,7 @@ ci_index = {
             transform=get_artist_name
         ),
         Rule(
-            ['ReleaseDetailsByTerritory', 'Genre', _genre_fields, 'text'],
+            ['ReleaseDetailsByTerritory', 'Genre', ('index', True), _genre_fields, 'text'],
             ['release', 'tag'],
             condition=is_non_empty
         )

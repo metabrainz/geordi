@@ -23,6 +23,10 @@ def entity2json(entity):
     return json.dumps(entity, separators=(',', ':'), sort_keys=True)
 
 
+def is_list(value):
+    return isinstance(value, (list, tuple))
+
+
 def xml_setup(add_folder, add_data_item, import_manager):
     def _import_ci_xml(xml_file):
         if not xml_file.endswith('.xml'):
@@ -40,7 +44,7 @@ def xml_setup(add_folder, add_data_item, import_manager):
         def get_pid(data):
             pid = data['ProprietaryId']
 
-            if isinstance(pid, (list, tuple)):
+            if is_list(pid):
                 raise Exception('Multiple ProprietaryId nodes')
 
             # I don't see any ProprietaryIds in the dumps that use a namespace
@@ -60,11 +64,23 @@ def xml_setup(add_folder, add_data_item, import_manager):
         recordings_by_reference = {}
 
         sound_recordings = root['ResourceList']['SoundRecording']
-        if not isinstance(sound_recordings, (list, tuple)):
+        if not is_list(sound_recordings):
             sound_recordings = [sound_recordings]
 
         for recording in sound_recordings:
             recordings_by_reference[recording['ResourceReference']['text']] = recording
+
+            # All the dumps seem to have only one Worldwide territory for all
+            # Recordings, so the code assumes that to be a constant and would
+            # probably break otherwise.
+            details = recording['SoundRecordingDetailsByTerritory']
+            if is_list(details):
+                raise Exception('Multiple SoundRecordingDetailsByTerritory nodes')
+
+            genres = details['Genre']
+            if not is_list(genres):
+                details['Genre'] = [genres]
+
             print add_data_item('ci/recording/' + get_pid(recording['SoundRecordingId']), 'recording', entity2json(recording))
 
         for release in root['ReleaseList']['Release']:
@@ -82,7 +98,7 @@ def xml_setup(add_folder, add_data_item, import_manager):
             resource_references = release['ReleaseResourceReferenceList']['ReleaseResourceReference']
 
             # Handle releases that have only one track.
-            if not isinstance(resource_references, (list, tuple)):
+            if not is_list(resource_references):
                 resource_references = [resource_references]
                 release['ReleaseResourceReferenceList'] = {'ReleaseResourceReference': resource_references}
 
@@ -93,12 +109,14 @@ def xml_setup(add_folder, add_data_item, import_manager):
                 ref['_RecordingName'] = recording['ReferenceTitle']['TitleText']['text']
                 ref['_RecordingDuration'] = recording['Duration']['text']
 
-            # All the dumps seem to have only one Worldwide territory for all
-            # Releases, so the code assumes that to be a constant and would
-            # probably break otherwise.
+            # See comment for SoundRecordingDetailsByTerritory above.
             details = release['ReleaseDetailsByTerritory']
-            if isinstance(details, (list, tuple)):
+            if is_list(details):
                 raise Exception('Multiple ReleaseDetailsByTerritory nodes')
+
+            genres = details['Genre']
+            if not is_list(genres):
+                details['Genre'] = [genres]
 
             print add_data_item('ci/release/' + get_pid(release['ReleaseId']), 'release', entity2json(release))
 

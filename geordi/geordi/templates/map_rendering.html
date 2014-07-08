@@ -16,6 +16,8 @@
 
         {%- if release.packaging -%}{{ info_table_row('Packaging:', comma_list(release.packaging)) }}{%- endif -%}
         {%- if release.mediums and release.mediums.split.formats -%}{{ info_table_row('Formats:', comma_list(release.mediums.split.formats)) }}{%- endif -%}{# Yeah, it's not in render_mediums, shoot me #}
+
+        {%- if release.tag -%}{{ info_table_row('Tags:', comma_list(release.tag)) }}{%- endif -%}
     </tbody></table>
     {%- if release.mediums -%}{{ render_mediums(release.mediums, links=item.links) }}{%- endif -%}
   {%- elif 'recording' in item.map -%}
@@ -24,6 +26,7 @@
     <table class="table table-striped"><tbody>
         {%- if recording.length -%}{{ info_table_row('Length:', comma_list(recording.length)) }}{%- endif -%}
         {%- if recording.isrcs -%}{{ info_table_row('ISRCs:', comma_list(recording.isrcs)) }}{%- endif -%}
+        {%- if recording.tag -%}{{ info_table_row('Tags:', comma_list(recording.tag)) }}{%- endif -%}
     </tbody></table>
   {%- endif -%}
 {%- endmacro -%}
