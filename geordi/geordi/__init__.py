@@ -10,6 +10,8 @@ from geordi.data.model.editor import Editor
 import jinja2_highlight
 import logging
 
+__version__ = '0.2'
+
 login_manager = LoginManager()
 login_manager.login_view = "frontend.homepage"
 

@@ -16,6 +16,7 @@ import os
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('../geordi'))
+from geordi import __version__
 
 # -- General configuration ------------------------------------------------
 
@@ -50,7 +51,7 @@ copyright = u'2014, MetaBrainz Foundation'
 # built documents.
 #
 # The short X.Y version.
-version = '0.1'
+version = __version__
 # The full version, including alpha/beta/rc tags.
 release = version
 
