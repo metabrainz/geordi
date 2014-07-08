@@ -43,7 +43,7 @@
                 "name": {"type": "array"},
                 "artists": {"$ref": "#/definitions/artists"},
                 "length": {"type": "array"},
-                "tag": {"type": "array"}
+                "tags": {"type": "array"},
             }
         },
         "release": {
@@ -60,7 +60,7 @@
 
                 "artists": {"$ref": "#/definitions/artists"},
 
-                "tag": {"type": "array"},
+                "tags": {"type": "array"},
 
                 "labels": {
                     "type": "object",

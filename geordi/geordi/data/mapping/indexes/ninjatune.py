@@ -15,7 +15,7 @@ def track_name(track, *args, **kwargs):
     title = track.get('MAIN TITLE', track.get('Main Title'))
     title_version = track.get('TITLE VERSION', track.get('Title Version'))
     if title_version:
-        return '%s (%s)' % (title, title_version) 
+        return '%s (%s)' % (title, title_version)
     else:
         return title
 
@@ -36,7 +36,7 @@ ninjatune = {
                    both(lambda x, *args, **kwargs: ['release', 'labels', 'combined', (kwargs.get('index')+1,), SimplePathPart('catalog_number', no_manip=True)], 'CATALOGUE NUMBER', 'Catalogue Number'),
 
                    both(['release', 'barcode'], 'BARCODE', 'Barcode', transform=lambda val, *args, **kwargs: str(int(unicode(val).strip())), condition=lambda x, *args, **kwargs: re.match('^\s*[0-9]+\s*$', unicode(x))),
-                   both(['release', 'tag'], 'MAIN GENRE', 'Main Genre', 'SUB_GENRE', 'Sub_Genre', condition=lambda x, *args, **kwargs: x != ''),
+                   both(['release', 'tags'], 'MAIN GENRE', 'Main Genre', 'SUB_GENRE', 'Sub_Genre', condition=lambda x, *args, **kwargs: x != ''),
 
                    both(lambda x, *args, **kwargs: ['release', 'mediums', 'split', 'tracks', (kwargs.get('t_index'),), 'number'], 'TRACK NUMBER', 'track number',
                         prefix=['tracks', ('t_index', True)], suffix=[],

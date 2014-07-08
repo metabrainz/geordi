@@ -61,7 +61,7 @@ ci_index = {
         ),
         Rule(
             ['SoundRecordingDetailsByTerritory', 'Genre', ('index', True), _genre_fields, 'text'],
-            ['recording', 'tag'],
+            ['recording', 'tags'],
             condition=is_non_empty
         )
     ],
@@ -101,7 +101,7 @@ ci_index = {
         ),
         Rule(
             ['ReleaseDetailsByTerritory', 'Genre', ('index', True), _genre_fields, 'text'],
-            ['release', 'tag'],
+            ['release', 'tags'],
             condition=is_non_empty
         )
     ]
