@@ -1,8 +1,21 @@
 from geordi.test_case import GeordiTestCase
 from geordi.data.model.editor import Editor
+from . import db
 
 
 class EditorTestCase(GeordiTestCase):
+
+    def test_get(self):
+        name = 'Tester'
+        editor = Editor(name=name)
+        db.session.add(editor)
+        db.session.flush()
+
+        same_editor = Editor.get(name)
+        assert editor == same_editor
+
+        missing_editor = Editor.get('Unknown')
+        assert missing_editor is None
 
     def test_add_or_update(self):
         editors = Editor.query.all()
