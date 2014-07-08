@@ -33,8 +33,8 @@ class ItemData(db.Model):
             return None
 
     @classmethod
-    def create(cls, item_id, data, data_id):
-        item_data = cls(item_id=item_id, data=data, id=data_id)
+    def create(cls, item_id, data_json, data_id):
+        item_data = cls(item_id=item_id, data=data_json, id=data_id)
         db.session.add(item_data)
         db.session.flush()
         return item_data
@@ -54,13 +54,13 @@ class ItemData(db.Model):
 
     @staticmethod
     def get_indexes():
-        result = db.session.execute("SELECT DISTINCT regexp_replace(id, '/.*$', '') n FROM item_data ORDER BY n")
+        result = db.session.execute("SELECT DISTINCT regexp_replace(id, '/.*$', '') n FROM geordi.item_data ORDER BY n")
         return [i[0] for i in result]
 
     @staticmethod
     def get_item_types_by_index(index):
         result = db.session.execute("SELECT DISTINCT regexp_replace(id, '^[^/]*/([^/]*)/.*$', '\\1') n "
-                                    "FROM item_data "
+                                    "FROM geordi.item_data "
                                     "WHERE id ~ ('^' || :index || '/') "
                                     "ORDER BY n",
                                     {'index': index})
@@ -69,7 +69,7 @@ class ItemData(db.Model):
     @staticmethod
     def get_item_ids(index, item_type):
         result = db.session.execute("SELECT DISTINCT regexp_replace(id, '^[^/]*/[^/]*/(.*)$', '\\1') n "
-                                    "FROM item_data "
+                                    "FROM geordi.item_data "
                                     "WHERE id ~ ('^' || :index || '/' || :item_type || '/') "
                                     "ORDER BY n",
                                     {'index': index, 'item_type': item_type})
@@ -77,14 +77,14 @@ class ItemData(db.Model):
 
     @staticmethod
     def delete_data_item(data_id):
-        result = db.session.execute("DELETE FROM item_data WHERE id = :id RETURNING item", {'id': data_id})
+        result = db.session.execute("DELETE FROM geordi.item_data WHERE id = :id RETURNING item", {'id': data_id})
         item = result.fetchone()[0]
-        db.session.execute("DELETE FROM item_link "
+        db.session.execute("DELETE FROM geordi.item_link "
                            "WHERE (item = :item OR linked = :item) "
                            "  AND (NOT EXISTS (SELECT TRUE FROM item_data WHERE item = item_link.item) "
                            "  OR NOT EXISTS (SELECT TRUE FROM item_data WHERE item = item_link.linked))",
                            {'item': item})
         db.session.execute("DELETE FROM item "
-                           "WHERE id = :item AND NOT EXISTS (SELECT TRUE FROM item_data WHERE item = item.id)",
+                           "WHERE id = :item AND NOT EXISTS (SELECT TRUE FROM geordi.item_data WHERE item = item.id)",
                            {'item': item})
         db.session.flush()
