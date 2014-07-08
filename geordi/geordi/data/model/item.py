@@ -52,7 +52,7 @@ class Item(db.Model):
         item = cls.query.\
                    options(db.joinedload('item_data')).\
                    options(db.joinedload('item_links')).\
-                   filter(cls.id==item_id).first()
+                   filter(cls.id == item_id).first()
 
         if len(item.item_data) > 0:
             data = dict([(d.id, json.loads(d.data)) for d in item.item_data])
