@@ -2,6 +2,7 @@ from geordi.test_case import GeordiTestCase
 from geordi.data.model.item import Item
 from geordi.data.model.item_data import ItemData
 
+
 class FrontendViewsTestCase(GeordiTestCase):
 
     def test_homepage(self):
