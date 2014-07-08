@@ -1,12 +1,12 @@
 from __future__ import division, absolute_import
 from flask import Flask
 from flask.ext.login import LoginManager
-import geordi.settings
 from geordi.frontend.views import frontend
 from geordi.api.views import api
 from geordi.user import User
 from geordi.data.model import db
 from geordi.data.model.editor import Editor
+import geordi.base_config
 import jinja2_highlight
 import logging
 
@@ -34,21 +34,26 @@ def _setup_logger(name, level):
     ch.setFormatter(formatter)
     logger.addHandler(ch)
 
-def create_app(*args, **kwargs):
+def create_app(config_file='settings.cfg', *args, **kwargs):
+    app = GeordiFlask(__name__)
+
+    # Logging
     if kwargs.get('log_sql'):
         _setup_logger('sqlalchemy.engine', logging.INFO)
     if kwargs.get('log_debug'):
         _setup_logger('geordi', logging.DEBUG)
-    app = GeordiFlask(__name__)
-    app.config.from_object('geordi.settings')
-    app.config.from_pyfile('settings.cfg', silent=True)
 
+    # Config
+    app.config.from_object(geordi.base_config)
+    app.config.from_pyfile(config_file, silent=True)
+
+    # Extensions
+    db.init_app(app)
     login_manager.init_app(app)
 
+    # Blueprints
     app.register_blueprint(frontend)
     app.register_blueprint(api, url_prefix='/api/1')
-
-    db.init_app(app)
 
     @app.before_first_request
     def setup_logging():
@@ -58,4 +63,5 @@ def create_app(*args, **kwargs):
                 error_fh = RotatingFileHandler(app.config['ERROR_LOG'], maxBytes=1024*1024*10, backupCount=10, encoding='utf_8')
                 error_fh.setLevel(logging.ERROR)
                 app.logger.addHandler(error_fh)
+
     return app
