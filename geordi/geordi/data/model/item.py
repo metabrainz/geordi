@@ -1,6 +1,4 @@
 from . import db
-from geordi.data.model.item_data import ItemData
-from geordi.data.model.item_link import ItemLink
 import json
 
 
