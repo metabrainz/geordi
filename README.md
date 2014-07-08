@@ -1,5 +1,5 @@
 geordi
-------
+======
 
 This project allows the consumption of arbitrary data, for use as a data source and matching tool.
 
@@ -8,7 +8,7 @@ This project allows the consumption of arbitrary data, for use as a data source 
 It's named after [Geordi La Forge](http://en.memory-alpha.org/wiki/Geordi_La_Forge), in reference to [MusicBrainz Picard](https://github.com/musicbrainz/picard).
 
 Setup
-=====
+-----
 
 ### Shared dependencies:
 
@@ -49,7 +49,7 @@ To create tables in existing database run:
 *(replace 'python' with 'python2' where applicable)*
 
 Importing Data
-==============
+--------------
 
 To import data, use the manager.py script in the 'geordi' directory. Various
 options exist under the 'data' subcommand, for which documentation exists.
@@ -57,7 +57,7 @@ Source-specific import tools are in the geordi.data.importer module, mostly
 under the 'indexes' subdirectory.
 
 Running server
-==============
+--------------
 
 To run the server:
 
@@ -68,7 +68,7 @@ To run the server:
 
 
 Testing
-=======
+-------
 
 To run tests, install nose (remember to enable your virtualenv!):
 
@@ -85,6 +85,6 @@ And then run the tests, you should see something like this:
 
 
 Further Documentation
-=====================
+---------------------
 
-The geordi server has some [additional documentation](geordi/docs/index.md) as well.
+The geordi server has some [additional documentation](https://geordi.readthedocs.org/) as well.

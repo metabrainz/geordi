@@ -2,12 +2,15 @@ from __future__ import division, absolute_import
 from flask import Flask
 from flask.ext.login import LoginManager
 from geordi.frontend import frontend
+from geordi.api import api
 import geordi.settings
 from geordi.user import User
 from geordi.data.model import db
 from geordi.data.model.editor import Editor
 import jinja2_highlight
 import logging
+
+__version__ = '0.2'
 
 login_manager = LoginManager()
 login_manager.login_view = "frontend.homepage"
@@ -43,6 +46,7 @@ def create_app(*args, **kwargs):
     login_manager.init_app(app)
 
     app.register_blueprint(frontend)
+    app.register_blueprint(api, url_prefix='/api/1')
 
     db.init_app(app)
 

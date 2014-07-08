@@ -9,6 +9,12 @@ class ItemData(db.Model):
     item_id = db.Column('item', db.Integer, db.ForeignKey('geordi.item.id', ondelete='CASCADE'), nullable=False)
     data = db.Column(db.UnicodeText)
 
+    def to_dict(self):
+        response = dict(id=self.id,
+                        item_id=self.item_id,
+                        data=self.data)
+        return response
+
     @classmethod
     def get(cls, id, **kwargs):
         return cls.query.filter_by(id=id, **kwargs).first()
