@@ -15,6 +15,8 @@ def item_data(item_id):
     except ValueError:
         abort(404)
     item = Item.get(item_id)
+    if item is None:
+        abort(404)
     return jsonify(item.to_dict())
 
 @api.route('/data')
