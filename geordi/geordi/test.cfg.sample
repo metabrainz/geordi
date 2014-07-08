@@ -1,0 +1,8 @@
+SECRET_KEY = 'secret'
+
+# Change this value to match your test database.
+# Don't forget to create 'geordi' schema.
+SQLALCHEMY_DATABASE_URI = 'postgresql://geordi_test:geordi_test@localhost:5432/geordi_test'
+
+OAUTH_CLIENT_ID = ''
+OAUTH_CLIENT_SECRET = ''
