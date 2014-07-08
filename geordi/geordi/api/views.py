@@ -39,7 +39,7 @@ def list_items(index, item_type):
     """
     return jsonify(index=index, item_type=item_type, items=ItemData.get_item_ids(index, item_type))
 
-@api.route('/data/<index>/<item_type>/<data_id>')
+@api.route('/data/<index>/<item_type>/<path:data_id>')
 def data_item(index, item_type, data_id):
     """Get item ID based on specified index, item type, and data ID.
 

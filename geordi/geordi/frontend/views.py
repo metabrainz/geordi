@@ -191,7 +191,7 @@ def list_items(index, item_type):
     item_ids = ItemData.get_item_ids(index, item_type)
     return render_template('itemtype.html', items=item_ids, item_type=item_type, index=index)
 
-@frontend.route('/data/<index>/<item_type>/<data_id>')
+@frontend.route('/data/<index>/<item_type>/<path:data_id>')
 def data_item(index, item_type, data_id):
     item_id = ItemData.data_to_item('/'.join([index, item_type, data_id]))
     if item_id is None:
