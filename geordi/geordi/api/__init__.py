@@ -6,6 +6,10 @@ api = Blueprint('api', __name__)
 
 @api.route('/item/<item_id>')
 def item_data(item_id):
+    """Get item's data, links, and map.
+
+    :resheader Content-Type: *application/json*
+    """
     return jsonify(Item.get(item_id).to_dict())
 
 @api.route('/data')
