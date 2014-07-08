@@ -4,16 +4,12 @@ from geordi.data.model.item_data import ItemData
 
 api = Blueprint('api', __name__)
 
-@api.route('/item/<item_id>')
+@api.route('/item/<int:item_id>')
 def item_data(item_id):
     """Get item's data, links, and map.
 
     :resheader Content-Type: *application/json*
     """
-    try:
-        item_id = int(item_id)
-    except ValueError:
-        abort(404)
     item = Item.get(item_id)
     if item is None:
         abort(404)

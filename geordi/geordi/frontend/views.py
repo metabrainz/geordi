@@ -125,12 +125,8 @@ def logout():
 def homepage():
     return render_template('homepage.html')
 
-@frontend.route('/item/<item_id>')
+@frontend.route('/item/<int:item_id>')
 def item(item_id):
-    try:
-        item_id = int(item_id)
-    except ValueError:
-        abort(404)
     item = data.get_renderable(item_id)
     if item is None:
         abort(404)
