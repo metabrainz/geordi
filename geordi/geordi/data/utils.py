@@ -65,14 +65,15 @@ def _link_type_to_item_type(link_type):
 
 def _map_item(item_id):
     # fetch data
-    item = Item.get_item_data(item_id)
+    item = Item.get(item_id)
     # generate map
-    (mapped, links) = map_item(item)
+    (mapped, links) = map_item(item.to_dict())
     this_mapped = mapped[None]
     if list(verify_map(this_mapped)):
         print "Validation errors in mapping item %s: %r, continuing." % (item_id, list(verify_map(this_mapped)))
     # First, update this item's map
-    Item.update_map(json.dumps(this_mapped, separators=(',', ':')), item_id)
+    item.map = json.dumps(this_mapped, separators=(',', ':'))
+    db.session.flush()
     # Then, go through the links, creating items as needed with the types designated by their mapping paths
     ItemLink.delete_by_item_id(item_id)
     for (node, destination, data_id) in links:

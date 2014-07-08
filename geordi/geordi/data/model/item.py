@@ -45,12 +45,6 @@ class Item(db.Model):
         return item
 
     @classmethod
-    def update_map(cls, item_map, item_id):
-        item = cls.get(item_id)
-        item.map = item_map
-        db.session.flush()
-
-    @classmethod
     def get_item_data(cls, item_id):
         """Fetch and return an item's data."""
         ret = {'id': item_id, 'data': [], 'map': {}, 'type': ''}
