@@ -10,11 +10,11 @@ class Item(db.Model):
     type = db.Column(db.Unicode)
     map = db.Column(db.UnicodeText)
 
-    item_data = db.relationship('ItemData', cascade='delete', backref='item')
+    item_data = db.relationship('ItemData', lazy='joined', cascade='delete', backref='item')
     item_redirects = db.relationship('ItemRedirect', cascade='delete', backref='new')
 
     # Item links
-    item_links = db.relationship('ItemLink', cascade='delete', backref='item', foreign_keys='ItemLink.item_id')
+    item_links = db.relationship('ItemLink', lazy='joined', cascade='delete', backref='item', foreign_keys='ItemLink.item_id')
     items_linked = db.relationship('ItemLink', cascade='delete', backref='linked', foreign_keys='ItemLink.linked_id')
 
     # Matches
