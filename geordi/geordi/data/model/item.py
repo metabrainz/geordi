@@ -22,6 +22,14 @@ class Item(db.Model):
     # Matches
     raw_matches = db.relationship('RawMatch', cascade='delete', backref='item')
 
+    def to_dict(self):
+        response = dict(id=self.id,
+                        type=self.type,
+                        map=json.loads(self.map),
+                        item_data=dict([(i.id, json.loads(i.data)) for i in self.item_data]),
+                        item_links=dict([(i.type, i.linked_id) for i in self.item_links]))
+        return response
+
     def delete(self):
         db.session.delete(self)
         db.session.flush()

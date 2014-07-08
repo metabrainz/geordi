@@ -1,15 +1,12 @@
 from flask import Blueprint, abort, jsonify
+from geordi.data.model.item import Item
 from geordi.data.model.item_data import ItemData
 
 api = Blueprint('api', __name__)
 
 @api.route('/item/<item_id>')
 def item_data(item_id):
-    raise NotImplementedError
-
-@api.route('/item/<item_id>/map')
-def item_map(item_id):
-    raise NotImplementedError
+    return jsonify(Item.get(item_id).to_dict())
 
 @api.route('/data')
 def list_indexes():

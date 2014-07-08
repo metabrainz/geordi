@@ -9,6 +9,12 @@ class ItemLink(db.Model):
     item_id = db.Column('item', db.Integer, db.ForeignKey('geordi.item.id', ondelete='CASCADE'), primary_key=True)
     linked_id = db.Column('linked', db.Integer, db.ForeignKey('geordi.item.id', ondelete='CASCADE'), primary_key=True)
 
+    def to_dict(self):
+        response = dict(type=self.type,
+                        item_id=self.item_id,
+                        linked_id=self.linked_id)
+        return response
+
     @classmethod
     def get(cls, type, item_id, linked_id, **kwargs):
         return cls.query.filter_by(type=type, item_id=item_id, linked_id=linked_id, **kwargs).first()
