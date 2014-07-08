@@ -1,9 +1,9 @@
 from __future__ import division, absolute_import
 from flask import Flask
 from flask.ext.login import LoginManager
-from geordi.frontend import frontend
-from geordi.api import api
 import geordi.settings
+from geordi.frontend.views import frontend
+from geordi.api.views import api
 from geordi.user import User
 from geordi.data.model import db
 from geordi.data.model.editor import Editor
