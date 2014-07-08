@@ -74,6 +74,7 @@ def _map_item(item_id):
     # First, update this item's map
     Item.update_map(json.dumps(this_mapped, separators=(',', ':')), item_id)
     # Then, go through the links, creating items as needed with the types designated by their mapping paths
+    ItemLink.delete_by_item_id(item_id)
     for (node, destination, data_id) in links:
         link_type = '%'.join([str(d) for d in destination])
         if node is None:
