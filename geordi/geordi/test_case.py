@@ -8,7 +8,6 @@ class GeordiTestCase(TestCase):
     def create_app(self):
         app = create_app('test.cfg')
         app.config['TESTING'] = True
-        app.config['CSRF_ENABLED'] = False
         return app
 
     def setUp(self):

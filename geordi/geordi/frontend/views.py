@@ -38,12 +38,14 @@ def get_ip():
             return request.environ['REMOTE_ADDR']
 
 def get_csrf():
-    rand = base64.urlsafe_b64encode(os.urandom(30))
-    if current_app.config['CSRF_ENABLED']:
+    if not current_app.config['TESTING']:
+        rand = base64.urlsafe_b64encode(os.urandom(30))
         ip = get_ip()
         CSRF.update_csrf(ip, rand)
         db.session.commit()
-    return rand
+        return rand
+    else:
+        return 'test'
 
 @frontend.route('/oauth/login_redirect')
 def login_redirect():
