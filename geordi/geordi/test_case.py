@@ -6,8 +6,9 @@ from . import db
 class GeordiTestCase(TestCase):
 
     def create_app(self):
-        app = create_app('test.cfg')
+        app = create_app()
         app.config['TESTING'] = True
+        app.config['SQLALCHEMY_DATABASE_URI'] = app.config['TEST_SQLALCHEMY_DATABASE_URI']
         return app
 
     def setUp(self):

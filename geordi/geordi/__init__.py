@@ -34,7 +34,7 @@ def _setup_logger(name, level):
     ch.setFormatter(formatter)
     logger.addHandler(ch)
 
-def create_app(config_file='settings.cfg', *args, **kwargs):
+def create_app(settings_file='settings.cfg', *args, **kwargs):
     app = GeordiFlask(__name__)
 
     # Logging
@@ -45,7 +45,7 @@ def create_app(config_file='settings.cfg', *args, **kwargs):
 
     # Config
     app.config.from_object(geordi.base_settings)
-    app.config.from_pyfile(config_file, silent=True)
+    app.config.from_pyfile(settings_file, silent=True)
 
     # Extensions
     db.init_app(app)
