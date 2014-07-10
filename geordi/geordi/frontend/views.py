@@ -1,4 +1,4 @@
-from flask import Blueprint, current_app, render_template, request, abort, redirect, url_for, g, flash, jsonify
+from flask import Blueprint, Response, current_app, render_template, request, abort, redirect, url_for, g, flash, jsonify
 from flask.ext.login import current_user, login_required, login_user, logout_user
 import geordi.data as data
 from geordi.data.model import db
@@ -146,7 +146,7 @@ def entity_data(mbid):
         entity = Entity.get_remote(mbid=mbid, type_hint=type_hint)
         db.session.commit()
     if not entity:
-        return jsonify(entity=None) # XXX: 404?
+        return Response(json.dumps({'entity': None}), status=404, mimetype='application/json')
     return jsonify(entity=entity.to_dict())
 
 #@frontend.route('/item/<item_id>/match', methods=['POST'])
