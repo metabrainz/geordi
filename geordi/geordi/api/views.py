@@ -29,7 +29,10 @@ def list_index(index):
 
     :resheader Content-Type: *application/json*
     """
-    return jsonify(index=index, item_types=ItemData.get_item_types_by_index(index))
+    item_types = ItemData.get_item_types_by_index(index)
+    if not item_types:
+        abort(404)
+    return jsonify(index=index, item_types=item_types)
 
 @api.route('/data/<index>/<item_type>')
 def list_items(index, item_type):
@@ -37,7 +40,10 @@ def list_items(index, item_type):
 
     :resheader Content-Type: *application/json*
     """
-    return jsonify(index=index, item_type=item_type, items=ItemData.get_item_ids(index, item_type))
+    item_ids = ItemData.get_item_ids(index, item_type)
+    if not item_ids:
+        abort(404)
+    return jsonify(index=index, item_type=item_type, items=item_ids)
 
 @api.route('/data/<index>/<item_type>/<path:data_id>')
 def data_item(index, item_type, data_id):
@@ -46,7 +52,6 @@ def data_item(index, item_type, data_id):
     :resheader Content-Type: *application/json*
     """
     item_id = ItemData.data_to_item('/'.join([index, item_type, data_id]))
-    if item_id is None:
+    if not item_id:
         abort(404)
-    else:
-        return jsonify(index=index, item_type=item_type, data_id=data_id, item_id=item_id)
+    return jsonify(index=index, item_type=item_type, data_id=data_id, item_id=item_id)
