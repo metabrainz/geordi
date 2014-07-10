@@ -1,13 +1,16 @@
 from __future__ import division, absolute_import
 from flask import Flask
 from flask.ext.login import LoginManager
-from geordi.frontend import frontend
-import geordi.settings
+from geordi.frontend.views import frontend as frontend_bp
+from geordi.api.views import api as api_bp
 from geordi.user import User
 from geordi.data.model import db
 from geordi.data.model.editor import Editor
+import geordi.base_settings
 import jinja2_highlight
 import logging
+
+__version__ = '0.2'
 
 login_manager = LoginManager()
 login_manager.login_view = "frontend.homepage"
@@ -31,20 +34,26 @@ def _setup_logger(name, level):
     ch.setFormatter(formatter)
     logger.addHandler(ch)
 
-def create_app(*args, **kwargs):
+def create_app(settings_file='settings.cfg', *args, **kwargs):
+    app = GeordiFlask(__name__)
+
+    # Logging
     if kwargs.get('log_sql'):
         _setup_logger('sqlalchemy.engine', logging.INFO)
     if kwargs.get('log_debug'):
         _setup_logger('geordi', logging.DEBUG)
-    app = GeordiFlask(__name__)
-    app.config.from_object('geordi.settings')
-    app.config.from_pyfile('settings.cfg', silent=True)
 
+    # Config
+    app.config.from_object(geordi.base_settings)
+    app.config.from_pyfile(settings_file, silent=True)
+
+    # Extensions
+    db.init_app(app)
     login_manager.init_app(app)
 
-    app.register_blueprint(frontend)
-
-    db.init_app(app)
+    # Blueprints
+    app.register_blueprint(frontend_bp)
+    app.register_blueprint(api_bp, url_prefix='/api/1')
 
     @app.before_first_request
     def setup_logging():
@@ -54,4 +63,5 @@ def create_app(*args, **kwargs):
                 error_fh = RotatingFileHandler(app.config['ERROR_LOG'], maxBytes=1024*1024*10, backupCount=10, encoding='utf_8')
                 error_fh.setLevel(logging.ERROR)
                 app.logger.addHandler(error_fh)
+
     return app

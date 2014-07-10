@@ -1,4 +1,5 @@
 from flask.ext.script import Manager
+from flask import current_app
 from geordi import create_app
 from geordi.data import model
 from geordi.data.manage import data_manager
@@ -11,7 +12,7 @@ manager.add_command('data', data_manager)
 
 @manager.command
 def create_tables():
-    model.create_tables(manager.app)
+    model.create_tables(current_app)
 
 if __name__ == "__main__":
     manager.run()

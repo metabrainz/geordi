@@ -5,6 +5,8 @@ import re
 import logging
 from flask.ext.script import Manager
 from geordi.data.mapping import map_item, verify_map
+from geordi.data.model.item import Item
+from geordi.data.model.item_data import ItemData
 
 data_manager = Manager(usage="Manipulate and query the elasticsearch and postgresql databases.")
 
@@ -20,16 +22,16 @@ def setup_logger():
 @data_manager.command
 def show_item(item_id):
     '''Show data for an item given an ID.'''
-    print json.dumps(geordi.data.get_item(item_id), indent=4)
+    print json.dumps(Item.get(item_id).to_dict(), indent=4)
 
 @data_manager.command
 def show_data_item(data_id):
     '''Show item ID given a data ID.'''
-    print geordi.data.data_to_item(data_id)
+    print ItemData.data_to_item(data_id)
 
 @data_manager.command
 def show_item_map(item_id):
-    item = geordi.data.get_item(item_id)
+    item = Item.get(item_id).to_dict()
     data = map_item(item)
     print json.dumps({'data': data[0], 'links': data[1]}, indent=4)
 
@@ -45,7 +47,7 @@ def add_data_item(data_id, data_type, data_filename):
     with open(data_filename) as f:
         data = f.read()
     item_id = geordi.data.add_data_item(data_id, data_type, data)
-    print json.dumps(geordi.data.get_item(item_id), indent=4)
+    print json.dumps(Item.get(item_id).to_dict(), indent=4)
 
 @data_manager.command
 def add_folder(folder):

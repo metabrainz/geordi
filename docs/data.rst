@@ -25,5 +25,3 @@ Technical details
 -----------------
 
 All data for geordi is stored in the new geordi SQL database, or in a replicated MusicBrainz database when, in the future, non-raw matches are implemented. This data is propagated to a search server, similar to the main MusicBrainz search server except updated live (on import/remapping and when matches are registered).
-
-The [geordi SQL schema](../sql/tables.sql) is available for consideration.
