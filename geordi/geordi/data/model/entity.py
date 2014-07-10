@@ -40,7 +40,7 @@ class Entity(db.Model, DeleteMixin):
         opener.addheaders = [('Accept', 'application/json')]
         try:
             json_data = json.load(opener.open(url, timeout=5))
-            entity = cls(mbid=json_data['mbid'], type=json_data['entityType'], data=json.dumps({'name': json_data['name']}))
+            entity = cls(mbid=json_data['gid'], type=json_data['entityType'], data=json.dumps({'name': json_data['name']}))
             db.session.add(entity)
             #if mbid != json_data['mbid']: handle redirected gids
             db.session.flush()
