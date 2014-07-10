@@ -1,0 +1,6 @@
+{% extends "layout.html" %}
+{% block title %}Server error{% endblock %}
+{% block content %}
+<p>Server failed to process your request. You can try again later.</p>
+<code>{{ error }}</code>
+{% endblock %}

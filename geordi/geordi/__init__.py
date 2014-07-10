@@ -3,6 +3,7 @@ from flask import Flask
 from flask.ext.login import LoginManager
 from geordi.frontend.views import frontend as frontend_bp
 from geordi.api.views import api as api_bp
+from geordi import errors
 from geordi.user import User
 from geordi.data.model import db
 from geordi.data.model.editor import Editor
@@ -36,6 +37,7 @@ def _setup_logger(name, level):
 
 def create_app(settings_file='settings.cfg', *args, **kwargs):
     app = GeordiFlask(__name__)
+    errors.init_error_handlers(app)
 
     # Logging
     if kwargs.get('log_sql'):
