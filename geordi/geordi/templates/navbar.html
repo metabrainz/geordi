@@ -14,26 +14,28 @@
         <li><a href="{{ url_for('frontend.list_indexes') }}">Indexes</a></li>
         <li><a href="https://geordi.readthedocs.org">Documentation</a></li>
       </ul>
-      {%- if current_user.id -%}
-        <ul class="nav navbar-nav navbar-right">
-          <li><a href="https://musicbrainz.org/user/{{ current_user.id }}">{{ current_user.id }}</a></li>
-          <li><a href="{{ url_for('frontend.logout') }}">Log out</a></li>
-        </ul>
-      {%- else -%}
-        <form class="navbar-form navbar-right" action="{{ url_for('frontend.login_redirect') }}" method="get">
-          <div class="form-group">
-            <div class="input-group">
-              <span class="input-group-addon">
-                <input id="remember" type="checkbox" data-toggle="tooltip" data-placement="bottom" title="Remember me?" name="remember" checked="checked" />
-              </span>
-              <input type="hidden" name="csrf" value="{{ g.login_parameters.csrf }}" />
-              <input type="hidden" name="returnto" value="{{ g.login_parameters.returnto }}" />
-              <span class="input-group-btn">
-                <button class="btn btn-default login-button" type="submit" value="log_in">Login</button>
-              </span>
+      {%- if not error -%}
+        {%- if current_user.id -%}
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="https://musicbrainz.org/user/{{ current_user.id }}">{{ current_user.id }}</a></li>
+            <li><a href="{{ url_for('frontend.logout') }}">Log out</a></li>
+          </ul>
+        {%- else -%}
+          <form class="navbar-form navbar-right" action="{{ url_for('frontend.login_redirect') }}" method="get">
+            <div class="form-group">
+              <div class="input-group">
+                <span class="input-group-addon">
+                  <input id="remember" type="checkbox" data-toggle="tooltip" data-placement="bottom" title="Remember me?" name="remember" checked="checked" />
+                </span>
+                <input type="hidden" name="csrf" value="{{ g.login_parameters.csrf }}" />
+                <input type="hidden" name="returnto" value="{{ g.login_parameters.returnto }}" />
+                <span class="input-group-btn">
+                  <button class="btn btn-default login-button" type="submit" value="log_in">Login</button>
+                </span>
+              </div>
             </div>
-          </div>
-        </form>
+          </form>
+        {%- endif -%}
       {%- endif -%}
     </div>
   </div>
