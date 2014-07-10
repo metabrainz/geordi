@@ -118,6 +118,13 @@ ci_index = {
             condition=role_is('Lyricist'),
             transform=get_artist_name,
             node_destination='work'
+        ),
+        Rule(
+            ['SoundRecordingDetailsByTerritory', 'IndirectResourceContributor', ('index', True)],
+            lambda *args, **kwargs: ['work', 'publishers', (kwargs.get('index'),), SimplePathPart('target', no_manip=True)],
+            condition=role_is('MusicPublisher'),
+            transform=get_artist_name,
+            node_destination='work'
         )
     ],
     'release': [
