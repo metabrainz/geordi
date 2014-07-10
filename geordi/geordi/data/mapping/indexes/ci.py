@@ -1,5 +1,6 @@
 import re
 from ..rule import Rule
+from ..insert import SimplePathPart
 
 
 re_duration = re.compile("PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?")
@@ -35,6 +36,22 @@ def get_recording_title(recording, *args, **kwargs):
     return recording['ReferenceTitle']['TitleText']['text']
 
 
+def role_is(accepted_role):
+    def condition(data, *args, **kwargs):
+        node = data.get('ResourceContributorRole') or data.get('IndirectResourceContributorRole')
+        role = node['text']
+        if role == 'UserDefined':
+            return node['_UserDefinedValue'] == accepted_role
+        else:
+            return role == accepted_role
+    return condition
+
+
+_extra_title_info = re.compile(r'\((remastered|extended single mix|(single|full|demo) version|acoustic)\)', re.I)
+def get_work_title(value, data, *args, **kwargs):
+    return re.sub(_extra_title_info, '', value).strip()
+
+
 def is_non_empty(x, *args, **kwargs):
     return x != ''
 
@@ -47,6 +64,18 @@ ci_index = {
         Rule(['ReferenceTitle', 'TitleText', 'text'], ['recording', 'name']),
         Rule(['Duration', 'text'], ['recording', 'length'], transform=transform_duration),
         Rule(['SoundRecordingId', 'ISRC', 'text'], ['recording', 'isrc']),
+        Rule(
+            ['ReferenceTitle', 'TitleText', 'text'],
+            ['recording', 'works', (0, True), SimplePathPart('target', no_manip=True)],
+            transform=get_work_title,
+            link=lambda value, data, *args, **kwargs: 'ci/recording/' + data['SoundRecordingId']['ProprietaryId']['text'] + ':work'
+        ),
+        Rule(
+            ['ReferenceTitle', 'TitleText', 'text'],
+            ['work', 'name'],
+            transform=get_work_title,
+            node_destination='work'
+        ),
         Rule(
             ['SoundRecordingDetailsByTerritory', 'DisplayArtist', ('index', True)],
             ['recording', 'artists', 'unsplit'],
@@ -63,6 +92,32 @@ ci_index = {
             ['SoundRecordingDetailsByTerritory', 'Genre', ('index', True), _genre_fields, 'text'],
             ['recording', 'tags'],
             condition=is_non_empty
+        ),
+        Rule(
+            ['SoundRecordingDetailsByTerritory', 'ResourceContributor', ('index', True)],
+            lambda *args, **kwargs: ['recording', 'producers', (kwargs.get('index'),), SimplePathPart('target', no_manip=True)],
+            condition=role_is('Producer'),
+            transform=get_artist_name,
+        ),
+        Rule(
+            ['SoundRecordingDetailsByTerritory', 'ResourceContributor', ('index', True)],
+            lambda *args, **kwargs: ['recording', 'mixers', (kwargs.get('index'),), SimplePathPart('target', no_manip=True)],
+            condition=role_is('Mixer'),
+            transform=get_artist_name
+        ),
+        Rule(
+            ['SoundRecordingDetailsByTerritory', 'IndirectResourceContributor', ('index', True)],
+            lambda *args, **kwargs: ['work', 'composers', (kwargs.get('index'),), SimplePathPart('target', no_manip=True)],
+            condition=role_is('Composer'),
+            transform=get_artist_name,
+            node_destination='work'
+        ),
+        Rule(
+            ['SoundRecordingDetailsByTerritory', 'IndirectResourceContributor', ('index', True)],
+            lambda *args, **kwargs: ['work', 'lyricists', (kwargs.get('index'),), SimplePathPart('target', no_manip=True)],
+            condition=role_is('Lyricist'),
+            transform=get_artist_name,
+            node_destination='work'
         )
     ],
     'release': [

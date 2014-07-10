@@ -27,6 +27,13 @@ def is_list(value):
     return isinstance(value, (list, tuple))
 
 
+def force_list(node, child_name):
+    value = node.get(child_name)
+    if value and not is_list(value):
+        value = node[child_name] = [value]
+    return value
+
+
 def xml_setup(add_folder, add_data_item, import_manager):
     def _import_ci_xml(xml_file):
         if not xml_file.endswith('.xml'):
@@ -77,9 +84,9 @@ def xml_setup(add_folder, add_data_item, import_manager):
             if is_list(details):
                 raise Exception('Multiple SoundRecordingDetailsByTerritory nodes')
 
-            genres = details['Genre']
-            if not is_list(genres):
-                details['Genre'] = [genres]
+            force_list(details, 'Genre')
+            force_list(details, 'ResourceContributor')
+            force_list(details, 'IndirectResourceContributor')
 
             print add_data_item('ci/recording/' + get_pid(recording['SoundRecordingId']), 'recording', entity2json(recording))
 
@@ -95,12 +102,8 @@ def xml_setup(add_folder, add_data_item, import_manager):
             if release['ReleaseType']['text'] == 'TrackRelease':
                 continue
 
-            resource_references = release['ReleaseResourceReferenceList']['ReleaseResourceReference']
-
             # Handle releases that have only one track.
-            if not is_list(resource_references):
-                resource_references = [resource_references]
-                release['ReleaseResourceReferenceList'] = {'ReleaseResourceReference': resource_references}
+            resource_references = force_list(release['ReleaseResourceReferenceList'], 'ReleaseResourceReference')
 
             # Needed by the mapping step to link tracks with recordings.
             for ref in resource_references:
@@ -114,9 +117,7 @@ def xml_setup(add_folder, add_data_item, import_manager):
             if is_list(details):
                 raise Exception('Multiple ReleaseDetailsByTerritory nodes')
 
-            genres = details['Genre']
-            if not is_list(genres):
-                details['Genre'] = [genres]
+            force_list(details, 'Genre')
 
             print add_data_item('ci/release/' + get_pid(release['ReleaseId']), 'release', entity2json(release))
 

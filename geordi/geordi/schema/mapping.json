@@ -8,6 +8,7 @@
         "label": {"$ref": "#/definitions/label"},
         "place": {"$ref": "#/definitions/place"},
         "recording": {"$ref": "#/definitions/recording"},
+        "relationship": {"$ref": "#/definitions/relationship"},
         "release": {"$ref": "#/definitions/release"},
         "release_group": {"$ref": "#/definitions/release_group"},
         "work": {"$ref": "#/definitions/work"}
@@ -44,6 +45,24 @@
                 "artists": {"$ref": "#/definitions/artists"},
                 "length": {"type": "array"},
                 "tags": {"type": "array"},
+                "works": {
+                    "type": "array",
+                    "items": {"$ref": "#/definitions/relationship"}
+                },
+                "producers": {
+                    "type": "array",
+                    "items": {"$ref": "#/definitions/relationship"}
+                },
+                "mixers": {
+                    "type": "array",
+                    "items": {"$ref": "#/definitions/relationship"}
+                }
+            }
+        },
+        "relationship": {
+            "type": "object",
+            "properties": {
+                "target": {"type": "string"}
             }
         },
         "release": {
@@ -147,7 +166,19 @@
         "work": {
             "type": "object",
             "properties": {
-                "name": {"type": "array"}
+                "name": {"type": "array"},
+                "composers": {
+                    "type": "array",
+                    "items": {"$ref": "#/definitions/relationship"}
+                },
+                "lyricists": {
+                    "type": "array",
+                    "items": {"$ref": "#/definitions/relationship"}
+                },
+                "publishers": {
+                    "type": "array",
+                    "items": {"$ref": "#/definitions/relationship"}
+                }
             }
         },
 
