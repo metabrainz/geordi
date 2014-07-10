@@ -1,8 +1,8 @@
 from __future__ import division, absolute_import
 from flask import Flask
 from flask.ext.login import LoginManager
-from geordi.frontend.views import frontend
-from geordi.api.views import api
+from geordi.frontend.views import frontend as frontend_bp
+from geordi.api.views import api as api_bp
 from geordi.user import User
 from geordi.data.model import db
 from geordi.data.model.editor import Editor
@@ -52,8 +52,8 @@ def create_app(settings_file='settings.cfg', *args, **kwargs):
     login_manager.init_app(app)
 
     # Blueprints
-    app.register_blueprint(frontend)
-    app.register_blueprint(api, url_prefix='/api/1')
+    app.register_blueprint(frontend_bp)
+    app.register_blueprint(api_bp, url_prefix='/api/1')
 
     @app.before_first_request
     def setup_logging():
