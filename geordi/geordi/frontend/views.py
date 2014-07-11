@@ -8,6 +8,7 @@ from geordi.data.model.editor import Editor
 from geordi.data.model.entity import Entity
 from geordi.data.model.item import Item
 from geordi.data.model.item_data import ItemData
+from geordi.data.model.raw_match import RawMatch
 from geordi.user import User
 
 import json
@@ -158,33 +159,33 @@ def entity_data(mbid):
         return Response(json.dumps({'entity': None}), status=404, mimetype='application/json')
     return jsonify(entity=entity.to_dict())
 
-#@frontend.route('/item/<item_id>/match', methods=['POST'])
-#@login_required
-#def match_item(item_id):
-#    '''This endpoint is passed a set of mbids, and an item.
-#    It then checks if the set matches the current match for the item;
-#    if so, it does nothing. If not, the submitted match becomes the
-#    new match, superseding the former match. As a precaution, empty
-#    sets will be ignored unless a special extra parameter is set.
-#    '''
-#    is_mbid = re.compile('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$')
-#    empty = request.form.get('empty', False)
-#    mbids = [mbid.lower() for mbid in request.form.getlist('matches')]
-#    if len(mbids) == 0 and not empty:
-#        return jsonify({'error': 'No matches provided.'})
-#    if len([True for mbid in mbids if (is_mbid.match(mbid) is None)]) > 0:
-#        return jsonify({'error': 'MBIDs improperly formatted.'})
-#    with get_db() as conn:
-#        ## fetch existing matches from the DB
-#        #existing = data.get_matches(item_id, conn=conn)
-#        #if set(mbids) == set(existing):
-#        #    return jsonify({'error': 'Matches not changed'})
-#        ## add new matches if applicable
-#        #entities = data.get_entities(mbids, conn=conn, cached=False) # check error condition?
-#        #success = data.add_matches(item_id, mbids, conn=conn)
-#        ## return JSON success value and matches preserved/added/superseded
-#        pass
-#    return jsonify({})
+@frontend.route('/item/<item_id>/match', methods=['POST'])
+@login_required
+def match_item(item_id):
+    '''This endpoint is passed a set of mbids, and an item.
+    It then checks if the set matches the current match for the item;
+    if so, it does nothing. If not, the submitted match becomes the
+    new match, superseding the former match. As a precaution, empty
+    sets will be ignored unless a special extra parameter is set.
+    '''
+    is_mbid = re.compile('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$')
+    empty = request.form.get('empty', False)
+    mbids = [mbid.lower() for mbid in request.form.getlist('matches')]
+    if len(mbids) == 0 and not empty:
+        return jsonify({'error': 'No matches provided.'})
+    if len([True for mbid in mbids if (is_mbid.match(mbid) is None)]) > 0:
+        return jsonify({'error': 'MBIDs improperly formatted.'})
+    existing = RawMatch.get_by_item(item_id, superseded=False)
+    if len(existing) > 1:
+        raise Exception('Why are there %d non-superseded matches for item %d?' % (len(existing), item_id))
+    elif len(existing) == 1:
+        if set(mbids) == set([entity.mbid for entity in existing[0].entities]):
+            return jsonify({'error': 'Matches not changed'})
+    entities = Entity.query.filter(Entity.mbid.in_(mbids)).all()
+    if len(entities) != len(mbids):
+        return jsonify({'error': 'Not all entities were found in the DB'})
+    match = RawMatch.match_item(item_id, current_user.id, entities)
+    return jsonify(match=match.to_dict())
 
 @frontend.route('/data')
 def list_indexes():

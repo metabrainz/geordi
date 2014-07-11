@@ -27,7 +27,7 @@ class Entity(db.Model, DeleteMixin):
     data = db.Column(db.UnicodeText)
 
     #: Property for matches using this entity.
-    raw_match_entities = db.relationship('RawMatchEntity', cascade='delete', backref='entity')
+    raw_match_entities = db.relationship('RawMatchEntity', cascade='delete', backref=db.backref('entity', lazy='joined'))
 
     @classmethod
     def get(cls, mbid, **kwargs):

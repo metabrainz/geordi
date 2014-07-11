@@ -20,7 +20,7 @@ class Editor(db.Model, DeleteMixin):
     internal = db.Column(db.Boolean, nullable=False, default=False)
 
     #: Property for matches entered by this user. Not loaded by default.
-    matches = db.relationship('RawMatch', cascade='delete', backref='editor')
+    matches = db.relationship('RawMatch', cascade='delete', backref=db.backref('editor', lazy='joined'))
 
     @classmethod
     def get(cls, name, **kwargs):
