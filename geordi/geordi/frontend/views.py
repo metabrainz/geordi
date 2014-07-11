@@ -4,6 +4,7 @@ import geordi.data as data
 from geordi.data.model import db
 from geordi.data.model.csrf import CSRF
 from geordi.data.model.editor import Editor
+from geordi.data.model.item import Item
 from geordi.data.model.item_data import ItemData
 from geordi.user import User
 
@@ -133,6 +134,13 @@ def item(item_id):
     if item is None:
         abort(404)
     return render_template('item.html', item=item)
+
+@frontend.route('/item/<int:item_id>/links')
+def item_links(item_id):
+    item = Item.get(item_id)
+    if item is None:
+        abort(404)
+    return render_template('item_links.html', item=item)
 
 #@frontend.route('/entity/<mbid>')
 #@login_required
