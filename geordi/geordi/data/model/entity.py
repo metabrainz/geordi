@@ -17,7 +17,7 @@ class Entity(db.Model):
     type = db.Column(db.Unicode, nullable=False)
     data = db.Column(db.UnicodeText)
 
-    raw_match_entities = db.relationship('RawMatchEntity', cascade='delete', backref='entity')
+    raw_match_entities = db.relationship('RawMatchEntity', cascade='delete', backref=db.backref('entity', lazy='joined'))
 
     @classmethod
     def get(cls, mbid, **kwargs):

@@ -9,7 +9,7 @@ class Editor(db.Model):
     tz = db.Column(db.Unicode)
     internal = db.Column(db.Boolean, nullable=False, default=False)
 
-    matches = db.relationship('RawMatch', cascade='delete', backref='editor')
+    matches = db.relationship('RawMatch', cascade='delete', backref=db.backref('editor', lazy='joined'))
 
     @classmethod
     def get(cls, name, **kwargs):
