@@ -7,6 +7,7 @@
     <tr>
       <th>Linked item</th>
       <th>Type</th>
+      <th></th>
     </tr>
     </thead>
     <tbody>
@@ -14,7 +15,7 @@
       <tr>
         <td><a href="{{ url_for('frontend.item', item_id=link.item_id) }}">{{ link.item_id }}</a>
         <td>{{ link.type }}</td>
-        <td>
+        <td>{{ link.desc }}</td>
       </tr>
     {% endfor %}
     </tbody>
