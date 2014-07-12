@@ -142,18 +142,24 @@ def item_links(item_id):
     if item is None:
         abort(404)
 
-    maps = {}
+    linked_items = {}
     for item_link in set(item.items_linked):
-        maps[item_link.item_id] = Item.get(item_link.item_id).map_dict
+        linked_items[item_link.item_id] = Item.get(item_link.item_id)
 
     def to_int_conditionally(val):
         return int(val) if re.match('^\d+$', val) else val
 
+    links = []
     for item_link in item.items_linked:
         path = [to_int_conditionally(x) for x in item_link.type.split('%')]
-        item_link.desc = extract_value(maps[item_link.item_id], path)[0][1]
+        links.append(dict(
+            item_id=item_link.item_id,
+            item_type=linked_items[item_link.item_id].type,
+            path=item_link.type,
+            value=extract_value(linked_items[item_link.item_id].map_dict, path)[0][1],
+        ))
 
-    return render_template('item_links.html', item=item)
+    return render_template('item_links.html', item=item, links=links)
 
 #@frontend.route('/entity/<mbid>')
 #@login_required

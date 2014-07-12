@@ -7,15 +7,17 @@
     <tr>
       <th>Linked item</th>
       <th>Type</th>
-      <th></th>
+      <th>Value</th>
+      <th>Path</th>
     </tr>
     </thead>
     <tbody>
-    {% for link in item.items_linked %}
+    {% for link in links %}
       <tr>
         <td><a href="{{ url_for('frontend.item', item_id=link.item_id) }}">{{ link.item_id }}</a>
-        <td>{{ link.type }}</td>
-        <td>{{ link.desc }}</td>
+        <td>{{ link.item_type }}</td>
+        <td>{{ link.value }}</td>
+        <td>{{ link.path|replace('%', ' \u2192 ') }}</td>
       </tr>
     {% endfor %}
     </tbody>
