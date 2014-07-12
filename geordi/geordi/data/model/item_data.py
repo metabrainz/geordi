@@ -1,12 +1,21 @@
+"""
+geordi.data.model.item_data
+---------------------------
+"""
 from . import db
+from .mixins import DeleteMixin
 
 
-class ItemData(db.Model):
+class ItemData(db.Model, DeleteMixin):
+    """Model for the 'item_data' table, storing index-specific raw data."""
     __tablename__ = 'item_data'
     __table_args__ = {'schema': 'geordi'}
 
+    #: Data item identifier of the form (index)/(item type)/(identifier).
     id = db.Column(db.Unicode, primary_key=True)
+    #: Item ID of the item to which this data item belongs.
     item_id = db.Column('item', db.Integer, db.ForeignKey('geordi.item.id', ondelete='CASCADE'), nullable=False)
+    #: Raw JSON data.
     data = db.Column(db.UnicodeText)
 
     def to_dict(self):
@@ -46,11 +55,6 @@ class ItemData(db.Model):
         item_data.data = data
         db.session.flush()
         return item_data
-
-    def delete(self):
-        db.session.delete(self)
-        db.session.flush()
-        return self
 
     @staticmethod
     def get_indexes():
