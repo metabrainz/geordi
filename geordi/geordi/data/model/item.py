@@ -34,10 +34,14 @@ class Item(db.Model, DeleteMixin):
     #: Property for matches of this item to MusicBrainz entities.
     raw_matches = db.relationship('RawMatch', cascade='delete', backref='item')
 
+    @property
+    def map_dict(self):
+        return json.loads(self.map) if self.map is not None else dict()
+
     def to_dict(self):
         response = dict(id=self.id,
                         type=self.type,
-                        map=json.loads(self.map) if self.map is not None else dict(),
+                        map=self.map_dict,
                         data=dict([(i.id, json.loads(i.data)) for i in self.item_data]),
                         links=dict([(i.type, i.linked_id) for i in self.item_links]))
         return response
