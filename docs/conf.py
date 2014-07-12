@@ -28,6 +28,7 @@ from geordi import __version__
 # ones.
 extensions = [
     'sphinxcontrib.autohttp.flask',
+    'sphinx.ext.autodoc'
 ]
 
 # Add any paths that contain templates here, relative to this directory.

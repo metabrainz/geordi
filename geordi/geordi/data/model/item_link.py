@@ -1,12 +1,21 @@
+"""
+geordi.data.model.item_link
+---------------------------
+"""
 from . import db
+from .mixins import DeleteMixin
 
 
-class ItemLink(db.Model):
+class ItemLink(db.Model, DeleteMixin):
+    """Model for the 'item_link' table, storing automatically-extracted links between items."""
     __tablename__ = 'item_link'
     __table_args__ = {'schema': 'geordi'}
 
+    #: Type of this link, expressed as a path into the mapped JSON data of the source item, joined by '%' characters.
     type = db.Column(db.Unicode, nullable=False, primary_key=True)
+    #: Item ID of the source side of this link.
     item_id = db.Column('item', db.Integer, db.ForeignKey('geordi.item.id', ondelete='CASCADE'), primary_key=True)
+    #: Item ID of the target side of this link.
     linked_id = db.Column('linked', db.Integer, db.ForeignKey('geordi.item.id', ondelete='CASCADE'), primary_key=True)
 
     def to_dict(self):
@@ -22,11 +31,6 @@ class ItemLink(db.Model):
     @classmethod
     def get_by_item_id(cls, item_id, **kwargs):
         return cls.query.filter_by(item_id=item_id, **kwargs).all()
-
-    def delete(self):
-        db.session.delete(self)
-        db.session.flush()
-        return self
 
     @classmethod
     def find_or_insert(cls, node_item_id, target_item_id, link_type):
