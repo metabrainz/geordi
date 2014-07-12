@@ -4,6 +4,9 @@ geordi.data.model.item_link
 """
 from . import db
 from .mixins import DeleteMixin
+from .item import Item
+from geordi.data.mapping.extract import extract_value
+import re
 
 
 class ItemLink(db.Model, DeleteMixin):
@@ -17,6 +20,12 @@ class ItemLink(db.Model, DeleteMixin):
     item_id = db.Column('item', db.Integer, db.ForeignKey('geordi.item.id', ondelete='CASCADE'), primary_key=True)
     #: Item ID of the target side of this link.
     linked_id = db.Column('linked', db.Integer, db.ForeignKey('geordi.item.id', ondelete='CASCADE'), primary_key=True)
+
+    @property
+    def value(self):
+        item = Item.get(self.item_id)
+        path = [(int(x) if re.match('^\d+$', x) else x) for x in self.type.split('%')]
+        return extract_value(item.map_dict, path)[0][1]
 
     def to_dict(self):
         response = dict(type=self.type,

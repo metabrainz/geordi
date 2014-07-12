@@ -138,27 +138,10 @@ def item(item_id):
 
 @frontend.route('/item/<int:item_id>/links')
 def item_links(item_id):
-    item = Item.get(item_id)
+    item = Item.query.filter_by(id=item_id).options(db.joinedload('items_linked').joinedload('item')).first()
     if item is None:
         abort(404)
-
-    linked_items = {}
-    for item_link in set(item.items_linked):
-        linked_items[item_link.item_id] = Item.get(item_link.item_id)
-
-    def to_int_conditionally(val):
-        return int(val) if re.match('^\d+$', val) else val
-
-    links = []
-    for item_link in item.items_linked:
-        path = [to_int_conditionally(x) for x in item_link.type.split('%')]
-        links.append(dict(
-            item_id=item_link.item_id,
-            path=item_link.type,
-            value=extract_value(linked_items[item_link.item_id].map_dict, path)[0][1],
-        ))
-
-    return render_template('item_links.html', item=item, links=links, linked_items=linked_items)
+    return render_template('item_links.html', item=item)
 
 #@frontend.route('/entity/<mbid>')
 #@login_required

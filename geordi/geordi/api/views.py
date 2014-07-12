@@ -1,8 +1,6 @@
 from flask import Blueprint, abort, jsonify
 from geordi.data.model.item import Item
 from geordi.data.model.item_data import ItemData
-from geordi.data.mapping.extract import extract_value
-import re
 
 api = Blueprint('api', __name__)
 
@@ -26,23 +24,13 @@ def item_links(item_id):
     item = Item.get(item_id)
     if item is None:
         abort(404)
-
-    linked_items = {}
-    for item_link in set(item.items_linked):
-        linked_items[item_link.item_id] = Item.get(item_link.item_id)
-
-    def to_int_conditionally(val):
-        return int(val) if re.match('^\d+$', val) else val
-
     links = []
     for item_link in item.items_linked:
-        path = [to_int_conditionally(x) for x in item_link.type.split('%')]
         links.append(dict(
             item_id=item_link.item_id,
             path=item_link.type,
-            value=extract_value(linked_items[item_link.item_id].map_dict, path)[0][1],
+            value=item_link.value,
         ))
-
     return jsonify(links=links)
 
 @api.route('/data')

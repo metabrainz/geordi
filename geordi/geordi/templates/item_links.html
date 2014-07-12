@@ -11,12 +11,12 @@
     </tr>
     </thead>
     <tbody>
-    {% for link in links %}
+    {% for link in item.items_linked %}
       <tr>
         <td><a href="{{ url_for('frontend.item', item_id=link.item_id) }}">{{ link.item_id }}</a></td>
-        <td>{{ render_title(linked_items[link.item_id].map_dict) }}</td>
+        <td>{{ render_title(link.item.map_dict) }}</td>
         <td>{{ link.value }}</td>
-        <td>{{ link.path|replace('%', ' \u2192 ') }}</td>
+        <td>{{ link.type|replace('%', ' \u2192 ') }}</td>
       </tr>
     {% endfor %}
     </tbody>
