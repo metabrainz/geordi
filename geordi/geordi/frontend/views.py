@@ -154,12 +154,11 @@ def item_links(item_id):
         path = [to_int_conditionally(x) for x in item_link.type.split('%')]
         links.append(dict(
             item_id=item_link.item_id,
-            item_type=linked_items[item_link.item_id].type,
             path=item_link.type,
             value=extract_value(linked_items[item_link.item_id].map_dict, path)[0][1],
         ))
 
-    return render_template('item_links.html', item=item, links=links)
+    return render_template('item_links.html', item=item, links=links, linked_items=linked_items)
 
 #@frontend.route('/entity/<mbid>')
 #@login_required

@@ -1,23 +1,30 @@
 {% extends "layout.html" %}
-{% from "map_rendering.html" import render_map %}
+{% from "map_rendering.html" import comma_list %}
 {% block title %}Links to item {{ item.id }}{% endblock %}
 {% block content %}
   <table class="table table-striped">
     <thead>
     <tr>
-      <th>Linked item</th>
-      <th>Type</th>
-      <th>Value</th>
+      <th colspan="2">Linked item</th>
       <th>Path</th>
+      <th>Value</th>
     </tr>
     </thead>
     <tbody>
     {% for link in links %}
       <tr>
-        <td><a href="{{ url_for('frontend.item', item_id=link.item_id) }}">{{ link.item_id }}</a>
-        <td>{{ link.item_type }}</td>
-        <td>{{ link.value }}</td>
+        <td><a href="{{ url_for('frontend.item', item_id=link.item_id) }}">{{ link.item_id }}</a></td>
+        <td>
+          {%- if 'release' in linked_items[link.item_id].map_dict -%}
+            {%- set release = linked_items[link.item_id].map_dict.release -%}
+            Release: {{ comma_list(release.name, before="“", after="”") }}{# Assume we have a name. #}
+          {%- elif 'recording' in linked_items[link.item_id].map_dict -%}
+            {%- set recording = linked_items[link.item_id].map_dict.recording -%}
+            Recording: {{ comma_list(recording.name, before="“", after="”") }}{# Assume we have a name. #}
+          {%- endif -%}
+        </td>
         <td>{{ link.path|replace('%', ' \u2192 ') }}</td>
+        <td>{{ link.value }}</td>
       </tr>
     {% endfor %}
     </tbody>
