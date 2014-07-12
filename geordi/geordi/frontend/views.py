@@ -63,7 +63,7 @@ def login_redirect():
         opts['remember'] = True
     if request.args.get('returnto'):
         opts['returnto'] = request.args.get('returnto')
-    CSRF.update_opts(opts, request.args['csrf'])
+    CSRF.get(request.args['csrf']).opts = json.dumps(opts)
     db.session.commit()
     return redirect(redirect_uri, code=307)
 
