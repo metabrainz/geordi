@@ -6,8 +6,8 @@
     <thead>
     <tr>
       <th colspan="2">Linked item</th>
-      <th>Path</th>
       <th>Value</th>
+      <th>Path</th>
     </tr>
     </thead>
     <tbody>
@@ -23,8 +23,8 @@
             Recording: {{ comma_list(recording.name, before="“", after="”") }}{# Assume we have a name. #}
           {%- endif -%}
         </td>
-        <td>{{ link.path|replace('%', ' \u2192 ') }}</td>
         <td>{{ link.value }}</td>
+        <td>{{ link.path|replace('%', ' \u2192 ') }}</td>
       </tr>
     {% endfor %}
     </tbody>
