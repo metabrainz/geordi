@@ -23,9 +23,8 @@ class ItemLink(db.Model, DeleteMixin):
 
     @property
     def value(self):
-        item = Item.get(self.item_id)
         path = [(int(x) if re.match('^\d+$', x) else x) for x in self.type.split('%')]
-        return extract_value(item.map_dict, path)[0][1]
+        return extract_value(self.item.map_dict, path)[0][1]
 
     def to_dict(self):
         response = dict(type=self.type,

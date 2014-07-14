@@ -1,4 +1,5 @@
 from flask import Blueprint, abort, jsonify
+from geordi.data.model import db
 from geordi.data.model.item import Item
 from geordi.data.model.item_data import ItemData
 
@@ -21,7 +22,7 @@ def item_links(item_id):
 
     :resheader Content-Type: *application/json*
     """
-    item = Item.get(item_id)
+    item = Item.query.filter_by(id=item_id).options(db.joinedload('items_linked').joinedload('item')).first()
     if item is None:
         abort(404)
     links = []
