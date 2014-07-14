@@ -26,13 +26,11 @@
   {%- endif -%}
 {%- endmacro -%}
 
-{%- macro render_title(map) -%}
+{%- macro render_title(map) -%}{# Assumes we have a name. #}
   {%- if 'release' in map -%}
-    {%- set release = map.release -%}
-    Release: {{ comma_list(release.name, before="“", after="”") }}{# Assume we have a name. #}
+    Release: {{ comma_list(map.release.name, before="“", after="”") }}
   {%- elif 'recording' in map -%}
-    {%- set recording = map.recording -%}
-    Recording: {{ comma_list(recording.name, before="“", after="”") }}{# Assume we have a name. #}
+    Recording: {{ comma_list(map.recording.name, before="“", after="”") }}
   {%- endif -%}
 {%- endmacro -%}
 
