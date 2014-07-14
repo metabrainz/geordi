@@ -1,9 +1,11 @@
 from flask import Blueprint, current_app, render_template, request, abort, redirect, url_for, g, flash, jsonify
 from flask.ext.login import current_user, login_required, login_user, logout_user
 import geordi.data as data
+from geordi.data.mapping.extract import extract_value
 from geordi.data.model import db
 from geordi.data.model.csrf import CSRF
 from geordi.data.model.editor import Editor
+from geordi.data.model.item import Item
 from geordi.data.model.item_data import ItemData
 from geordi.user import User
 
@@ -133,6 +135,13 @@ def item(item_id):
     if item is None:
         abort(404)
     return render_template('item.html', item=item)
+
+@frontend.route('/item/<int:item_id>/links')
+def item_links(item_id):
+    item = Item.query.filter_by(id=item_id).options(db.joinedload('items_linked').joinedload('item')).first()
+    if item is None:
+        abort(404)
+    return render_template('item_links.html', item=item)
 
 #@frontend.route('/entity/<mbid>')
 #@login_required
