@@ -1,8 +1,8 @@
 {# Macros for rendering mapped data #}
 {%- macro render_map(item) -%}
+  <h3>{{ render_title(item.map) }}</h3>
   {%- if 'release' in item.map -%}
     {%- set release = item.map.release -%}
-    <h3>Release: {{ comma_list(release.name, before="“", after="”") }}</h3>{# Assume we have a name. #}
     <table class="table table-striped"><tbody>
         {%- if release.status -%}{{ info_table_row('Status:', comma_list(release.status)) }}{%- endif -%}
 
@@ -20,10 +20,17 @@
     {%- if release.mediums -%}{{ render_mediums(release.mediums, links=item.links) }}{%- endif -%}
   {%- elif 'recording' in item.map -%}
     {%- set recording = item.map.recording -%}
-    <h3>Recording: {{ comma_list(recording.name, before="“", after="”") }}</h3>{# Assume we have a name. #}
     <table class="table table-striped"><tbody>
         {%- if recording.isrcs -%}{{ info_table_row('ISRCs:', comma_list(recording.isrcs)) }}{%- endif -%}
     </tbody></table>
+  {%- endif -%}
+{%- endmacro -%}
+
+{%- macro render_title(map) -%}{# Assumes we have a name. #}
+  {%- if 'release' in map -%}
+    Release: {{ comma_list(map.release.name, before="“", after="”") }}
+  {%- elif 'recording' in map -%}
+    Recording: {{ comma_list(map.recording.name, before="“", after="”") }}
   {%- endif -%}
 {%- endmacro -%}
 

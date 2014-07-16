@@ -22,6 +22,19 @@ class FrontendViewsTestCase(GeordiTestCase):
         response = self.client.get("/item/missing")
         self.assert404(response)
 
+    def test_item_links(self):
+        item = Item.create()
+
+        response = self.client.get("/item/%s/links" % item.id)
+        self.assert200(response)
+        response = self.client.get("/item/0%s/links" % item.id)
+        self.assert200(response)
+
+        response = self.client.get("/item/%s0/links" % item.id)
+        self.assert404(response)
+        response = self.client.get("/item/missing/links")
+        self.assert404(response)
+
     def test_list_indexes(self):
         response = self.client.get("/data")
         self.assert200(response)

@@ -1,10 +1,24 @@
 Geordi data lifecycle/terminology
 =================================
 
-1. Importing: This is the process of putting data into geordi. It's done with manager commands, either directly with the 'add data item' command, with an 'add folder' command, or with purpose-built importers, which reside in the geordi/data/importer/ directory. Updating data is simply re-importing it, which should preserve matches and other such information.
+As data moves in and through geordi it goes through several stages. This document explains the various steps and introduces the terminology used to refer to each step.
 
-2. Matching: After importing, items that are already in MusicBrainz may be marked as such by way of matching. Initially, this will only be with 'raw' matches, i.e., those stored within geordi. In the future, it should also be possible for matches to be derived from URL relationships and other properties of the MusicBrainz database, presumably upon replication.
+Importing (to geordi)
+---------------------
+The process of putting data into geordi. This step is done by an admin of the geordi installation, using commands provided by manager.py. In general, importing will use *importers*, which are implemented in the geordi/data/importer/indexes directory. Should data be updated, or mappings be updated, reimporting the same data performs an update.
 
-3. Seeding: Geordi's mapped data can be converted into a format that allows adding it to MusicBrainz. Eventually, it should also be possible for the same process to provide suggested edits, and seed pages that edit data, rather than those that add information exclusively, but this will probably depend on having replicated data from MusicBrainz.
+Mapping
+-------
+The process of turning data in raw form into geordi's standard mapping format. This step is performed as part of importing, above, but is mentioned separately as it's separated in the codebase. Mappings are defined in the geordi/data/mapping/indexes, per index and item type. Mappings are defined declaratively using rules specifying a source in the raw JSON data and a destination, along with, potentially, item links, conditions, transformations, and so-called "blank node" destinations. Mapping is discussed separately in the :doc:`mapping` document.
 
-4. Merging and Splitting: not yet implemented, but it will eventually be possible to link two items, by way of an interface to specify their connection (potentially via intermediate objects such as release groups, areas, etc.). Likewise, it should be possible to split items by assigning their data items, links, and matches to two sides.
+Matching
+--------
+After importing, items that are already in MusicBrainz may be marked as such by way of matching. This step is performed by users, through the web interface. (not yet implemented)
+
+Seeding (importing to MusicBrainz)
+----------------------------------
+Geordi's mapped data can be converted into a format that allows adding it to MusicBrainz. Seeding is initiated by users who wish to add an item not already in MusicBrainz to it, or update some data in MusicBrainz. (not yet implemented)
+
+Merging and Splitting
+---------------------
+Since multiple items from several indexes can represent the same object, they can be marked as the same thing and thus merged, by way of an interface to specify their connection (potentially via intermediate objects such as release groups, areas, etc.). Likewise, it should be possible to split items by assigning their data items, links, and matches to two sides. (not yet implemented)

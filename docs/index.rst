@@ -8,10 +8,10 @@ Contents
 --------
 
 .. toctree::
-   :maxdepth: 2
 
    data
    data-lifecycle
+   db
    mapping
    mapping-format
    api

@@ -1,10 +1,12 @@
 from flask import Blueprint, Response, current_app, render_template, request, abort, redirect, url_for, g, flash, jsonify
 from flask.ext.login import current_user, login_required, login_user, logout_user
 import geordi.data as data
+from geordi.data.mapping.extract import extract_value
 from geordi.data.model import db
 from geordi.data.model.csrf import CSRF
 from geordi.data.model.editor import Editor
 from geordi.data.model.entity import Entity
+from geordi.data.model.item import Item
 from geordi.data.model.item_data import ItemData
 from geordi.data.model.raw_match import RawMatch
 from geordi.user import User
@@ -65,7 +67,7 @@ def login_redirect():
         opts['remember'] = True
     if request.args.get('returnto'):
         opts['returnto'] = request.args.get('returnto')
-    CSRF.update_opts(opts, request.args['csrf'])
+    CSRF.get(request.args['csrf']).opts = json.dumps(opts)
     db.session.commit()
     return redirect(redirect_uri, code=307)
 
@@ -135,6 +137,13 @@ def item(item_id):
     if item is None:
         abort(404)
     return render_template('item.html', item=item)
+
+@frontend.route('/item/<int:item_id>/links')
+def item_links(item_id):
+    item = Item.query.filter_by(id=item_id).options(db.joinedload('items_linked').joinedload('item')).first()
+    if item is None:
+        abort(404)
+    return render_template('item_links.html', item=item)
 
 @frontend.route('/entity/<mbid>')
 @login_required
