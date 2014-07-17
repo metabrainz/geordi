@@ -31,7 +31,9 @@
           <h4 class="modal-title" id="match-modal-label">Match this item to MusicBrainz</h4>
         </div>
         <div class="modal-body">
-          lalalalala
+          <p>This modal should have some fields, which when given MBIDs fetch data from the '/entity' endpoint, passing along the item type (for this entity: {{ item.type }}) as the type hint, and not permitting hitting the cache.</p>
+          <p>In doing so, they should seed the database with the cached entity information required such that when the form is ultimately submitted (by posting JSON to the relevant endpoint) the MBIDs will already be there. In part this will mean that upon getting a response from the entity endpoint, the MBID should be replaced with whatever that gives back, in case it's a redirected MBID.</p>
+          <p>Somewhere in this dialog should probably show the currently-active match, and something should probably be expandable or otherwise clickable to show the history of matches, when there are historical matches for the item.</p>
         </div>
       </div>
     </div>
