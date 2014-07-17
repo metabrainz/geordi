@@ -167,10 +167,13 @@ def match_item(item_id):
     if so, it does nothing. If not, the submitted match becomes the
     new match, superseding the former match. As a precaution, empty
     sets will be ignored unless a special extra parameter is set.
+
+    The item ID should be passed in the URL; the rest in POSTed JSON.
     '''
     is_mbid = re.compile('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$')
-    empty = request.form.get('empty', False)
-    mbids = [mbid.lower() for mbid in request.form.getlist('matches')]
+    request_json = request.get_json()
+    empty = request_json.get('empty', False)
+    mbids = [mbid.lower() for mbid in request_json.get('matches')]
     if len(mbids) == 0 and not empty:
         return jsonify({'error': 'No matches provided.'})
     if len([True for mbid in mbids if (is_mbid.match(mbid) is None)]) > 0:

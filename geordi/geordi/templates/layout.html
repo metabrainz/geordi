@@ -32,6 +32,7 @@
       </div>
       {% block content %}{% endblock %}
     </div>
+    {%- block hiddencontent -%}{%- endblock -%}
     {%- block js %}
     <script src="{{ url_for('static', filename='scripts/lib/require.js') }}"></script>
     <script>
