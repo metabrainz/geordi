@@ -2,6 +2,10 @@
 {% from "map_rendering.html" import render_map %}
 {% block title %}Item {{ item.id }}{% endblock %}
 {% block content %}
+  {%- if current_user.id -%}
+    <button class="btn btn-primary btn-lg pull-right" data-toggle="modal" data-target="#match-modal">Match this item</button>
+  {%- endif -%}
+
   <h2>Mapped Data</h2>
   {{ render_map(item) }}
 
@@ -14,4 +18,23 @@
     {% endfor %}
     <li><h3>Raw item map</h3>{%- highlight 'json' %}{{ item.map_formatted }}{% endhighlight -%}</li>
   </ul>
+
+{% endblock %}
+
+{% block hiddencontent %}
+{%- if current_user.id -%}
+  <div class="modal" id="match-modal" tabindex="-1" role="dialog" aria-labelledby="match-modal-label" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+          <h4 class="modal-title" id="match-modal-label">Match this item to MusicBrainz</h4>
+        </div>
+        <div class="modal-body">
+          lalalalala
+        </div>
+      </div>
+    </div>
+  </div>
+{%- endif -%}
 {% endblock %}
