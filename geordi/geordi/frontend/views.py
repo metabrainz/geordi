@@ -188,6 +188,7 @@ def match_item(item_id):
     if len(entities) != len(mbids):
         return jsonify({'error': 'Not all entities were found in the DB'})
     match = RawMatch.match_item(item_id, current_user.id, entities)
+    db.session.commit()
     return jsonify(match=match.to_dict())
 
 @frontend.route('/data')
