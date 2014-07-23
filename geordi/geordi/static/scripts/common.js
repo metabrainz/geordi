@@ -2,6 +2,7 @@ require.config({
     paths: {
         jquery: "lib/jquery",
         bootstrap: "lib/bootstrap",
+        knockout: "lib/knockout"
     },
     shim: {
         bootstrap: { deps: ["jquery"] }
