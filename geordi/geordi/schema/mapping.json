@@ -8,6 +8,7 @@
         "label": {"$ref": "#/definitions/label"},
         "place": {"$ref": "#/definitions/place"},
         "recording": {"$ref": "#/definitions/recording"},
+        "relationship": {"$ref": "#/definitions/relationship"},
         "release": {"$ref": "#/definitions/release"},
         "release_group": {"$ref": "#/definitions/release_group"},
         "work": {"$ref": "#/definitions/work"}
@@ -41,7 +42,27 @@
             "type": "object",
             "properties": {
                 "name": {"type": "array"},
-                "artists": {"$ref": "#/definitions/artists"}
+                "artists": {"$ref": "#/definitions/artists"},
+                "length": {"type": "array"},
+                "tags": {"type": "array"},
+                "works": {
+                    "type": "array",
+                    "items": {"$ref": "#/definitions/relationship"}
+                },
+                "producers": {
+                    "type": "array",
+                    "items": {"$ref": "#/definitions/relationship"}
+                },
+                "mixers": {
+                    "type": "array",
+                    "items": {"$ref": "#/definitions/relationship"}
+                }
+            }
+        },
+        "relationship": {
+            "type": "object",
+            "properties": {
+                "target": {"type": "string"}
             }
         },
         "release": {
@@ -57,6 +78,8 @@
                 "release_group": {"type": "array"},
 
                 "artists": {"$ref": "#/definitions/artists"},
+
+                "tags": {"type": "array"},
 
                 "labels": {
                     "type": "object",
@@ -76,7 +99,7 @@
                             "properties": {
                                 "labels": {"type": "array"},
                                 "catalog_numbers": {"type": "array"}
-                            } 
+                            }
                         }
                     }
                 },
@@ -143,7 +166,19 @@
         "work": {
             "type": "object",
             "properties": {
-                "name": {"type": "array"}
+                "name": {"type": "array"},
+                "composers": {
+                    "type": "array",
+                    "items": {"$ref": "#/definitions/relationship"}
+                },
+                "lyricists": {
+                    "type": "array",
+                    "items": {"$ref": "#/definitions/relationship"}
+                },
+                "publishers": {
+                    "type": "array",
+                    "items": {"$ref": "#/definitions/relationship"}
+                }
             }
         },
 
