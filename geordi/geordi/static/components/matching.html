@@ -10,13 +10,13 @@
   <tbody data-bind="foreach: entities">
     <tr>
       <td style="width: 60%;"
-          data-bind="css: { 'has-success': mbid() &amp;&amp; !loading() &amp;&amp; !hasInvalidMBID(),
-                            'has-error': mbid() &amp;&amp; (hasInvalidMBID() || loadError()) }">
+          data-bind="css: { 'has-success': mbid() && !loading() && !hasInvalidMBID(),
+                            'has-error': mbid() && (hasInvalidMBID() || loadError()) }">
         <div class="input-group" style="width: 100%;">
           <input type="text" class="form-control" data-bind="textInput: mbid, disable: loading">
           <span class="input-group-btn">
             <button type="button" class="btn btn-default"
-                data-bind="click: remove.bind($data), disable: !data() &amp;&amp; $parents[1].emptyFieldCount() === 1">
+                data-bind="click: remove.bind($data), disable: !data() && $parents[1].emptyFieldCount() === 1">
               Remove
             </button>
           </span>
