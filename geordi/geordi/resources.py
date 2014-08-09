@@ -37,6 +37,19 @@ def styles():
             with open(os.path.join(styles_build_dir, name + ".css"), "w") as fp:
                 subprocess_call([lessc, os.path.join(styles_dir, fname)], stdout=fp)
 
+@resources_manager.command
+def lodash():
+    """Create a custom lodash build."""
+    call([
+        os.path.join(NODE_MODULES, "lodash"),
+        "modern",
+        "exports=amd",
+        "include=any,all,each,filter,reject,invoke,map,assign",
+        "-d",
+        "-o",
+        os.path.join(current_app.root_path, "static/scripts/lib/lodash.js")
+    ])
+
 def subprocess_call(*args, **kwargs):
     print " ".join(args[0])
     call(*args, **kwargs)
