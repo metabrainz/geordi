@@ -10,6 +10,10 @@
     modules: [
         {
             name: "common"
+        },
+        {
+            name: "matching",
+            exclude: ["common"]
         }
     ]
 })

@@ -3,7 +3,11 @@
 {% block title %}Item {{ item.id }}{% endblock %}
 {% block content %}
   {%- if current_user.id -%}
-    <button class="btn btn-primary btn-lg pull-right" data-toggle="modal" data-target="#match-modal">Match this item</button>
+    <button class="btn btn-primary btn-lg pull-right match-modal-button"
+      data-toggle="modal"
+      data-target="#match-modal"
+      data-item-type="{{ item.type }}"
+      data-item-id="{{ item.id }}">Match this item</button>
   {%- endif -%}
 
   <h2>Mapped Data</h2>
@@ -18,25 +22,26 @@
     {% endfor %}
     <li><h3>Raw item map</h3>{%- highlight 'json' %}{{ item.map_formatted }}{% endhighlight -%}</li>
   </ul>
-
 {% endblock %}
 
-{% block hiddencontent %}
 {%- if current_user.id -%}
-  <div class="modal" id="match-modal" tabindex="-1" role="dialog" aria-labelledby="match-modal-label" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-          <h4 class="modal-title" id="match-modal-label">Match this item to MusicBrainz</h4>
-        </div>
-        <div class="modal-body">
-          <p>This modal should have some fields, which when given MBIDs fetch data from the '/entity' endpoint, passing along the item type (for this entity: {{ item.type }}) as the type hint, and not permitting hitting the cache.</p>
-          <p>In doing so, they should seed the database with the cached entity information required such that when the form is ultimately submitted (by posting JSON to the relevant endpoint) the MBIDs will already be there. In part this will mean that upon getting a response from the entity endpoint, the MBID should be replaced with whatever that gives back, in case it's a redirected MBID.</p>
-          <p>Somewhere in this dialog should probably show the currently-active match, and something should probably be expandable or otherwise clickable to show the history of matches, when there are historical matches for the item.</p>
+  {% block hiddencontent %}
+    <div class="modal" id="match-modal" tabindex="-1" role="dialog" aria-labelledby="match-modal-label" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            <h4 class="modal-title" id="match-modal-label">Match this item to MusicBrainz</h4>
+          </div>
+          <div class="modal-body" data-bind="with: currentItem">
+            <matching-form params="type: type, id: id"></matching>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  {% endblock %}
+  {%- block js %}
+    {{ super() }}
+    <script>require(["matching"]);</script>
+  {% endblock -%}
 {%- endif -%}
-{% endblock %}

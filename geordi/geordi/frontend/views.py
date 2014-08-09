@@ -150,6 +150,7 @@ def item_links(item_id):
 def entity_data(mbid):
     use_cache = not request.args.get('no_cache', False)
     type_hint = request.args.get('type_hint', None)
+    entity = None
     if use_cache:
         entity = Entity.get(mbid=mbid)
     if not entity:
@@ -182,7 +183,7 @@ def match_item(item_id):
     if len(existing) > 1:
         raise Exception('Why are there %d non-superseded matches for item %d?' % (len(existing), item_id))
     elif len(existing) == 1:
-        if set(mbids) == set([entity.mbid for entity in existing[0].entities]):
+        if set(mbids) == set([entity.entity_mbid for entity in existing[0].entities]):
             return jsonify({'error': 'Matches not changed'})
     entities = Entity.query.filter(Entity.mbid.in_(mbids)).all()
     if len(entities) != len(mbids):
@@ -190,6 +191,16 @@ def match_item(item_id):
     match = RawMatch.match_item(item_id, current_user.id, entities)
     db.session.commit()
     return jsonify(match=match.to_dict())
+
+@frontend.route('/item/<item_id>/matches')
+@login_required
+def item_matches(item_id):
+    current = RawMatch.get_by_item(item_id, superseded=False)
+    previous = RawMatch.get_by_item(item_id, superseded=True)
+    return jsonify({
+        'currentMatch': current[0].to_dict() if current else None,
+        'previousMatches': [match.to_dict() for match in previous]
+    })
 
 @frontend.route('/data')
 def list_indexes():
