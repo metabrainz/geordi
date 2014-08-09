@@ -40,7 +40,7 @@ def styles():
 @resources_manager.command
 def lodash():
     """Create a custom lodash build."""
-    call([
+    subprocess_call([
         os.path.join(NODE_MODULES, "lodash"),
         "modern",
         "exports=amd",
