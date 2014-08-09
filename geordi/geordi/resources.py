@@ -47,7 +47,7 @@ def lodash():
         "include=any,all,each,filter,reject,invoke,map,assign",
         "-d",
         "-o",
-        os.path.join(current_app.root_path, "static/scripts/lib/lodash.js")
+        os.path.relpath(os.path.join(current_app.root_path, "static/scripts/lib/lodash.js"))
     ])
 
 def subprocess_call(*args, **kwargs):

@@ -1,7 +1,7 @@
 /**
  * @license
  * Lo-Dash 2.4.1 (Custom Build) <http://lodash.com/>
- * Build: `lodash modern exports="amd" include="any,all,each,filter,reject,invoke,map,assign" -d -o /Users/Michael/code/geordi/geordi/geordi/static/scripts/lib/lodash.js`
+ * Build: `lodash modern exports="amd" include="any,all,each,filter,reject,invoke,map,assign" -d -o geordi/geordi/static/scripts/lib/lodash.js`
  * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
  * Based on Underscore.js 1.5.2 <http://underscorejs.org/LICENSE>
  * Copyright 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
