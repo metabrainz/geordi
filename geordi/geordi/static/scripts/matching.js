@@ -18,98 +18,85 @@ define(["jquery", "lodash", "knockout", "text!components/matching.html"], functi
 
         this.itemID = params.id;
         this.itemType = params.type;
-        this.currentMatch = ko.observable(new Match({}));
+        this.newMatch = ko.observable(new Match({}, this));
+        this.currentMatch = ko.observable(this.newMatch.peek().toJS());
         this.previousMatches = ko.observableArray([]);
+        this.allowEmptyMatch = ko.observable(false);
         this.submissionLoading = ko.observable(false);
         this.submissionError = ko.observable("");
         this.submissionSuccess = ko.observable(false);
         this.getMatches();
-
-        var self = this;
-
-        ko.computed(function () {
-            if (self.emptyFieldCount() === 0) {
-                var currentMatch = self.currentMatch();
-                currentMatch.entities.push(new Entity({ type: self.itemType }, currentMatch));
-            }
-        });
     }
 
     MatchForm.prototype.canSubmit = function () {
         return !(
             this.submissionLoading() ||
             this.hasErrors() ||
-            this.emptyFieldCount() === this.currentMatch().entities().length
+            (this.newMatch().allFieldsAreEmpty() && !this.allowEmptyMatch())
         );
     };
 
     MatchForm.prototype.hasErrors = function () {
-        return !_.all(this.currentMatch().entities(), function (entity) {
+        return !_.all(this.newMatch().entities(), function (entity) {
             return !entity.hasInvalidMBID() && !entity.loadError();
         });
-    };
-
-    MatchForm.prototype.emptyFieldCount = function () {
-        return _.reject(_.invoke(this.currentMatch().entities(), "data")).length;
     };
 
     MatchForm.prototype.getMatches = function () {
         var self = this;
 
         $.get("/item/" + this.itemID + "/matches", function (data) {
-            var currentMatch = new Match(data.currentMatch || {});
+            var currentMatch = new Match(data.currentMatch || {}, self);
 
-            if (!data.currentMatch) {
-                currentMatch.entities.push(new Entity({}, currentMatch));
-            }
+            self.currentMatch(currentMatch.toJS());
 
-            self.currentMatch(currentMatch);
+            currentMatch.addEmptyField();
+
+            self.newMatch(currentMatch);
 
             self.previousMatches(
-                _.map(data.previousMatches, function (data) { return new Match(data) })
+                _.map(data.previousMatches, function (data) { return new Match(data, self) })
                 .sort(function (a, b) { return b.timestamp - a.timestamp })
             );
         });
     };
 
     MatchForm.prototype.submit = function () {
-        var mbids = _.filter(_.invoke(this.currentMatch().entities(), "mbid"), isMBID);
+        var mbids = _.filter(_.invoke(this.newMatch().entities(), "mbid"), isMBID);
+        var self = this;
 
-        if (mbids.length) {
-            var self = this;
+        this.submissionLoading(true);
+        this.submissionSuccess(false);
 
-            this.submissionLoading(true);
-            this.submissionSuccess(false);
-
-            $.ajax({
-                type: "POST",
-                url: "/item/" + this.itemID + "/match",
-                contentType : "application/json",
-                data: JSON.stringify({ matches: mbids }),
-            })
-            .done(function (response) {
-                if (response.error) {
-                    self.submissionError(response.error);
-                } else {
-                    self.submissionSuccess(true);
-                    self.submissionError("");
-                    self.getMatches();
-                }
-            })
-            .fail(function (jqXHR) {
-                self.submissionError(jqXHR.responseText);
-            })
-            .always(function () {
-                self.submissionLoading(false);
-            });
-        }
+        $.ajax({
+            type: "POST",
+            url: "/item/" + this.itemID + "/match",
+            contentType : "application/json",
+            data: JSON.stringify({ matches: mbids, empty: mbids.length === 0 }),
+        })
+        .done(function (response) {
+            if (response.error) {
+                self.submissionError(response.error);
+            } else {
+                self.submissionSuccess(true);
+                self.submissionError("");
+                self.getMatches();
+            }
+        })
+        .fail(function (jqXHR) {
+            self.submissionError(jqXHR.responseText);
+        })
+        .always(function () {
+            self.submissionLoading(false);
+        });
     };
 
-    function Match(data) {
+    function Match(data, form) {
         var self = this;
 
         _.assign(this, data);
 
+        this.form = form;
         this.timestamp = new Date(data.timestamp);
 
         this.entities = ko.observableArray(
@@ -119,8 +106,32 @@ define(["jquery", "lodash", "knockout", "text!components/matching.html"], functi
         );
     }
 
-    function Entity(data, parent) {
-        this.parent = parent;
+    Match.prototype.emptyFieldCount = function () {
+        return _.reject(_.invoke(this.entities(), "data")).length;
+    };
+
+    Match.prototype.allFieldsAreEmpty = function () {
+        return this.emptyFieldCount() === this.entities().length;
+    };
+
+    Match.prototype.addEmptyField = function () {
+        if (this.emptyFieldCount() === 0) {
+            this.entities.push(new Entity({ type: this.form.itemType }, this));
+        }
+    };
+
+    Match.prototype.toJS = function () {
+        return {
+            id: this.id,
+            item: this.item,
+            superseded: !!this.superseded,
+            timestamp: this.timestamp.toString(),
+            entities: _.invoke(this.entities(), "toJS")
+        };
+    };
+
+    function Entity(data, match) {
+        this.match = match;
         this.type = data.type;
         this.mbid = ko.observable(data.mbid || "");
         this.data = ko.observable(data.data);
@@ -154,12 +165,13 @@ define(["jquery", "lodash", "knockout", "text!components/matching.html"], functi
         var self = this;
         this.loading(true);
 
-        $.get("/entity/" + mbid + "?no_cache=true&type_hint=" + this.parent.itemType)
+        $.get("/entity/" + mbid + "?no_cache=true&type_hint=" + this.match.form.itemType)
             .done(function (data) {
                 self.ignoreChanges = true;
                 self.mbid(data.entity.mbid);
                 self.ignoreChanges = false;
                 self.data(data.entity.data);
+                self.match.addEmptyField();
             })
             .fail(function (data) {
                 self.data(null);
@@ -176,7 +188,15 @@ define(["jquery", "lodash", "knockout", "text!components/matching.html"], functi
     };
 
     Entity.prototype.remove = function () {
-        this.parent.entities.remove(this);
+        this.match.entities.remove(this);
+    };
+
+    Entity.prototype.toJS = function () {
+        return {
+            type: this.type,
+            mbid: this.mbid(),
+            data: _.clone(this.data())
+        };
     };
 
     var mbidRegex = /[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/;

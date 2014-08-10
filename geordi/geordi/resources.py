@@ -44,7 +44,7 @@ def lodash():
         os.path.join(NODE_MODULES, "lodash"),
         "modern",
         "exports=amd",
-        "include=any,all,each,filter,reject,invoke,map,assign",
+        "include=any,all,each,filter,reject,invoke,map,assign,clone",
         "-d",
         "-o",
         os.path.relpath(os.path.join(current_app.root_path, "static/scripts/lib/lodash.js"))

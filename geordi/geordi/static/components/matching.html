@@ -1,6 +1,6 @@
 <p>Paste MBIDs in the inputs below to match them.</p>
 
-<table class="table table-striped" data-bind="with: currentMatch">
+<table class="table table-striped" data-bind="with: newMatch">
   <thead>
     <tr>
       <td>MBID</td>
@@ -16,7 +16,7 @@
           <input type="text" class="form-control" data-bind="textInput: mbid, disable: loading">
           <span class="input-group-btn">
             <button type="button" class="btn btn-default"
-                data-bind="click: remove.bind($data), disable: !data() && $parents[1].emptyFieldCount() === 1">
+                data-bind="click: remove.bind($data), disable: !data() && $parent.emptyFieldCount() === 1">
               Remove
             </button>
           </span>
@@ -36,6 +36,15 @@
     </tr>
   </tbody>
 </table>
+
+<!-- ko if: (currentMatch().entities.length > 0 && newMatch().allFieldsAreEmpty()) -->
+  <div class="checkbox">
+    <label>
+      <input type="checkbox" data-bind="checked: allowEmptyMatch">
+      I intend to clear the current match.
+    </label>
+  </div>
+<!-- /ko -->
 
 <!-- ko if: submissionError -->
   <p class="error" data-bind="text: submissionError"></p>
