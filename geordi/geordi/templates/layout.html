@@ -9,9 +9,9 @@
     {%- endblock -%}
     {%- if config.DEBUG -%}
       <link rel="stylesheet/less" type="text/css" href="{{ url_for('static', filename='styles/geordi.less') }}" />
-      <script src="{{ url_for('static', filename='scripts/less.min.js') }}"></script>
+      <script src="{{ url_for('static', filename='scripts/lib/less.js') }}"></script>
     {%- else -%}
-      <link rel="stylesheet" href="{{ url_for('static', filename='styles/geordi.css') }}">
+      <link rel="stylesheet" href="{{ url_for('static', filename='build/styles/geordi.css') }}">
     {%- endif -%}
     {%- block css %}{% endblock -%}
   </head>
@@ -33,10 +33,10 @@
       {% block content %}{% endblock %}
     </div>
     {%- block js %}
-    <script src="{{ url_for('static', filename='scripts/jquery-2.1.1.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='scripts/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='scripts/lib/require.js') }}"></script>
     <script>
-      $('#remember').tooltip() // Activates tooltip in the navbar
+      require.config({ baseUrl: "/static/{% if not config.DEBUG %}build/{% endif %}scripts" });
+      require(["common"]);
     </script>
     {% endblock -%}
   </body>
