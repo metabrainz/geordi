@@ -16,7 +16,7 @@ def scripts():
     if os.path.isdir(scripts_build_dir):
         shutil.rmtree(scripts_build_dir)
 
-    subprocess_call(["node", os.path.join(NODE_MODULES, "r.js"), "-o", "build.js"])
+    subprocess_call(["node", os.path.join(NODE_MODULES, "r.js"), "-o", os.path.join(current_app.root_path, "../../build.js")])
 
 @resources_manager.command
 def styles():
@@ -36,6 +36,12 @@ def styles():
         if ext == ".less":
             with open(os.path.join(styles_build_dir, name + ".css"), "w") as fp:
                 subprocess_call([lessc, os.path.join(styles_dir, fname)], stdout=fp)
+
+@resources_manager.command
+def all():
+    """Compile both styles and scripts."""
+    styles()
+    scripts()
 
 def subprocess_call(*args, **kwargs):
     print " ".join(args[0])
