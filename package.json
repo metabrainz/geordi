@@ -9,6 +9,7 @@
   "license": "GPLv2+",
   "dependencies" : {
       "less" : ">=1.5.0",
-      "requirejs": "2.1.x"
+      "requirejs": "2.1.x",
+      "lodash-cli": "2.4.x"
   }
 }

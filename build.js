@@ -6,9 +6,14 @@
     skipDirOptimize: true,
     removeCombined: true,
     fileExclusionRegExp: /^(\.|less\.js$)/,
+    inlineText: true,
     modules: [
         {
             name: "common"
+        },
+        {
+            name: "matching",
+            exclude: ["common"]
         }
     ]
 })

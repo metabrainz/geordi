@@ -38,8 +38,21 @@ def styles():
                 subprocess_call([lessc, os.path.join(styles_dir, fname)], stdout=fp)
 
 @resources_manager.command
+def lodash():
+    """Create a custom lodash build."""
+    subprocess_call([
+        os.path.join(NODE_MODULES, "lodash"),
+        "modern",
+        "exports=amd",
+        "include=any,all,each,filter,reject,invoke,map,assign,clone",
+        "-d",
+        "-o",
+        os.path.relpath(os.path.join(current_app.root_path, "static/scripts/lib/lodash.js"))
+    ])
+
+@resources_manager.command
 def all():
-    """Compile both styles and scripts."""
+    """Compile both styles and scripts. Does not include building lodash."""
     styles()
     scripts()
 

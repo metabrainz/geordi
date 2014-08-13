@@ -2,6 +2,10 @@ require.config({
     paths: {
         jquery: "lib/jquery",
         bootstrap: "lib/bootstrap",
+        knockout: "lib/knockout",
+        lodash: "lib/lodash",
+        text: "lib/require.text",
+        components: "../components"
     },
     shim: {
         bootstrap: { deps: ["jquery"] }
