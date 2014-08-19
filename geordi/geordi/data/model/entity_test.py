@@ -5,16 +5,13 @@ from . import db
 
 class EntityTestCase(GeordiTestCase):
 
-    def test_delete(self):
-        self.assertEqual(Entity.query.count(), 0)
-
+    def test_get(self):
         entity = Entity(mbid='f27ec8db-af05-4f36-916e-3d57f91ecf5e', type='test')
         db.session.add(entity)
         db.session.flush()
 
-        entities = Entity.query.all()
-        self.assertEqual(len(entities), 1)
-        self.assertEqual(entities[0], entity)
+        same_csrf = CSRF.get('some_random_string')
+        self.assertEqual(csrf, same_csrf)
 
-        entity.delete()
-        self.assertEqual(Entity.query.count(), 0)
+        missing_csrf = CSRF.get('another_random_string')
+        self.assertIsNone(missing_csrf)
