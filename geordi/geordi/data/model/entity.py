@@ -68,4 +68,6 @@ class Entity(db.Model, DeleteMixin):
         return target
 
     def to_dict(self):
+        if self.data is None:
+            self.data = '{}'
         return {'mbid': self.mbid, 'type': self.type, 'data': json.loads(self.data)}
