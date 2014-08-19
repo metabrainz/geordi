@@ -7,7 +7,6 @@ from .mixins import DeleteMixin
 from geordi.data.model.raw_match_entity import RawMatchEntity
 from sqlalchemy.dialects.postgresql import UUID
 
-from urllib import urlencode
 import urllib2
 import json
 

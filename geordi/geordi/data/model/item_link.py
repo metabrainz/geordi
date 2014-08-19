@@ -4,7 +4,6 @@ geordi.data.model.item_link
 """
 from . import db
 from .mixins import DeleteMixin
-from .item import Item
 from geordi.data.mapping.extract import extract_value
 import re
 
