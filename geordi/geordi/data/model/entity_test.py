@@ -4,7 +4,7 @@ from . import db
 
 
 class EntityTestCase(GeordiTestCase):
-    
+
     def test_get(self):
         mbid = 'f27ec8db-af05-4f36-916e-3d57f91ecf5e'
         entity = Entity(mbid=mbid, type='test')
