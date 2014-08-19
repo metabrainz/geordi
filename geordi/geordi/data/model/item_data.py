@@ -19,10 +19,7 @@ class ItemData(db.Model, DeleteMixin):
     data = db.Column(db.UnicodeText)
 
     def to_dict(self):
-        response = dict(id=self.id,
-                        item_id=self.item_id,
-                        data=self.data)
-        return response
+        return {'id': self.id, 'item_id': self.item_id, 'data': self.data}
 
     @classmethod
     def get(cls, id, **kwargs):

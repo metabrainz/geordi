@@ -6,13 +6,17 @@ from . import db
 
 class ItemDataTestCase(GeordiTestCase):
 
-    def test_get(self):
-        item = Item()
-        db.session.add(item)
+    def setUp(self):
+        super(ItemDataTestCase, self).setUp()
+
+        # Item that will be used to create ItemData instances.
+        self.item = Item()
+        db.session.add(self.item)
         db.session.flush()
 
-        id = 'item-data-1'
-        item_data = ItemData(id=id, item_id=item.id)
+    def test_get(self):
+        id = 'random-id'
+        item_data = ItemData(id=id, item_id=self.item.id)
         db.session.add(item_data)
         db.session.flush()
 
@@ -21,3 +25,40 @@ class ItemDataTestCase(GeordiTestCase):
 
         missing_item_data = ItemData.get('unknown')
         self.assertIsNone(missing_item_data)
+
+    def test_get_by_item_id(self):
+        item_data = ItemData(id='random-id', item_id=self.item.id)
+        db.session.add(item_data)
+        db.session.flush()
+
+        results = ItemData.get_by_item_id(self.item.id)
+        self.assertListEqual(results, [item_data])
+
+        missing_results = ItemData.get_by_item_id(self.item.id + 1)
+        self.assertListEqual(missing_results, [])
+
+    def test_update(self):
+        item_data = ItemData(id='random-id', item_id=self.item.id)
+        db.session.add(item_data)
+        db.session.flush()
+
+        another_item = Item()
+        db.session.add(another_item)
+        db.session.flush()
+
+        updated_item_data = ItemData.update(data_id=item_data.id, item_id=another_item.id, data='{"data": true}')
+
+        self.assertEqual(item_data, updated_item_data)
+
+    def test_to_dict(self):
+        item_data = ItemData(id='random-id', item_id=self.item.id)
+        db.session.add(item_data)
+        db.session.flush()
+        self.assertDictEqual(item_data.to_dict(),
+                             {'id': item_data.id, 'item_id': item_data.item_id, 'data': item_data.data})
+
+        # Let's add some data
+        item_data.data = '{"data": true}'
+        db.session.flush()
+        self.assertDictEqual(item_data.to_dict(),
+                             {'id': item_data.id, 'item_id': item_data.item_id, 'data': '{"data": true}'})
