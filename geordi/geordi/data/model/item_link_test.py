@@ -7,8 +7,7 @@ from . import db
 class ItemLinkTestCase(GeordiTestCase):
 
     def test_find_or_insert(self):
-        links = ItemLink.query.all()
-        assert len(links) == 0
+        self.assertEqual(ItemLink.query.count(), 0)
 
         link_type = 'test'
         test_item_1 = Item.create()
@@ -17,19 +16,18 @@ class ItemLinkTestCase(GeordiTestCase):
         link_1 = ItemLink.find_or_insert(test_item_1.id, test_item_2.id, link_type)
 
         links = ItemLink.query.all()
-        assert len(links) == 1
-        assert links[0] == link_1
+        self.assertEqual(len(links), 1)
+        self.assertEqual(links[0], link_1)
 
         link_2 = ItemLink.find_or_insert(test_item_1.id, test_item_2.id, link_type)
 
         links = ItemLink.query.all()
-        assert len(links) == 1
-        assert links[0] == link_2
-        assert link_1 == link_2
+        self.assertEqual(len(links), 1)
+        self.assertEqual(links[0], link_2)
+        self.assertEqual(link_1, link_2)
 
     def test_delete_by_item_id(self):
-        links = ItemLink.query.all()
-        assert len(links) == 0
+        self.assertEqual(ItemLink.query.count(), 0)
 
         link_type = 'test'
         item_1 = Item.create()
@@ -43,16 +41,17 @@ class ItemLinkTestCase(GeordiTestCase):
         db.session.flush()
 
         links = ItemLink.query.all()
-        assert len(links) == 2
-        assert link_1 in links and link_2 in links
+        self.assertEqual(len(links), 2)
+        self.assertIn(link_1, links)
+        self.assertIn(link_2, links)
 
         ItemLink.delete_by_item_id(item_1.id)
 
         links = ItemLink.query.all()
-        assert len(links) == 1
-        assert link_1 not in links and link_2 in links
+        self.assertEqual(len(links), 1)
+        self.assertNotIn(link_1, links)
+        self.assertIn(link_2, links)
 
         ItemLink.delete_by_item_id(item_2.id)
 
-        links = ItemLink.query.all()
-        assert len(links) == 0
+        self.assertEqual(ItemLink.query.count(), 0)

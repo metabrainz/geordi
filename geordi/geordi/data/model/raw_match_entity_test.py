@@ -11,8 +11,7 @@ from datetime import datetime
 class RawMatchEntityTestCase(GeordiTestCase):
 
     def test_delete(self):
-        match_entities = RawMatchEntity.query.all()
-        assert len(match_entities) == 0
+        self.assertEqual(RawMatchEntity.query.count(), 0)
 
         # Helper items
         editor = Editor(name='Tester')
@@ -31,10 +30,8 @@ class RawMatchEntityTestCase(GeordiTestCase):
         db.session.flush()
 
         match_entities = RawMatchEntity.query.all()
-        assert len(match_entities) == 1
-        assert match_entities[0] == match_entity
+        self.assertEqual(len(match_entities), 1)
+        self.assertEqual(match_entities[0], match_entity)
 
         match.delete()
-
-        entities = RawMatchEntity.query.all()
-        assert len(entities) == 0
+        self.assertEqual(RawMatchEntity.query.count(), 0)

@@ -17,28 +17,23 @@ class ItemDataTestCase(GeordiTestCase):
         db.session.flush()
 
         same_item_data = ItemData.get(id)
-        assert item_data == same_item_data
+        self.assertEqual(item_data, same_item_data)
 
         missing_item_data = ItemData.get('unknown')
-        assert missing_item_data is None
+        self.assertIsNone(missing_item_data)
 
     def test_delete(self):
-        resp = Item.query.all()
-        assert len(resp) == 0
-
         # Helper item
         item = Item()
         db.session.add(item)
         db.session.flush()
 
+        self.assertEqual(ItemData.query.count(), 0)
+
         item_data = ItemData(id='item-data-1', item_id=item.id)
         db.session.add(item_data)
         db.session.flush()
-
-        resp = ItemData.query.all()
-        assert len(resp) == 1
+        self.assertEqual(ItemData.query.count(), 1)
 
         item_data.delete()
-
-        resp = ItemData.query.all()
-        assert len(resp) == 0
+        self.assertEqual(ItemData.query.count(), 0)

@@ -7,8 +7,7 @@ from . import db
 class ItemRedirectTestCase(GeordiTestCase):
 
     def test_delete(self):
-        redirects = ItemRedirect.query.all()
-        assert len(redirects) == 0
+        self.assertEqual(ItemRedirect.query.count(), 0)
 
         item = Item.create()
         redirect = ItemRedirect(old_id=42, new_id=item.id)
@@ -16,10 +15,9 @@ class ItemRedirectTestCase(GeordiTestCase):
         db.session.flush()
 
         redirects = ItemRedirect.query.all()
-        assert len(redirects) == 1
-        assert redirects[0] == redirect
+        self.assertEqual(len(redirects), 1)
+        self.assertEqual(redirects[0], redirect)
 
         redirect.delete()
 
-        redirects = ItemRedirect.query.all()
-        assert len(redirects) == 0
+        self.assertEqual(ItemRedirect.query.count(), 0)
