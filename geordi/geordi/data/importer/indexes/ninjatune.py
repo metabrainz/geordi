@@ -4,7 +4,11 @@ import json
 # No sense bothering to remove the couple of duplicates, I figure.
 invariants = ([u'SUB_LABEL', u'MAIN LABEL', u'PRODUCT TITLE', u'PRODUCT VERSION',
                u'ARTIST', u'DISPLAY ARTIST', u'BARCODE', u'CATALOGUE NUMBER',
-               u'FORMAT', u'MAIN RELEASE DATE', u'_P_ YEAR', u'_P_ HOLDER',
+               u'FORMAT', u'PRICE BAND', u'MAIN RELEASE DATE', u'RIGHTS EXPIRY DATE',
+               u'UK RELEASE DATE', u'EIRE RELEASE DATE', u'GERMANY RELEASE DATE',
+               u'FRANCE RELEASE DATE', u'BENELUX RELEASE DATE', u'US RELEASE DATE',
+               u'AUSTRALIA RELEASE DATE', u'JAPAN RELEASE DATE',
+               u'_P_ YEAR', u'_P_ HOLDER',
                u'_C_ YEAR', u'_C_ HOLDER', u'MAIN GENRE', u'SUB_GENRE',
                u'TERRITORIES _ ZONES INCLUDED', u'TERRITORIES _ ZONES EXCLUDED',
                u'PART NUMBER', u'TOTAL PARTS'] +
@@ -24,7 +28,11 @@ known_fields = (invariants +
                 [u'TRACK NUMBER', u'MAIN TITLE', u'TITLE VERSION', u'_ARTIST',
                  u'_DISPLAY ARTIST', u'ISRC CODE', u'_MAIN GENRE',
                  u'_SUB_GENRE', u'__P_ YEAR', u'__P_ HOLDER', u'__C_ YEAR',
-                 u'__C_ HOLDER', u'PUBLISHER'] +
+                 u'__C_ HOLDER', u'PUBLISHER', u'COMPOSER', u'LYRICIST',
+                 u'PRODUCER', u'MIXER', u'EXPLICIT LYRICS?',
+                 u'CAN TRACK BE MADE AVAILABLE INDIVIDUALLY?', u'DURATION',
+                 u'ENTRY NUMBER', u'RINGTONE TYPE', u'TO', u'KEYWORD', u'NUMBER',
+                 u'PREVIEW URL'] +
                 [u'track number', u'Main Title', u'Title Version', u'_Artist',
                  u'_Display Artist', u'ISRC Code', u'_Main Genre',
                  u'_Sub_Genre', u'__P_ Year', u'__P_ Holder', u'__C_ Year',
@@ -55,7 +63,7 @@ def ninjatune_setup(add_folder, add_data_item, import_manager):
             if headers[i] == '':
                 headers[i] = 'column:' + str(i)
             elif headers[i] not in known_fields:
-                raise Exception('Unknown header column %s' % header)
+                raise Exception('Unknown header column %s' % headers[i])
         data = {}
         for row_number in range(1,sh.nrows):
             row = sh.row(row_number)
