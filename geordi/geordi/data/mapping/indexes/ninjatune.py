@@ -24,6 +24,13 @@ def oldstyle_release_event(val, *args, **kwargs):
         return "%04d-%02d-%02d" % (int(match.group(3)), int(match.group(2)), int(match.group(1)))
     return re.sub('^(\d{1,2})/(\d{1,2})/(\d{4})$', format_oldstyle, val)
 
+def is_int(val, *args, **kwargs):
+    try:
+        int(val)
+        return True
+    except:
+        return False
+
 _ninjatune_countries = [
     {'code': 'UK', 'name': 'UK'},
     {'code': 'US', 'name': 'US'},
@@ -82,7 +89,7 @@ ninjatune = {
                        for d in _ninjatune_countries
                    ])),
 
-                   both(['release', 'barcode'], 'BARCODE', 'Barcode', transform=lambda val, *args, **kwargs: str(int(unicode(val).strip())), condition=lambda x, *args, **kwargs: re.match('^\s*[0-9]+\s*$', unicode(x))),
+                   both(['release', 'barcode'], 'BARCODE', 'Barcode', transform=lambda val, *args, **kwargs: str(int(val)), condition=is_int),
                    both(['release', 'tags'], 'MAIN GENRE', 'Main Genre', 'SUB_GENRE', 'Sub_Genre', condition=lambda x, *args, **kwargs: x != ''),
 
                    both(lambda x, *args, **kwargs: ['release', 'mediums', 'split', 'tracks', (kwargs.get('t_index'),), 'number'], 'TRACK NUMBER', 'track number',
