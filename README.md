@@ -40,9 +40,19 @@ In the geordi/geordi directory, copy settings.cfg.sample to settings.cfg;
 modify database connection settings, set MusicBrainz OAuth configuration,
 and make any other needed changes.
 
+### Creating database
+
+To create a database matching the default configuration run:
+
+    createdb -O geordi geordi
+
+Then create the schema by running:
+
+    echo 'CREATE SCHEMA geordi' | psql -U geordi geordi
+
 ### Creating tables
 
-To create tables in existing database run:
+To create tables in an existing database run:
 
     python manager.py create_tables
 
