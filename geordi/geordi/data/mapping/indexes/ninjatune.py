@@ -62,29 +62,39 @@ ninjatune = {
 
                    # Release events, old format (dd/mm/yyyy)
                    [Rule(['MAIN RELEASE DATE', ('index', True)],
-                         ['release', 'events', 'split', 'dates'],
+                         lambda *args, **kwargs: ['release', 'events', 'combined', (0, 'Main%s' % kwargs.get('index')), SimplePathPart('date', no_manip=True)],
                         transform=oldstyle_release_event,
                         condition=lambda val, *args, **kwargs: isinstance(val, basestring) and re.match('^\d{1,2}/\d{1,2}/\d{4}$', val))],
 
+                   [Rule([d['name'].upper() + ' RELEASE DATE', ('index', True)],
+                         lambda *args, **kwargs: ['release', 'events', 'combined', (0, d['code'] + str(kwargs.get('index'))), SimplePathPart('date', no_manip=True)],
+                        transform=oldstyle_release_event,
+                        condition=lambda val, *args, **kwargs: isinstance(val, basestring) and re.match('^\d{1,2}/\d{1,2}/\d{4}$', val))
+
+                       for d in _ninjatune_countries
+                   ],
+
                    # Release events, new format
-                   both(['release', 'events', 'combined', (0, 'Main'), SimplePathPart('date', no_manip=True)], 'Main Release Date', 'Main Release date',
+                   both(lambda *args, **kwargs: ['release', 'events', 'combined', (0, 'Main%s' % kwargs.get('index')), SimplePathPart('date', no_manip=True)], 'Main Release Date', 'Main Release date',
                         transform=lambda val, *args, **kwargs: '-'.join([str(x) for x in val[0:3]]),
                         condition=lambda val, *args, **kwargs: val != '' and isinstance(val, list)),
 
                    # list-chain-deal since both() returns lists, which we want to flatten a level
                    # all countries are in the same format given a mapping between the name (as ninjatune sees it) and code, which is in _ninjatune_countries
                    list(chain.from_iterable([
-                       both(['release', 'events', 'combined', (0, d['code']), SimplePathPart('date', no_manip=True)], d['name'] + ' Release Date', d['name'] + ' Release date',
+                       both(lambda *args, **kwargs: ['release', 'events', 'combined', (0, d['code'] + str(kwargs.get('index'))), SimplePathPart('date', no_manip=True)],
+                            d['name'] + ' Release Date', d['name'] + ' Release date', d['name'].upper() + ' RELEASE DATE',
                         transform=lambda val, *args, **kwargs: '-'.join([str(x) for x in val[0:3]]),
                         condition=lambda val, *args, **kwargs: val != '' and isinstance(val, list))
 
                        for d in _ninjatune_countries
                    ])),
 
+                   # release event countries, where applicable
                    list(chain.from_iterable([
-                       both(['release', 'events', 'combined', (0, d['code']), SimplePathPart('country', no_manip=True)], d['name'] + ' Release Date', d['name'] + ' Release date',
-                        transform=d['code'],
-                        condition=lambda val, *args, **kwargs: val != '' and isinstance(val, list))
+                       both(lambda *args, **kwargs: ['release', 'events', 'combined', (0, d['code'] + str(kwargs.get('index'))), SimplePathPart('country', no_manip=True)],
+                            d['name'] + ' Release Date', d['name'] + ' Release date', d['name'].upper() + ' RELEASE DATE',
+                        transform=d['code'])
 
                        for d in _ninjatune_countries
                    ])),
