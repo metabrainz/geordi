@@ -36,7 +36,7 @@ To install all the dependencies run:
 
 ### Configuration
 
-In the geordi/geordi directory, copy settings.cfg.example to settings.cfg;
+In the geordi/geordi directory, copy settings.cfg.sample to settings.cfg;
 modify database connection settings, set MusicBrainz OAuth configuration,
 and make any other needed changes.
 
