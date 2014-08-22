@@ -1,0 +1,224 @@
+{
+    "id": "http://geordi.musicbrainz.org/mapping-schema#",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "properties": {
+        "area": {"$ref": "#/definitions/area"},
+        "artist": {"$ref": "#/definitions/artist"},
+        "label": {"$ref": "#/definitions/label"},
+        "place": {"$ref": "#/definitions/place"},
+        "recording": {"$ref": "#/definitions/recording"},
+        "relationship": {"$ref": "#/definitions/relationship"},
+        "release": {"$ref": "#/definitions/release"},
+        "release_group": {"$ref": "#/definitions/release_group"},
+        "work": {"$ref": "#/definitions/work"}
+    },
+    "definitions": {
+        "area": {
+            "type": "object",
+            "properties": {
+                "name": {"type": "array"}
+            }
+        },
+        "artist": {
+            "type": "object",
+            "properties": {
+                "name": {"type": "array"}
+            }
+        },
+        "label": {
+            "type": "object",
+            "properties": {
+                "name": {"type": "array"}
+            }
+        },
+        "place": {
+            "type": "object",
+            "properties": {
+                "name": {"type": "array"}
+            }
+        },
+        "recording": {
+            "type": "object",
+            "properties": {
+                "name": {"type": "array"},
+                "artists": {"$ref": "#/definitions/artists"},
+                "length": {"type": "array"},
+                "tags": {"type": "array"},
+                "works": {
+                    "type": "array",
+                    "items": {"$ref": "#/definitions/relationship"}
+                },
+                "producers": {
+                    "type": "array",
+                    "items": {"$ref": "#/definitions/relationship"}
+                },
+                "mixers": {
+                    "type": "array",
+                    "items": {"$ref": "#/definitions/relationship"}
+                }
+            }
+        },
+        "relationship": {
+            "type": "object",
+            "properties": {
+                "target": {"type": "string"}
+            }
+        },
+        "release": {
+            "type": "object",
+            "properties": {
+                "name": {"type": "array"},
+                "barcode": {"type": "array"},
+                "status": {"type": "array"},
+                "packaging": {"type": "array"},
+                "language": {"type": "array"},
+                "script": {"type": "array"},
+
+                "release_group": {"type": "array"},
+
+                "artists": {"$ref": "#/definitions/artists"},
+
+                "tags": {"type": "array"},
+
+                "labels": {
+                    "type": "object",
+                    "properties": {
+                        "combined": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "label": {"type": "string"},
+                                    "catalog_number": {"type": "string"}
+                                }
+                            }
+                        },
+                        "split": {
+                            "type": "object",
+                            "properties": {
+                                "labels": {"type": "array"},
+                                "catalog_numbers": {"type": "array"}
+                            }
+                        }
+                    }
+                },
+
+                "events": {
+                    "type": "object",
+                    "properties": {
+                        "combined": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "country": {"type": "string"},
+                                    "date": {"type": "string"}
+                                }
+                            }
+                        },
+                        "split": {
+                            "type": "object",
+                            "properties": {
+                                "countries": {"type": "array"},
+                                "dates": {"type": "array"}
+                            }
+                        }
+                    }
+                },
+
+                "mediums": {
+                    "type": "object",
+                    "properties": {
+                        "combined": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "tracks": {
+                                        "type": "array",
+                                        "items": { "$ref": "#/definitions/track" }
+                                    },
+                                    "format": {"type": "string"}
+                                }
+                            }
+                        },
+                        "split": {
+                            "type": "object",
+                            "properties": {
+                                "tracks": {
+                                    "type": "array",
+                                    "items": { "$ref": "#/definitions/track" }
+                                },
+                                "formats": {"type": "array"}
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "release_group": {
+            "type": "object",
+            "properties": {
+                "name": {"type": "array"}
+            }
+        },
+        "work": {
+            "type": "object",
+            "properties": {
+                "name": {"type": "array"},
+                "composers": {
+                    "type": "array",
+                    "items": {"$ref": "#/definitions/relationship"}
+                },
+                "lyricists": {
+                    "type": "array",
+                    "items": {"$ref": "#/definitions/relationship"}
+                },
+                "publishers": {
+                    "type": "array",
+                    "items": {"$ref": "#/definitions/relationship"}
+                }
+            }
+        },
+
+        "artists": {
+            "type": "object",
+            "properties": {
+                "combined": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {"type": "string"},
+                            "credit": {"type": "string"},
+                            "join_phrase": {"type": "string"}
+                        }
+                    }
+                },
+                "split": {
+                    "type": "object",
+                    "properties": {
+                        "names": {"type": "array"},
+                        "credits": {"type": "array"},
+                        "join_phrases": {"type": "array"}
+                    }
+                },
+                "unsplit": {
+                    "type": "array",
+                    "items": {"type": "string"}
+                }
+            }
+        },
+        "track": {
+            "type": "object",
+            "properties": {
+                "name": {"type": "array"},
+                "recording": {"type": "array"},
+                "artists": {"$ref": "#/definitions/artists"},
+                "number": {"type": "array"},
+                "length": {"type": "array"}
+            }
+        }
+    }
+}

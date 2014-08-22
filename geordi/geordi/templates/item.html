@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+{% from "map_rendering.html" import render_map %}
+{% block title %}Item {{ item.id }}{% endblock %}
+{% block content %}
+  {%- if current_user.id -%}
+    <button class="btn btn-primary btn-lg pull-right match-modal-button"
+      data-toggle="modal"
+      data-target="#match-modal"
+      data-item-type="{{ item.type }}"
+      data-item-id="{{ item.id }}">Match this item</button>
+  {%- endif -%}
+
+  <h2>Mapped Data</h2>
+  {{ render_map(item) }}
+
+  <p class="lead"><a href="{{ url_for('frontend.item_links', item_id=item.id) }}">View linked items</a></p>
+
+  <h2>Raw Data</h2>
+  <ul style="list-style-type: none; padding: 0">
+    {% for id, data in item.data_formatted.iteritems() %}
+      <li><h3>{{ id }}</h3>{% highlight 'json' %}{{ data }}{% endhighlight %}</li>
+    {% endfor %}
+    <li><h3>Raw item map</h3>{%- highlight 'json' %}{{ item.map_formatted }}{% endhighlight -%}</li>
+  </ul>
+{% endblock %}
+
+{%- if current_user.id -%}
+  {% block hiddencontent %}
+    <div class="modal" id="match-modal" tabindex="-1" role="dialog" aria-labelledby="match-modal-label" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            <h4 class="modal-title" id="match-modal-label">Match this item to MusicBrainz</h4>
+          </div>
+          <div class="modal-body" data-bind="with: currentItem">
+            <matching-form params="type: type, id: id"></matching-form>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endblock %}
+  {%- block js %}
+    {{ super() }}
+    <script>require(["matching"]);</script>
+  {% endblock -%}
+{%- endif -%}

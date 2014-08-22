@@ -1,0 +1,86 @@
+<p>Paste MBIDs in the inputs below to match them.</p>
+
+<table class="table table-striped" data-bind="with: newMatch">
+  <thead>
+    <tr>
+      <td>MBID</td>
+      <td>Entity</td>
+    </tr>
+  </thead>
+  <tbody data-bind="foreach: entities">
+    <tr>
+      <td style="width: 60%;"
+          data-bind="css: { 'has-success': mbid() && !loading() && !hasInvalidMBID(),
+                            'has-error': mbid() && (hasInvalidMBID() || loadError()) }">
+        <div class="input-group" style="width: 100%;">
+          <input type="text" class="form-control" data-bind="textInput: mbid, disable: loading">
+          <span class="input-group-btn">
+            <button type="button" class="btn btn-default"
+                data-bind="click: remove.bind($data), disable: !data() && $parent.emptyFieldCount() === 1">
+              Remove
+            </button>
+          </span>
+        </div>
+      </td>
+      <td>
+        <!-- ko if: data -->
+          <a data-bind="attr: { href: entityURL() }, text: data().name" target="_blank"></a>
+        <!-- /ko -->
+        <!-- ko if: hasInvalidMBID() -->
+          <span class="error">Invalid MBID</span>
+        <!-- /ko -->
+        <!-- ko if: loadError -->
+          <span class="error" data-bind="text: loadError"></span>
+        <!-- /ko -->
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ko if: (currentMatch().entities.length > 0 && newMatch().allFieldsAreEmpty()) -->
+  <div class="checkbox">
+    <label>
+      <input type="checkbox" data-bind="checked: allowEmptyMatch">
+      I intend to clear the current match.
+    </label>
+  </div>
+<!-- /ko -->
+
+<!-- ko if: submissionError -->
+  <p class="error" data-bind="text: submissionError"></p>
+<!-- /ko -->
+
+<!-- ko if: submissionSuccess -->
+  <p class="success">New matches successfully submitted.</p>
+<!-- /ko -->
+
+<button type="button" class="btn btn-primary"
+    data-bind="click: submit.bind($data),
+               enable: canSubmit(),
+               text: submissionLoading() ? 'Loading...' : 'Submit'">
+</button>
+
+<button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#previous-matches">
+  Show previous matches
+</button>
+
+<div id="previous-matches" class="collapse out" data-bind="if: previousMatches().length">
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <td>Date</td>
+        <td>Entities</td>
+      </tr>
+    </thead>
+    <tbody data-bind="foreach: previousMatches">
+      <tr>
+        <td data-bind="text: timestamp"</td>
+        <td data-bind="foreach: entities">
+          <a data-bind="attr: { href: entityURL() }, text: data().name" target="_blank"></a><!--
+            ko if: $index() < $parent.entities().length - 1
+          -->, <!--
+        /ko --></td>
+      </tr>
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,178 @@
+{# Macros for rendering mapped data #}
+{%- macro render_map(item) -%}
+  <h3>{{ render_title(item.map) }}</h3>
+  {%- if 'release' in item.map -%}
+    {%- set release = item.map.release -%}
+    <table class="table table-striped"><tbody>
+        {%- if release.status -%}{{ info_table_row('Status:', comma_list(release.status)) }}{%- endif -%}
+
+        {%- if release.artists -%}{{ info_table_row('Artists:', render_artists(release.artists, item.links, 'release')) }}{%- endif -%}
+        {%- if release.labels -%}{{ info_table_row('Labels:', render_labels(release.labels, item.links)) }}{%- endif -%}
+        {%- if release.events -%}{{ info_table_row('Events:', render_events(release.events, item.links)) }}{%- endif -%}
+
+        {%- if release.language -%}{{ info_table_row('Language:', comma_list(release.language)) }}{%- endif -%}
+        {%- if release.script -%}{{ info_table_row('Script:', comma_list(release.script)) }}{%- endif -%}
+        {%- if release.barcode -%}{{ info_table_row('Barcodes:', comma_list(release.barcode)) }}{%- endif -%}
+
+        {%- if release.packaging -%}{{ info_table_row('Packaging:', comma_list(release.packaging)) }}{%- endif -%}
+        {%- if release.mediums and release.mediums.split.formats -%}{{ info_table_row('Formats:', comma_list(release.mediums.split.formats)) }}{%- endif -%}{# Yeah, it's not in render_mediums, shoot me #}
+
+        {%- if release.tags -%}{{ info_table_row('Genres:', comma_list(release.tags)) }}{%- endif -%}
+    </tbody></table>
+    {%- if release.mediums -%}{{ render_mediums(release.mediums, links=item.links) }}{%- endif -%}
+  {%- elif 'recording' in item.map -%}
+    {%- set recording = item.map.recording -%}
+    <table class="table table-striped"><tbody>
+        {%- if recording.length -%}{{ info_table_row('Length:', comma_list(recording.length)) }}{%- endif -%}
+        {%- if recording.isrcs -%}{{ info_table_row('ISRCs:', comma_list(recording.isrcs)) }}{%- endif -%}
+        {%- if recording.tags -%}{{ info_table_row('Genres:', comma_list(recording.tags)) }}{%- endif -%}
+    </tbody></table>
+  {%- endif -%}
+{%- endmacro -%}
+
+{%- macro render_title(map) -%}{# Assumes we have a name. #}
+  {%- if 'release' in map -%}
+    Release: {{ comma_list(map.release.name, before="“", after="”") }}
+  {%- elif 'recording' in map -%}
+    Recording: {{ comma_list(map.recording.name, before="“", after="”") }}
+  {%- endif -%}
+{%- endmacro -%}
+
+{%- macro info_table_row(label, content) -%}
+    <tr><th>{{ label }}</th><td>{{ content }}</td></tr>
+{%- endmacro -%}
+{%- macro comma_list(list, before='', after='', final="") -%}
+   {%- for item in list %}{{ before }}{{ item }}{{ after }}{% if not (loop.last or (final and loop.revindex0 == 1)) %}, {% elif final and loop.revindex0 == 1 %}{{ final }}{% endif %}{%- endfor -%}
+{%- endmacro -%}
+{%- macro linked(item_id, text, hover='') -%}
+<a {% if hover %}title="{{hover}}" class="name-variation" {% endif %}href="{{ url_for('frontend.item', item_id=item_id) }}">{{ text }}</a>
+{%- endmacro -%}
+
+{%- macro render_artists(artists, links={}, prefix='') -%}
+  {%- if artists.combined -%}
+    <span class="combined-artists geordi-row">{%- for item in artists.combined -%}{{ render_combined_artist(item, links, prefix, loop.index0) }}{% endfor %}</span>
+  {%- endif -%}
+  {%- if artists.unsplit -%}
+    <span class="unsplit-artists geordi-row"><strong>Full credits:</strong> {{ comma_list(artists.unsplit, before="“", after="”") }}</span>
+  {%- endif -%}
+  {%- if artists.split -%}
+    <span class="split-artists geordi-row">
+        {%- if artists.split.names -%}<span class="split-artists-names geordi-row"><strong>List of artist names:</strong> {{ render_name_links(artists.split.names, 'artists%split%names', prefix=prefix, links=links, before="“", after="”") }}</span>{%- endif -%}
+        {%- if artists.split.credits -%}<span class="split-artists-credits geordi-row"><strong>List of artists as credited:</strong> {{ comma_list(artists.split.credits, before="“", after="”") }}</span>{%- endif -%}
+        {%- if artists.split.join_phrases -%}<span class="split-artists-join_phrases geordi-row"><strong>List of artist join phrases:</strong> {{ comma_list(artists.split.join_phrases, before="“", after="”") }}</span>{%- endif -%}
+     </span>
+  {%- endif -%}
+{%- endmacro -%}
+{%- macro render_combined_artist(artist, links={}, prefix='', index=0) -%}
+  {%- set link_key = [prefix, 'artists', 'combined', index]|join('%') -%}
+  {%- if artist.name and not artist.credit -%}
+    {%- set credit = artist.name -%}
+  {%- else -%}
+    {%- set credit = artist.credit -%}
+  {%- endif -%}
+  {%- if link_key in links -%}
+    {{ linked(links[link_key], credit, artist.name) }}
+  {%- else -%}
+    {%- if credit != artist.name -%}
+      <span class="name-variation" title="{{ artist.name }}">{{ credit }}</span>
+    {%- else -%}
+      {{ credit }}
+    {%- endif -%}
+  {%- endif -%}
+  {%- if artist.join_phrase -%}{{ artist.join_phrase }}{%- else %} {% endif -%}
+{%- endmacro -%}
+
+{%- macro render_labels(labels, links={}) -%}
+  {%- if labels.combined -%}
+    <span class="combined-labels geordi-row">{%- for item in labels.combined -%}{{ render_combined_label(item, links, loop.index0) }}{% if not loop.last%}, {% endif %}{% endfor %}</span>
+  {%- endif -%}
+  {%- if labels.split -%}
+    <span class="split-labels geordi-row">
+        {%- if labels.split.labels -%}<span class="split-labels-labels geordi-row"><strong>List of labels:</strong> {{ comma_list(labels.split.labels, before="“", after="”") }}</span>{%- endif -%}
+        {%- if labels.split.catalog_numbers -%}<span class="split-labels-catalog_numbers geordi-row"><strong>List of catalog numbers:</strong> {{ comma_list(labels.split.catalog_numbers, before="“", after="”") }}</span>{%- endif -%}
+    </span>
+  {%- endif -%}
+{%- endmacro -%}
+{%- macro render_combined_label(label, links={}, index=0) -%}
+  {%- set link_key = ['release', 'labels', 'combined', index, 'label']|join('%') -%}
+  {%- if link_key in links -%}
+    {%- if label.label -%}{%- set text = label.label -%}{%- else -%}{%- set text = '[unknown]' -%}{%- endif -%}
+    {{ linked(links[link_key], text) }}
+  {%- else -%}
+    {%- if label.label %}{{ label.label }}{% endif -%}
+  {%- endif -%}
+  {%- if label.catalog_number %} ({{ label.catalog_number }}){% endif -%}
+{%- endmacro -%}
+
+{%- macro render_events(events, links={}) -%}
+  {%- if events.combined -%}
+    <span class="combined-events geordi-row">{%- for item in events.combined -%}{{ render_combined_event(item) }}{% if not loop.last%}, {% endif %}{% endfor %}</span>
+  {%- endif -%}
+  {%- if events.split -%}
+    <span class="split-events geordi-row">
+        {%- if events.split.countries -%}<span class="split-events-countries"><strong>Countries:</strong> {{ comma_list(events.split.countries, before="“", after="”") }}</span>{%- endif -%}
+        {%- if events.split.dates -%}<span class="split-events-dates"><strong>Dates:</strong> {{ comma_list(events.split.dates, before="“", after="”") }}</span>{%- endif -%}
+    </span>
+  {%- endif -%}
+{%- endmacro -%}
+{%- macro render_combined_event(event) -%}
+  {%- if event.country %}{{ event.country }}{% endif -%}
+  {%- if event.date %} ({{ event.date }}){% endif -%}
+{%- endmacro -%}
+
+{%- macro render_mediums(mediums, links={}) -%}
+  <h4>Mediums</h4>
+  {%- if mediums.combined -%}
+    {%- for medium in mediums.combined -%}
+      <h5>{%- if medium.format -%}{{ format }}{%- else -%}Medium{%- endif %} {{ loop.index }}</h5>
+      {%- if medium.tracks -%}
+        {{ render_tracklist(medium.tracks, links=links, prefix=['release', 'mediums', 'combined', loop.index0]|join('%')) }}
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
+  {%- if mediums.split -%}
+    {%- if mediums.split.tracks -%}
+      <h5>Tracks</h5>
+      {{ render_tracklist(mediums.split.tracks, links=links, prefix=['release', 'mediums', 'split']|join('%')) }}
+    {%- endif -%}
+  {%- endif -%}
+{%- endmacro -%}
+{%- macro render_tracklist(tracks, links={}, prefix='') -%}
+  {%- set artists = tracks|selectattr("artists")|list|length > 0 -%}
+  {%- set lengths = tracks|selectattr("length")|list|length > 0 -%}
+  {%- set recordings = tracks|selectattr("recording")|list|length > 0 -%}
+  <table class="table table-striped">
+    {{ track_table_header(artists=artists, lengths=lengths, recordings=recordings) }}
+    <tbody>{%- for track in tracks -%}
+      {{ render_track(track, loop.index, artists=artists, lengths=lengths, recordings=recordings, links=links, prefix=[prefix, 'tracks', loop.index0]|join('%')) }}
+    {%- endfor -%}
+  </tbody></table>
+{%- endmacro -%}
+{%- macro track_table_header(artists=true, lengths=true, recordings=true) -%}
+<thead><tr>
+  <th>#</th>
+  <th>Name</th>
+  {%- if artists -%}<th>Artists</th>{%- endif -%}
+  {%- if lengths -%}<th>Length</th>{%- endif -%}
+  {%- if recordings -%}<th>Recording</th>{%- endif -%}
+</tr></thead>
+{%- endmacro -%}
+{%- macro render_track(track, position, artists=true, lengths=true, recordings=true, links={}, prefix='') -%}
+<tr>
+  <td>{{ position }}{%- if track.number -%}: {{ comma_list(track.number) }}{%- endif -%}</td>
+  <td>{{ comma_list(track.name) }}</td>
+  {%- if artists -%}<td>{%- if track.artists -%}{{ render_artists(track.artists, links=links, prefix=prefix) }}{%- endif -%}</td>{%- endif -%}
+  {%- if lengths -%}<td>{{ comma_list(track.length) }}</td>{%- endif -%}
+  {%- if recordings -%}<td>{%- if track.recording -%}{{ render_name_links(track.recording, 'recording', links=links, prefix=prefix) }}{%- endif -%}</td>{%- endif -%}
+</tr>
+{%- endmacro -%}
+
+{%- macro render_name_links(names, intermix, links={}, prefix='', before='', after='') -%}
+  {%- for name in names -%}
+    {%- set link_key = [prefix, intermix, loop.index0]|join('%') -%}
+    {{ before }}
+    {%- if link_key in links -%}{{ linked(links[link_key], name) }}{%- else -%}{{ name }}{%- endif -%}
+    {{ after }}
+    {%- if not loop.last -%}, {% endif -%}
+  {%- endfor -%}
+{%- endmacro -%}

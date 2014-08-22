@@ -1,62 +1,69 @@
-# geordi
-# Copyright (C) 2012 Ian McEwen, MetaBrainz Foundation
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 from __future__ import division, absolute_import
 from flask import Flask
-from flask.ext.login import LoginManager, UserMixin
-from geordi.config import *
+from flask.ext.login import LoginManager
+from geordi.frontend.views import frontend as frontend_bp
+from geordi.api.views import api as api_bp
+from geordi import errors
+from geordi.user import User
+from geordi.data.model import db
+from geordi.data.model.editor import Editor
+import geordi.base_settings
+import jinja2_highlight
+import logging
 
-from pyelasticsearch import ElasticSearch
-
-app = Flask(__name__)
-app.config.from_object(__name__)
-
-@app.before_first_request
-def setup_logging():
-    if not app.debug:
-        import logging
-        from logging.handlers import RotatingFileHandler
-        if app.config['ERROR_LOG']:
-            error_fh = RotatingFileHandler(app.config['ERROR_LOG'],
-                                           maxBytes=1024 * 1024 * 10,
-                                           backupCount=10,
-                                           encoding='utf_8')
-            error_fh.setLevel(logging.ERROR)
-            app.logger.addHandler(error_fh)
-        if app.config['WARNING_LOG']:
-            warning_fh = RotatingFileHandler(app.config['WARNING_LOG'],
-                                             maxBytes=1024 * 1024 * 10,
-                                             backupCount=10,
-                                             encoding='utf_8')
-            warning_fh.setLevel(logging.WARNING)
-            app.logger.addHandler(warning_fh)
-
-class User(UserMixin):
-    def __init__(self, id):
-        self.id = id
+__version__ = '0.2'
 
 login_manager = LoginManager()
-login_manager.login_view = "login"
+login_manager.login_view = "frontend.homepage"
 
 @login_manager.user_loader
 def load_user(username):
-    return User(username)
+    editor = Editor.get(username)
+    if editor is not None:
+        return User(editor.name, editor.tz)
 
-login_manager.setup_app(app, add_context_processor=True)
+class GeordiFlask(Flask):
+    jinja_options = dict(Flask.jinja_options)
+    jinja_options.setdefault('extensions', []).append('jinja2_highlight.HighlightExtension')
 
-es = ElasticSearch(app.config['ELASTICSEARCH_ENDPOINT'], max_retries=2)
+def _setup_logger(name, level):
+    logger = logging.getLogger(name)
+    logger.setLevel(level)
+    ch = logging.StreamHandler()
+    ch.setLevel(level)
+    formatter = logging.Formatter('%(asctime)s (%(levelname)s) %(name)s:  %(message)s')
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
 
-import geordi.views
+def create_app(settings_file='settings.cfg', *args, **kwargs):
+    app = GeordiFlask(__name__)
+    errors.init_error_handlers(app)
+
+    # Logging
+    if kwargs.get('log_sql'):
+        _setup_logger('sqlalchemy.engine', logging.INFO)
+    if kwargs.get('log_debug'):
+        _setup_logger('geordi', logging.DEBUG)
+
+    # Config
+    app.config.from_object(geordi.base_settings)
+    app.config.from_pyfile(settings_file, silent=True)
+
+    # Extensions
+    db.init_app(app)
+    login_manager.init_app(app)
+
+    # Blueprints
+    app.register_blueprint(frontend_bp)
+    app.register_blueprint(api_bp, url_prefix='/api/1')
+
+    @app.before_first_request
+    def setup_logging():
+        if not app.debug:
+            from logging.handlers import RotatingFileHandler
+            if app.config.get('ERROR_LOG'):
+                error_fh = RotatingFileHandler(app.config['ERROR_LOG'], maxBytes=1024*1024*10, backupCount=10, encoding='utf_8')
+                error_fh.setLevel(logging.ERROR)
+                app.logger.addHandler(error_fh)
+
+    return app

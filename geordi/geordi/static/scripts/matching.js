@@ -1,151 +1,209 @@
-// Open modal dialogs
-$('.subitem-linker').click(function(e) {
-  e.preventDefault();
-  subitem_id = $(this).attr('data-subitem');
-  $('#subitem-linker-content-' + subitem_id).modal();
-});
-$('.item-linker').click(function(e) {
-  e.preventDefault();
-  $('#item-linker-content').modal();
-});
+define(["jquery", "lodash", "knockout", "text!components/matching.html"], function ($, _, ko, template) {
+    var forms = {}, currentItem = ko.observable();
 
-function get_mbid_type(mbid) {
-    return $.ajax({
-        type: "GET",
-        url: '/internal/mbidtype/' + mbid,
-        dataType: 'json'
-    })
-}
+    $(document).on("click", ".match-modal-button", function () {
+        var data = $(this).data();
+        currentItem({ id: data.itemId, type: data.itemType });
+    });
 
-// AJAX form submission
-$('form.match-form').submit(function (e) {
-  $(this).siblings('div.response').addClass('loading').removeClass('error');
+    ko.components.register("matching-form", {
+        viewModel: function (params) {
+            return forms[params.id] || (forms[params.id] = new MatchForm(params));
+        },
+        template: template
+    });
 
-  e.preventDefault();
+    function MatchForm(params) {
+        forms[params.id] = this;
 
-  var promise = $.ajax({
-       type: "GET",
-       url: $(this).attr('action'),
-       data: $(this).serialize(),
-       dataType: 'json',
-       context: this
-  });
-
-  promise.done(function() {
-       $(this).siblings('div.response').text('Successfully matched. Please refresh the page to see this change.').removeClass('error loading');
-  })
-  .fail(function(jqXHR) {
-       $(this).siblings('div.response')
-           .text('Error matching: ' + $.parseJSON(jqXHR.responseText).error)
-           .addClass('error').removeClass('loading');
-  });
-});
-
-$('form.unmatch-form').submit(function (e) {
-  $(this).parent('div').siblings('div.response').addClass('loading').removeClass('error');
-
-  e.preventDefault();
-
-  var promise = $.ajax({
-       type: "GET",
-       url: $(this).attr('action'),
-       data: $(this).serialize(),
-       dataType: 'json',
-       context: this
-  });
-
-  promise.done(function() {
-       $(this).parent('div').siblings('div.response').text('Successfully unmatched. Please refresh the page to see this change.').removeClass('error loading');
-  })
-  .fail(function(jqXHR) {
-       $(this).parent('div').siblings('div.response')
-           .text('Error unmatching: ' + $.parseJSON(jqXHR.responseText).error)
-           .addClass('error').removeClass('loading');
-  });
-});
-
-$('form.match-form textarea').bind('change keyup input propertychange', function(event) {
-    var $this = $(this);
-    if ($this.data('content') == $this.val()) { return }
-
-    var matches = $this.val().match(/^(.*?),?\s*([^,]*)$/);
-
-    var rewrite = null;
-    var lastmbid = matches[2].match(/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/);
-    var last = false;
-    if (lastmbid === null) {
-        rewrite = matches[2];
-    } else {
-        rewrite = lastmbid;
-        last = true;
+        this.itemID = params.id;
+        this.itemType = params.type;
+        this.newMatch = ko.observable(new Match({}, this));
+        this.currentMatch = ko.observable(this.newMatch.peek().toJS());
+        this.previousMatches = ko.observableArray([]);
+        this.allowEmptyMatch = ko.observable(false);
+        this.submissionLoading = ko.observable(false);
+        this.submissionError = ko.observable("");
+        this.submissionSuccess = ko.observable(false);
+        this.getMatches();
     }
 
-    var mbids = matches[1].match(/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/g);
-    if (mbids !== null) {
-        rewrite = mbids.join(', ') + ', ' + rewrite;
-    }
+    MatchForm.prototype.canSubmit = function () {
+        return !(
+            this.submissionLoading() ||
+            this.hasErrors() ||
+            (this.newMatch().allFieldsAreEmpty() && !this.allowEmptyMatch())
+        );
+    };
 
-    var type = null;
-    var types = [];
-    var names = {};
-    var error = [];
-    if (mbids !== null || last) {
-        $this.parent('form').siblings('div.response').addClass('loading').removeClass('error');
-
-        var all_mbids = [];
-        if (mbids !== null) {
-            $.each(mbids, function(idx, elem) {
-                all_mbids.push(elem);
-            });
-        }
-        if (last) {
-            all_mbids.push(lastmbid);
-        }
-        $.each(all_mbids, function(index, elem) {
-            get_mbid_type(elem).done(function(data) {
-                types.push([elem, data.type]);
-                names[elem] = data.name;
-                if (type === null) {
-                    type = data.type;
-                } else if (type !== data.type) {
-                    error.push([elem, data.type]);
-                }
-            }).fail(function() {
-                types.push([elem, null]);
-                names[elem] = null;
-                error.push([elem, null]);
-            });
+    MatchForm.prototype.hasErrors = function () {
+        return !_.all(this.newMatch().entities(), function (entity) {
+            return !entity.hasInvalidMBID() && !entity.loadError();
         });
+    };
 
-        set_when_done = function () {
-            if (types.length != all_mbids.length) {
-                 window.setTimeout(set_when_done, 200)
-            } else if (error.length == 0 && type !== null) {
-                 $this.siblings('input[name="type"]').val(type);
-                 $this.siblings('span.match-type').text(type).removeClass('artist label release release-group work recording').addClass(type);
-                 var previewhtml = 'New matches: ';
-                 $.each(all_mbids, function(index, mbid) {
-                     previewhtml = previewhtml + '<a href="//musicbrainz.org/' + type + '/' + mbid + '">' + names[mbid] + '</a> '
-                 });
-                 $this.parent('form').siblings('div.preview').html(previewhtml);
-                 $this.parent('form').siblings('div.response').removeClass('error loading').text('')
-                 $this.siblings('input[type="submit"]').removeAttr('disabled');
+    MatchForm.prototype.getMatches = function () {
+        var self = this;
+
+        $.get("/item/" + this.itemID + "/matches", function (data) {
+            var currentMatch = new Match(data.currentMatch || {}, self);
+
+            self.currentMatch(currentMatch.toJS());
+
+            currentMatch.addEmptyField();
+
+            self.newMatch(currentMatch);
+
+            self.previousMatches(
+                _.map(data.previousMatches, function (data) { return new Match(data, self) })
+                .sort(function (a, b) { return b.timestamp - a.timestamp })
+            );
+        });
+    };
+
+    MatchForm.prototype.submit = function () {
+        var mbids = _.filter(_.invoke(this.newMatch().entities(), "mbid"), isMBID);
+        var self = this;
+
+        this.submissionLoading(true);
+        this.submissionSuccess(false);
+
+        $.ajax({
+            type: "POST",
+            url: "/item/" + this.itemID + "/match",
+            contentType : "application/json",
+            data: JSON.stringify({ matches: mbids, empty: mbids.length === 0 }),
+        })
+        .done(function (response) {
+            if (response.error) {
+                self.submissionError(response.error);
             } else {
-                 var text;
-                 if (type === null) {
-                     text = 'Could not find an entity type'
-                 } else {
-                     text = 'Not all MBIDs are entities of the same type';
-                 }
-                 $this.parent('form').siblings('div.response').addClass('error').removeClass('loading').text('Error: ' + text)
-                 $this.parent('form').siblings('div.preview').html('');
+                self.submissionSuccess(true);
+                self.submissionError("");
+                self.getMatches();
             }
-        }
-        window.setTimeout(set_when_done, 200);
+        })
+        .fail(function (jqXHR) {
+            self.submissionError(jqXHR.responseText);
+        })
+        .always(function () {
+            self.submissionLoading(false);
+        });
+    };
+
+    function Match(data, form) {
+        var self = this;
+
+        _.assign(this, data);
+
+        this.form = form;
+        this.timestamp = new Date(data.timestamp);
+
+        this.entities = ko.observableArray(
+            _.map(data.entities, function (data) {
+                return new Entity(data, self);
+            })
+        );
     }
 
-    if (rewrite) {
-        $this.val(rewrite)
-        $this.data('content', rewrite);
+    Match.prototype.emptyFieldCount = function () {
+        return _.reject(_.invoke(this.entities(), "data")).length;
+    };
+
+    Match.prototype.allFieldsAreEmpty = function () {
+        return this.emptyFieldCount() === this.entities().length;
+    };
+
+    Match.prototype.addEmptyField = function () {
+        if (this.emptyFieldCount() === 0) {
+            this.entities.push(new Entity({ type: this.form.itemType }, this));
+        }
+    };
+
+    Match.prototype.toJS = function () {
+        return {
+            id: this.id,
+            item: this.item,
+            superseded: !!this.superseded,
+            timestamp: this.timestamp.toString(),
+            entities: _.invoke(this.entities(), "toJS")
+        };
+    };
+
+    function Entity(data, match) {
+        this.match = match;
+        this.type = data.type;
+        this.mbid = ko.observable(data.mbid || "");
+        this.data = ko.observable(data.data);
+        this.loading = ko.observable(false);
+        this.loadError = ko.observable("");
+        this.mbid.subscribe(this.mbidChanged, this);
     }
+
+    Entity.prototype.entityURL = function () {
+        return "https://musicbrainz.org/" + this.type + "/" + this.mbid();
+    };
+
+    Entity.prototype.mbidChanged = function (mbid) {
+        this.loadError("");
+
+        if (!mbid || this.ignoreChanges) {
+            return;
+        }
+
+        this.data(null);
+
+        if (mbid = mbid.match(mbidRegex)) {
+            mbid = mbid[0];
+            this.ignoreChanges = true;
+            this.mbid(mbid);
+            this.ignoreChanges = false;
+        } else {
+            return;
+        }
+
+        var self = this;
+        this.loading(true);
+
+        $.get("/entity/" + mbid + "?no_cache=true&type_hint=" + this.match.form.itemType)
+            .done(function (data) {
+                self.ignoreChanges = true;
+                self.mbid(data.entity.mbid);
+                self.ignoreChanges = false;
+                self.data(data.entity.data);
+                self.match.addEmptyField();
+            })
+            .fail(function (data) {
+                self.data(null);
+                self.loadError("Not found");
+            })
+            .always(function () {
+                self.loading(false);
+            });
+    };
+
+    Entity.prototype.hasInvalidMBID = function () {
+        var mbid = this.mbid();
+        return mbid ? !isMBID(mbid) : false;
+    };
+
+    Entity.prototype.remove = function () {
+        this.match.entities.remove(this);
+    };
+
+    Entity.prototype.toJS = function () {
+        return {
+            type: this.type,
+            mbid: this.mbid(),
+            data: _.clone(this.data())
+        };
+    };
+
+    var mbidRegex = /[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/;
+
+    function isMBID(str) {
+        return mbidRegex.test(str);
+    }
+
+    ko.applyBindings({ currentItem: currentItem });
 });

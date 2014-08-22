@@ -1,0 +1,42 @@
+<nav class="navbar navbar-default navbar-static-top" role="navigation">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#geordi-navbar-collapse">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="{{ url_for('frontend.homepage') }}">geordi</a>
+    </div>
+    <div class="collapse navbar-collapse" id="geordi-navbar-collapse">
+      <ul class="nav navbar-nav">
+        <li><a href="{{ url_for('frontend.list_indexes') }}">Indexes</a></li>
+        <li><a href="https://geordi.readthedocs.org">Documentation</a></li>
+      </ul>
+      {%- if not error -%}
+        {%- if current_user.id -%}
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="https://musicbrainz.org/user/{{ current_user.id }}">{{ current_user.id }}</a></li>
+            <li><a href="{{ url_for('frontend.logout') }}">Log out</a></li>
+          </ul>
+        {%- else -%}
+          <form class="navbar-form navbar-right" action="{{ url_for('frontend.login_redirect') }}" method="get">
+            <div class="form-group">
+              <div class="input-group">
+                <span class="input-group-addon">
+                  <input id="remember" type="checkbox" data-toggle="tooltip" data-placement="bottom" title="Remember me?" name="remember" checked="checked" />
+                </span>
+                <input type="hidden" name="csrf" value="{{ g.login_parameters.csrf }}" />
+                <input type="hidden" name="returnto" value="{{ g.login_parameters.returnto }}" />
+                <span class="input-group-btn">
+                  <button class="btn btn-default login-button" type="submit" value="log_in">Login</button>
+                </span>
+              </div>
+            </div>
+          </form>
+        {%- endif -%}
+      {%- endif -%}
+    </div>
+  </div>
+</nav>

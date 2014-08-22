@@ -1,103 +1,44 @@
-{% extends "layout-basic.html" %}
-
-{% block header %}
-  {% if current_user.is_authenticated() %}
-    <a href="https://musicbrainz.org/user/{{current_user.id}}">{{ current_user.id }}</a> <a href="/logout">(log out)</a>
-  {% endif %}
-{% endblock %}
-
-{% block furtherlayout %}
-  <form action="/" method="get">
-    <div class="actions">
-      <select name="type" id="id-type">
-        <option value="query"{% if request.args.get('type') == 'query' %} selected="selected"{% endif %}>Query string</option>
-        <option value="raw"{% if request.args.get('type') == 'raw' %} selected="selected"{% endif %}>JSON query</option>
-        <option value="sub"{% if request.args.get('type') == 'sub' %} selected="selected"{% endif %}>Search items by linked subitem</option>
-      </select>
-      {%- if request.args.get('type', 'query') == 'query' -%}
-        <input type="text" data-searchtype="query" name="query" id="id-query" placeholder="Query" {% if request.args.get('query', false) %}value="{{ request.args.get('query') }}" {% endif %}/>
-      {%- elif request.args.get('type', 'query') == 'raw' -%}
-        <textarea name="query" data-searchtype="raw" id="id-query" placeholder="Query" cols=60 rows=8>{% if request.args.get('query', false) %}{{ request.args.get('query') }}{% endif %}</textarea>
-      {%- elif request.args.get('type', 'query') == 'sub' -%}
-        <div data-searchtype="sub" id="id-query">
-          <input type="text" name="query" placeholder="ID" {% if request.args.get('query', false) %}value="{{ request.args.get('query') }}" {% endif %}/>
-          {%- if request.args.get('subitem_index') -%}
-            {%- set selected_subitem_index = request.args.get('subitem_index') -%}
-          {%- else -%}
-            {%- set selected_subitem_index = g.all_indices[0] -%}
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {%- block head -%}
+      <title>{% block fulltitle %}{% block title %}{% endblock %} - geordi{% endblock %}</title>
+    {%- endblock -%}
+    {%- if config.DEBUG -%}
+      <link rel="stylesheet/less" type="text/css" href="{{ url_for('static', filename='styles/geordi.less') }}" />
+      <script src="{{ url_for('static', filename='scripts/lib/less.js') }}"></script>
+    {%- else -%}
+      <link rel="stylesheet" href="{{ url_for('static', filename='build/styles/geordi.css') }}">
+    {%- endif -%}
+    {%- block css %}{% endblock -%}
+  </head>
+  <body>
+    {%- include "navbar.html" -%}
+    <div id="content" class="container-fluid">
+      <div class="clearfix">
+        {%- with messages = get_flashed_messages() -%}
+          {%- if messages -%}
+            <ul class="flashes">
+              {%- for message in messages -%}
+                <li>{{ message }}</li>
+              {%- endfor -%}
+            </ul>
           {%- endif -%}
-          <select name="subitem_type">
-          {%- for (subitem_type, opts) in g.link_types[selected_subitem_index].iteritems() if subitem_type != "version" -%}
-            <option{% if subitem_type == request.args.get('subitem_type') %} selected=selected{% endif %} value="{{ subitem_type }}">{{ opts.name }}</option>
-          {%- endfor -%}
-          </select>
-          <select name="subitem_index">{% for index in g.all_indices %}<option{% if index == request.args.get('subitem_index') %} selected=selected{% endif %}>{{index}}</option>{% endfor %}</select>
-        </div>
-      {%- endif -%}
-      <input type="submit" class="btn primary" value="Search" />
+        {%- endwith -%}
+        <h1 id="h1title">{% block h1title %}{{ self.title() }}{% endblock %}</h1>
+      </div>
+      {% block content %}{% endblock %}
     </div>
-     <div class="filters">
-      <input type="checkbox" name="human" id="id-human" {% if request.args.get('human') == 'on' %}checked {% endif %}/> <label for="id-human">Show human-matched items</label>
-      <input type="checkbox" name="auto" id="id-auto" {% if request.args.get('auto') == 'on' or not request.args.get('s', False) %}checked {% endif %} /> <label for="id-auto">Show auto-matched items</label>
-      <input type="checkbox" name="un" id="id-un" {% if request.args.get('un') == 'on' or not request.args.get('s', False) %}checked {% endif %}/> <label for="id-un">Show unmatched items</label>
-      <select name="size" id="id-size"><option>10</option><option>25</option><option>100</option><option>1000</option></select> <label for="id-size">Page size</label>
-      <input type="hidden" name="s" value="1" />
-    </div>
-    <div class="filters">
-      <select multiple name="index" id="id-index">
-      <optgroup label="Index">
-      {%- for index in g.all_indices %}
-        <option{% if index in request.args.getlist('index') %} selected{% endif %}>{{ index }}</option>
-      {% endfor -%}
-      </optgroup>
-      </select>
-      <select multiple name="itemtype" id="id-itemtype">
-      <optgroup label="Item Type">
-        <option{% if 'item' in request.args.getlist('itemtype') or not request.args.get('s', False) %} selected{% endif %}>item</option>
-        <option{% if 'subitem' in request.args.getlist('itemtype') %} selected{% endif %}>subitem</option>
-      </optgroup>
-      </select>
-    </div>
-    {# <div class="filters">
-      User: <input type="text" name="user" value="{{ request.args.get('user', '') }}"/>
-    </div> #}
-    <p class="filter-preview"></p>
-  </form>
-{% endblock %}
-
-{% block layoutjs %}
-  <script>
-    geordi.subtype_options = { {% for (index, link_types) in g.link_types.iteritems() %}"{{index}}": [{% for (subitem_type, opts) in link_types.iteritems() if subitem_type != "version" %}["{{subitem_type}}", "{{opts.name}}"]{% if not loop.last %}, {% endif %}{% endfor %}]{% if not loop.last %}, {% endif %}{% endfor %} };
-    geordi.index_options_html = '<select id="id-subitem_index" name="subitem_index">{% for index in g.all_indices %}<option>{{index}}</option>{% endfor %}</select>';
-    geordi.link_types = {{ g.json.dumps(g.link_types) | safe }}
-  </script>
-  <script src="/static/scripts/search_form.js"></script>
-{% endblock %}
-
-{%- macro match_span(matching, show_timestamp, sparse) -%}
-<div class="match{% if sparse %} sparse{%- endif -%}">
-{%- if not sparse -%}<img height="16px" width="16px" src="/static/images/entity/{{matching.type}}.png" />
-  {% for mbid in matching.mbid %}<a href="https://musicbrainz.org/{{ matching.type }}/{{ mbid }}">{{ mbid[:4] }}…{{ mbid[-4:] }}</a>{% if not loop.last %}, {% endif %}{% endfor %}
-  [{% if not matching.auto -%}
-     <a href="https://musicbrainz.org/user/{{ matching.user }}">{{ matching.user }}</a>
-   {%- else -%}
-     <span title="{{ matching.ip }}">{{ matching.user }}</span>
-   {%- endif %}]
-  {%- if show_timestamp %}
-    {{ matching.timestamp }}
-  {%- endif -%}
-{%- else -%}
-{% for mbid in matching.mbid %}<a class="action-icon" href="https://musicbrainz.org/{{ matching.type }}/{{ mbid }}"><img title="View matched {{ matching.type }} on MusicBrainz" src="/static/images/entity/{{ matching.type }}.png" /></a> {% endfor -%}
-{%- endif -%}
-</div>
-{%- endmacro -%}
-
-{%- macro subitem_search(index, type, id, text) -%}
-<a class="subitem-search{% if not text %} action-icon{% endif %}" href="/?type=sub&query={{ id }}&subitem_type={{ type }}&subitem_index={{ index }}&auto=on&un=on&human=on&s=1" title="View other items using this subitem">
-{%- if text -%}
-  {{ text }}
-{%- else -%}
-  <img src="/static/images/search.png" title="View other items using this subitem" />
-{%- endif -%}
-</a>
-{%- endmacro -%}
+    {%- block hiddencontent -%}{%- endblock -%}
+    {%- block js %}
+    <script src="{{ url_for('static', filename='scripts/lib/require.js') }}"></script>
+    <script>
+      require.config({ baseUrl: "/static/{% if not config.DEBUG %}build/{% endif %}scripts" });
+      require(["common"]);
+    </script>
+    {% endblock -%}
+  </body>
+</html>

@@ -1,0 +1,18 @@
+DEBUG = False  # Won't matter with manager.py, use -d option to set false, defaults true
+
+SECRET_KEY = 'seriously, change this'
+
+# MusicBrainz OAuth configuration.
+# See https://musicbrainz.org/account/applications for more info.
+OAUTH_CLIENT_ID = 'XXXXXXXXXXXXXXXXXXXXXX'
+OAUTH_CLIENT_SECRET = 'XXXXXXXXXXXXXXXXXXXXXX'
+OAUTH_REDIRECT_URI = 'http://localhost:5000/oauth/callback'
+
+
+# Settings defined below have default values in base_settings.py, but can be overridden in this file.
+
+# URI of the primary database.
+#SQLALCHEMY_DATABASE_URI = 'postgresql://geordi:geordi@localhost:5432/geordi'
+
+# URI of the database that will be used when running tests.
+#TEST_SQLALCHEMY_DATABASE_URI = 'postgresql://geordi_test:geordi_test@localhost:5432/geordi_test'

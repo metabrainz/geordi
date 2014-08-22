@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+{% block title %}Items for {{ item_type }} in {{ index }}{% endblock %}
+{% block content %}
+<ul>
+  {% for item in items %}
+    <li><a href="{{ url_for('frontend.data_item', index=index, item_type=item_type, data_id=item) }}">{{ item }}</a></li>
+  {% endfor %}
+</ul>
+{% endblock %}

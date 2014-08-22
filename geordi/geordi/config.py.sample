@@ -1,8 +1,0 @@
-SECRET_KEY = 'super seekrit'
-ELASTICSEARCH_ENDPOINT = 'http://localhost:9200/'
-AVAILABLE_INDICES = ['wcd', 'discogs']
-OAUTH_CLIENT_ID = 'XXXXXXXXXXXXXXXXXXXXXX'
-OAUTH_CLIENT_SECRET = 'XXXXXXXXXXXXXXXXXXXXXX'
-OAUTH_REDIRECT_URI = 'http://localhost:5000/internal/oauth'
-ERROR_LOG = 'errors.log'
-WARNING_LOG = 'warnings.log'

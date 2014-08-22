@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{% from "map_rendering.html" import render_title %}
+{% block title %}Links to item {{ item.id }}{% endblock %}
+{% block content %}
+  <table class="table table-striped">
+    <thead>
+    <tr>
+      <th colspan="2">Linked item</th>
+      <th>Value</th>
+      <th>Path</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for link in item.items_linked %}
+      <tr>
+        <td><a href="{{ url_for('frontend.item', item_id=link.item_id) }}">{{ link.item_id }}</a></td>
+        <td>{{ render_title(link.item.map_dict) }}</td>
+        <td>{{ link.value }}</td>
+        <td>{{ link.type|replace('%', ' \u2192 ') }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

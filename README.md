@@ -1,5 +1,5 @@
 geordi
--------
+======
 
 This project allows the consumption of arbitrary data, for use as a data source and matching tool.
 
@@ -8,66 +8,71 @@ This project allows the consumption of arbitrary data, for use as a data source 
 It's named after [Geordi La Forge](http://en.memory-alpha.org/wiki/Geordi_La_Forge), in reference to [MusicBrainz Picard](https://github.com/musicbrainz/picard).
 
 Setup
-=====
+-----
 
-Shared dependencies: elasticsearch -- install and make available,
-presumably on localhost:9200 (the default).  See
-http://www.elasticsearch.org/download/ .
+### Shared dependencies:
+
+* postgresql
 
 You will also need to be able to install python packages, we recommend
 using virtualenvwrapper for this.  On Debian/Ubuntu systems you can
 install that with:
 
-`sudo apt-get install virtualenvwrapper`
+    sudo apt-get install virtualenvwrapper
 
-----
+### Python dependencies:
 
-Python dependencies:
-
-`mkvirtualenv geordi`
+    mkvirtualenv geordi
 
 The mkvirtualenv command will create and activate a virtual
 environment in which python modules will be installed.  You can
 re-active this environment with the following command:
 
-`workon geordi`
+    workon geordi
 
 To install all the dependencies run:
 
-`pip install -r requirements.txt`
+    pip install -r requirements.txt
 
-----
+### Configuration
+
+In the geordi/geordi directory, copy settings.cfg.example to settings.cfg;
+modify database connection settings, set MusicBrainz OAuth configuration,
+and make any other needed changes.
+
+### Creating tables
+
+To create tables in existing database run:
+
+    python manager.py create_tables
+
+*(replace 'python' with 'python2' where applicable)*
+
+Importing Data
+--------------
+
+To import data, use the manager.py script in the 'geordi' directory. Various
+options exist under the 'data' subcommand, for which documentation exists.
+Source-specific import tools are in the geordi.data.importer module, mostly
+under the 'indexes' subdirectory.
+
+Running server
+--------------
 
 To run the server:
 
-`python geordi/run.py`
+    cd geordi
+    python manager.py runserver
 
-----
-
-For importing, perl dependencies:
-
-`cpanm XML::XML2JSON LWP::UserAgent HTTP::Request URI::Escape Encode JSON Try::Tiny File::Slurp`
-
-----
-
-To import data, from tools directory:
-
-`./submit-dir.pl --index some-index-name /some/directory/*`
-
-Where * should be a bunch of directories named by identifier, containing XML and JSON files.
-
-Usage
-=====
-
-Thus far, only displays data, updates when that's fixed!
+*(replace 'python' with 'python2' where applicable)*
 
 
-Tests
-=====
+Testing
+-------
 
 To run tests, install nose (remember to enable your virtualenv!):
 
-`pip install nose`
+    pip install nose
 
 And then run the tests, you should see something like this:
 
@@ -79,17 +84,7 @@ And then run the tests, you should see something like this:
     OK
 
 
-Code Layout
-===========
+Further Documentation
+---------------------
 
-geordi subdir: new python codebase (GPLv3+)
-
-tools subdir:
-
- * submit-dir.pl
-
-    Submits files to the local elastic search server.
-
- * other largely outdated files for historical understanding
-
-ingestr-server-perl subdir: old perl codebase
+The geordi server has some [additional documentation](https://geordi.readthedocs.org/) as well.

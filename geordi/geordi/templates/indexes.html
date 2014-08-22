@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+{% block title %}Indexes{% endblock %}
+{% block content %}
+<ul>
+  {% for index in indexes %}
+    <li><a href="{{ url_for('frontend.list_index', index=index) }}">{{ index }}</a></li>
+  {% endfor %}
+</ul>
+{% endblock %}
