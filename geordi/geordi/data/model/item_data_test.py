@@ -15,7 +15,7 @@ class ItemDataTestCase(GeordiTestCase):
         db.session.flush()
 
     def test_get(self):
-        id = 'random-id'
+        id = 'test/artist/Tester'
         item_data = ItemData(id=id, item_id=self.item.id)
         db.session.add(item_data)
         db.session.flush()
@@ -27,7 +27,7 @@ class ItemDataTestCase(GeordiTestCase):
         self.assertIsNone(missing_item_data)
 
     def test_get_by_item_id(self):
-        item_data = ItemData(id='random-id', item_id=self.item.id)
+        item_data = ItemData(id='test/artist/Tester', item_id=self.item.id)
         db.session.add(item_data)
         db.session.flush()
 
@@ -38,7 +38,7 @@ class ItemDataTestCase(GeordiTestCase):
         self.assertListEqual(missing_results, [])
 
     def test_update(self):
-        item_data = ItemData(id='random-id', item_id=self.item.id)
+        item_data = ItemData(id='test/artist/Tester', item_id=self.item.id)
         db.session.add(item_data)
         db.session.flush()
 
@@ -51,7 +51,7 @@ class ItemDataTestCase(GeordiTestCase):
         self.assertEqual(item_data, updated_item_data)
 
     def test_to_dict(self):
-        item_data = ItemData(id='random-id', item_id=self.item.id)
+        item_data = ItemData(id='test/artist/Tester', item_id=self.item.id)
         db.session.add(item_data)
         db.session.flush()
         self.assertDictEqual(item_data.to_dict(),
@@ -66,7 +66,7 @@ class ItemDataTestCase(GeordiTestCase):
     def test_delete(self):
         self.assertEqual(ItemData.query.count(), 0)
 
-        item_data = ItemData(id='item-data-1', item_id=self.item.id)
+        item_data = ItemData(id='test/artist/Tester', item_id=self.item.id)
         db.session.add(item_data)
         db.session.flush()
         self.assertEqual(ItemData.query.count(), 1)
