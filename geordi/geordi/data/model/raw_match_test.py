@@ -21,13 +21,17 @@ class RawMatchTestCase(GeordiTestCase):
         db.session.flush()
 
         self.entity_1 = Entity(mbid='f27ec8db-af05-4f36-916e-3d57f91ecf5e', type='test')
-        self.entity_2 = Entity(mbid='85d9c621-e30f-4788-a962-a089c0d34182', type='test')
+        self.entity_2 = Entity(mbid='85d9c621-e30f-4788-a962-a089c0d34182', type='another')
         db.session.add(self.entity_1)
         db.session.add(self.entity_2)
         db.session.flush()
 
     def test_match_item(self):
-        match = RawMatch.match_item(item_id=self.item.id, editor_name=self.editor.name, entities=[self.entity_1, self.entity_2])
+        match = RawMatch.match_item(item_id=self.item.id, editor_name=self.editor.name,
+                                    entities=[self.entity_1, self.entity_2])
+        self.assertEqual(match.item.id, self.item.id)
+        self.assertEqual(match.editor, self.editor)
+        # TODO: Check entities
 
     def test_to_dict(self):
         match = RawMatch(item_id=self.item.id, editor_name=self.editor.name, timestamp=datetime.now())
