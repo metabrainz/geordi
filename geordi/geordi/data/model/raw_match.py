@@ -32,9 +32,9 @@ class RawMatch(db.Model, DeleteMixin):
         return cls.query.filter_by(item_id=item_id, **kwargs).all()
 
     @classmethod
-    def match_item(cls, item_id, editor, entities):
+    def match_item(cls, item_id, editor_name, entities):
         cls.query.filter_by(item_id=item_id, superseded=False).update({"superseded": True})
-        match = cls(item_id=item_id, editor_name=editor, timestamp=db.func.now())
+        match = cls(item_id=item_id, editor_name=editor_name, timestamp=db.func.now())
         db.session.add(match)
         for entity in entities:
             rm = RawMatchEntity(raw_match=match, entity=entity)
@@ -43,10 +43,10 @@ class RawMatch(db.Model, DeleteMixin):
         return match
 
     def to_dict(self):
-        response = dict(id=self.id,
-                        item=self.item_id,
-                        timestamp=self.timestamp,
-                        superseded=self.superseded,
-                        entities=[e.entity.to_dict() for e in self.entities]
-                        )
-        return response
+        return {
+            'id': self.id,
+            'item': self.item_id,
+            'timestamp': self.timestamp,
+            'superseded': self.superseded,
+            'entities': [e.entity.to_dict() for e in self.entities],
+        }
