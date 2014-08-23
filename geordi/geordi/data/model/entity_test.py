@@ -30,3 +30,14 @@ class EntityTestCase(GeordiTestCase):
         db.session.flush()
         self.assertDictEqual(entity_2.to_dict(),
                              {'mbid': entity_2.mbid, 'type': entity_2.type, 'data': {'test': True}})
+
+    def test_delete(self):
+        self.assertEqual(Entity.query.count(), 0)
+
+        entity = Entity(mbid='f27ec8db-af05-4f36-916e-3d57f91ecf5e', type='test')
+        db.session.add(entity)
+        db.session.flush()
+        self.assertEqual(Entity.query.count(), 1)
+
+        entity.delete()
+        self.assertEqual(Entity.query.count(), 0)

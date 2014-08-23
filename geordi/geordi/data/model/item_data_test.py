@@ -62,3 +62,14 @@ class ItemDataTestCase(GeordiTestCase):
         db.session.flush()
         self.assertDictEqual(item_data.to_dict(),
                              {'id': item_data.id, 'item_id': item_data.item_id, 'data': '{"data": true}'})
+
+    def test_delete(self):
+        self.assertEqual(ItemData.query.count(), 0)
+
+        item_data = ItemData(id='item-data-1', item_id=self.item.id)
+        db.session.add(item_data)
+        db.session.flush()
+        self.assertEqual(ItemData.query.count(), 1)
+
+        item_data.delete()
+        self.assertEqual(ItemData.query.count(), 0)

@@ -18,8 +18,7 @@ class EditorTestCase(GeordiTestCase):
         self.assertIsNone(missing_editor)
 
     def test_add_or_update(self):
-        editors = Editor.query.all()
-        self.assertEqual(len(editors), 0)
+        self.assertEqual(Editor.query.count(), 0)
 
         editor_1 = Editor.add_or_update('Tester 1')
 
@@ -40,3 +39,14 @@ class EditorTestCase(GeordiTestCase):
         self.assertEqual(len(editors), 2)
         self.assertIn(editor_3, editors)
         self.assertNotEqual(editor_2, editor_3)
+
+    def test_delete(self):
+        self.assertEqual(Editor.query.count(), 0)
+
+        editor = Editor(name='Tester')
+        db.session.add(editor)
+        db.session.flush()
+        self.assertEqual(Editor.query.count(), 1)
+
+        editor.delete()
+        self.assertEqual(Editor.query.count(), 0)
