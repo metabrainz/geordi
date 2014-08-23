@@ -34,7 +34,7 @@ class Entity(db.Model, DeleteMixin):
         return cls.query.filter_by(mbid=mbid, **kwargs).first()
 
     @classmethod
-    def get_remote(cls, mbid, **kwargs):
+    def get_remote(cls, mbid):
         url = 'https://musicbrainz.org/ws/js/entity/%s' % mbid
         opener = urllib2.build_opener()
         opener.addheaders = [('Accept', 'application/json')]
