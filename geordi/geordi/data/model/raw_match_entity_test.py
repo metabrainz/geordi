@@ -10,31 +10,28 @@ from datetime import datetime
 
 class RawMatchEntityTestCase(GeordiTestCase):
 
-    def test_delete(self):
-        match_entities = RawMatchEntity.query.all()
-        assert len(match_entities) == 0
+    def setUp(self):
+        super(RawMatchEntityTestCase, self).setUp()
 
         # Helper items
-        editor = Editor(name='Tester')
-        db.session.add(editor)
-        item = Item()
-        db.session.add(item)
+        self.editor = Editor(name='Tester')
+        db.session.add(self.editor)
+        self.item = Item()
+        db.session.add(self.item)
         db.session.flush()
-        match = RawMatch(item_id=item.id, editor_name=editor.name, timestamp=datetime.now())
-        db.session.add(match)
-        entity = Entity(mbid='f27ec8db-af05-4f36-916e-3d57f91ecf5e', type='test')
-        db.session.add(entity)
+        self.match = RawMatch(item_id=self.item.id, editor_name=self.editor.name, timestamp=datetime.now())
+        db.session.add(self.match)
+        self.entity = Entity(mbid='f27ec8db-af05-4f36-916e-3d57f91ecf5e', type='test')
+        db.session.add(self.entity)
         db.session.flush()
 
-        match_entity = RawMatchEntity(raw_match_id=match.id, entity_mbid=entity.mbid)
+    def test_delete(self):
+        self.assertEqual(RawMatchEntity.query.count(), 0)
+
+        match_entity = RawMatchEntity(raw_match_id=self.match.id, entity_mbid=self.entity.mbid)
         db.session.add(match_entity)
         db.session.flush()
+        self.assertEqual(RawMatchEntity.query.count(), 1)
 
-        match_entities = RawMatchEntity.query.all()
-        assert len(match_entities) == 1
-        assert match_entities[0] == match_entity
-
-        match.delete()
-
-        entities = RawMatchEntity.query.all()
-        assert len(entities) == 0
+        match_entity.delete()
+        self.assertEqual(RawMatchEntity.query.count(), 0)

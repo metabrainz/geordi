@@ -7,7 +7,6 @@ from .mixins import DeleteMixin
 from geordi.data.model.raw_match_entity import RawMatchEntity
 from sqlalchemy.dialects.postgresql import UUID
 
-from urllib import urlencode
 import urllib2
 import json
 
@@ -35,7 +34,7 @@ class Entity(db.Model, DeleteMixin):
         return cls.query.filter_by(mbid=mbid, **kwargs).first()
 
     @classmethod
-    def get_remote(cls, mbid, **kwargs):
+    def get_remote(cls, mbid):
         url = 'https://musicbrainz.org/ws/js/entity/%s' % mbid
         opener = urllib2.build_opener()
         opener.addheaders = [('Accept', 'application/json')]
@@ -69,4 +68,6 @@ class Entity(db.Model, DeleteMixin):
         return target
 
     def to_dict(self):
+        if self.data is None:
+            self.data = '{}'
         return {'mbid': self.mbid, 'type': self.type, 'data': json.loads(self.data)}

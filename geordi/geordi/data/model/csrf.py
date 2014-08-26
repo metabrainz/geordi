@@ -4,7 +4,6 @@ geordi.data.model.csrf
 """
 from . import db
 from .mixins import DeleteMixin
-import json
 from datetime import datetime, timedelta
 
 

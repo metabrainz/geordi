@@ -1,1 +1,7 @@
 geordi/static/styles/geordi.css
+
+# Test results
+nosetests.xml
+.cache
+.coverage
+/cover/
