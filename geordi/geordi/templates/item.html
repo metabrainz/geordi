@@ -8,6 +8,11 @@
       data-target="#match-modal"
       data-item-type="{{ item.type }}"
       data-item-id="{{ item.id }}">Match this item</button>
+    <button class="btn btn-primary btn-lg pull-right import-modal-button"
+      data-toggle="modal"
+      data-target="#import-modal"
+      data-item-type="{{ item.type }}"
+      data-item-id="{{ item.id }}">Import this item</button>
   {%- endif -%}
 
   <h2>Mapped Data</h2>
@@ -35,6 +40,37 @@
           </div>
           <div class="modal-body" data-bind="with: currentItem">
             <matching-form params="type: type, id: id"></matching-form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal" id="import-modal" tabindex="-1" role="dialog" aria-labelledby="import-modal-label" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            <h4 class="modal-title" id="import-modal-label">Import this item into MusicBrainz</h4>
+          </div>
+          <div class="modal-body">
+            {%- if item.map.release -%}
+              <form action="https://musicbrainz.org/release/add" method="post">
+                <input type="hidden" name="name" value="{{ item.map.release.name[0] }}">
+                {%- if item.map.release.artists.combined -%}
+                  {%- for artist in item.map.release.artists.combined -%}
+                    <input type="hidden" name="artist_credit.names.{{ loop.index0 }}.artist.name" value="{{ artist.name }}">
+                    <input type="hidden" name="artist_credit.names.{{ loop.index0 }}.name" value="{{ artist.credit }}">
+                    <input type="hidden" name="artist_credit.names.{{ loop.index0 }}.join_phrase" value="{{ artist.join_phrase }}">
+                  {% endfor %}
+                {%- elif item.map.release.artists.split -%}
+                  {%- for name in item.map.release.artists.split.names -%}
+                    <input type="hidden" name="artist_credit.names.{{ loop.index0 }}.artist.name" value="{{ name }}">
+                  {% endfor %}
+                {%- elif item.map.release.artists.unsplit -%}
+                  <input type="hidden" name="artist_credit.names.0.artist.name" value="{{ item.map.release.artists.unsplit.name[0] }}">
+                {%- endif -%}
+                <input type="submit" value="Import">
+              </form>
+            {%- endif -%}
           </div>
         </div>
       </div>
