@@ -68,6 +68,100 @@
                 {%- elif item.map.release.artists.unsplit -%}
                   <input type="hidden" name="artist_credit.names.0.artist.name" value="{{ item.map.release.artists.unsplit.name[0] }}">
                 {%- endif -%}
+                {%- if item.map.release.events.combined -%}
+                  {%- for event in item.map.release.events.combined -%}
+                    <input type="hidden" name="events.{{ loop.index0 }}.country" value="{{ event.country }}">
+                    {# REQUIRES SPLITTING DATE #}
+                    <input type="hidden" name="events.{{ loop.index0 }}.date.year" value="">
+                    <input type="hidden" name="events.{{ loop.index0 }}.date.month" value="">
+                    <input type="hidden" name="events.{{ loop.index0 }}.date.day" value="">
+                  {% endfor %}
+                {%- elif item.map.release.events.split and not item.map.release.events.split.dates -%}
+                  {%- for country in item.map.release.events.split.countries -%}
+                    <input type="hidden" name="events.{{ loop.index0 }}.country" value="{{ country }}">
+                  {% endfor %}
+                {%- elif item.map.release.events.split and not item.map.release.events.split.countries -%}
+                  {%- for date in item.map.release.events.split.dates -%}
+                    {# REQUIRES SPLITTING DATE #}
+                    <input type="hidden" name="events.{{ loop.index0 }}.date.year" value="">
+                    <input type="hidden" name="events.{{ loop.index0 }}.date.month" value="">
+                    <input type="hidden" name="events.{{ loop.index0 }}.date.day" value="">
+                  {% endfor %}
+                {%- elif item.map.release.events.split -%} 
+                  {# REQUIRES UI #}
+                {%- endif -%}
+                {%- if item.map.release.labels.combined -%}
+                  {%- for label in item.map.release.labels.combined -%}
+                    <input type="hidden" name="labels.{{ loop.index0 }}.name" value="{{ label.label }}">
+                    <input type="hidden" name="labels.{{ loop.index0 }}.catalog_number" value="{{ label.catalog_number }}">
+                  {% endfor %}
+                {%- elif item.map.release.labels.split -%}
+                  {# REQUIRES UI #}
+                {%- endif -%}
+                <input type="hidden" name="barcode" value="{{ item.map.release.barcode[0] }}"> {# REQUIRES UI TO SUPPORT MULTIPLE BARCODES #}
+
+                {%- if item.map.release.mediums.combined -%}
+                  {%- for medium in item.map.release.mediums.combined if medium.tracks -%}
+                    {% set medium_loop = loop %}
+                    {%- if medium.format -%}
+                      <input type="hidden" name="mediums.{{ loop.index0 }}.format" value="{{ medium.format }}">
+                    {%- endif -%}
+                    {%- for track in medium.tracks -%}
+                      {% set track_loop = loop %}
+                      {%- if track.name -%}
+                        <input type="hidden" name="mediums.{{ medium_loop.index0 }}.track.{{ loop.index0 }}.name" value="{{ track.name[0] }}">
+                      {%- endif -%}
+                      {%- if track.length -%}
+                        <input type="hidden" name="mediums.{{ medium_loop.index0 }}.track.{{ loop.index0 }}.length" value="{{ track.length[0] }}">
+                      {%- endif -%}
+                      {%- if track.number -%}
+                        <input type="hidden" name="mediums.{{ medium_loop.index0 }}.track.{{ loop.index0 }}.number" value="{{ track.number[0] }}">
+                      {%- endif -%}
+                      {%- if track.artists.combined -%}
+                        {%- for artist in track.artists.combined -%}
+                          <input type="hidden" name="mediums.{{ medium_loop.index0 }}.track.{{ track_loop.index0 }}.artist_credit.names.{{ loop.index0 }}.artist.name" value="{{ artist.name }}">
+                          <input type="hidden" name="mediums.{{ medium_loop.index0 }}.track.{{ track_loop.index0 }}.artist_credit.names.{{ loop.index0 }}.name" value="{{ artist.credit }}">
+                          <input type="hidden" name="mediums.{{ medium_loop.index0 }}.track.{{ track_loop.index0 }}.artist_credit.names.{{ loop.index0 }}.join_phrase" value="{{ artist.join_phrase }}">
+                        {% endfor %}
+                      {%- elif track.artists.split -%}
+                        {%- for name in track.artists.split.names -%}
+                          <input type="hidden" name="mediums.{{ medium_loop.index0 }}.track.{{ track_loop.index0 }}.artist_credit.names.{{ loop.index0 }}.artist.name" value="{{ name }}">
+                        {% endfor %}
+                      {%- elif track.artists.unsplit -%}
+                        <input type="hidden" name="mediums.{{ medium_loop.index0 }}.track.{{ track_loop.index0 }}.artist_credit.names.0.artist.name" value="{{ track.artists.unsplit.name[0] }}">
+                      {%- endif -%}
+                    {% endfor %}
+                  {% endfor %}
+                {%- elif item.map.release.mediums.split and item.map.release.mediums.split.tracks -%}
+                  {%- if item.map.release.mediums.split.format -%}
+                    <input type="hidden" name="mediums.0.format" value="{{ item.map.release.mediums.split.format[0] }}">
+                  {%- endif -%}
+                  {%- for track in item.map.release.mediums.split.tracks -%}
+                    {% set track_loop = loop %}
+                    {%- if track.name -%}
+                      <input type="hidden" name="mediums.0.track.{{ loop.index0 }}.name" value="{{ track.name[0] }}">
+                    {%- endif -%}
+                    {%- if track.length -%}
+                      <input type="hidden" name="mediums.0.track.{{ loop.index0 }}.length" value="{{ track.length[0] }}">
+                    {%- endif -%}
+                    {%- if track.number -%}
+                      <input type="hidden" name="mediums.0.track.{{ loop.index0 }}.number" value="{{ track.number[0] }}">
+                    {%- endif -%}
+                    {%- if track.artists.combined -%}
+                      {%- for artist in track.artists.combined -%}
+                        <input type="hidden" name="mediums.0.track.{{ track_loop.index0 }}.artist_credit.names.{{ loop.index0 }}.artist.name" value="{{ artist.name }}">
+                        <input type="hidden" name="mediums.0.track.{{ track_loop.index0 }}.artist_credit.names.{{ loop.index0 }}.name" value="{{ artist.credit }}">
+                        <input type="hidden" name="mediums.0.track.{{ track_loop.index0 }}.artist_credit.names.{{ loop.index0 }}.join_phrase" value="{{ artist.join_phrase }}">
+                      {% endfor %}
+                    {%- elif track.artists.split -%}
+                      {%- for name in track.artists.split.names -%}
+                        <input type="hidden" name="mediums.0.track.{{ track_loop.index0 }}.artist_credit.names.{{ loop.index0 }}.artist.name" value="{{ name }}">
+                      {% endfor %}
+                    {%- elif track.artists.unsplit -%}
+                      <input type="hidden" name="mediums.0.track.{{ track_loop.index0 }}.artist_credit.names.0.artist.name" value="{{ track.artists.unsplit.name[0] }}">
+                    {%- endif -%}
+                  {% endfor %}
+                {%- endif -%}
                 <input type="submit" value="Import">
               </form>
             {%- endif -%}
