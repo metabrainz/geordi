@@ -108,7 +108,7 @@ def map_data_item(data_id, data):
         # get rules to use
         rules = index_dict.get(index, {}).get(item_type, [])
         if len(rules) == 0:
-            raise Exception('no rules found to use')
+            raise Exception('no rules found to use for '+`index`+':'+`item_type`)
         for rule in rules:
             if rule.test(data):
                 values = rule.run(data)
