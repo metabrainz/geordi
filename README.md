@@ -36,8 +36,7 @@ re-active this environment with the following command:
 To install all the dependencies run:
 
     pip install -r requirements.txt
-    npm install less
-    npm install requirejs
+    npm install .
 
 ### Configuration
 
