@@ -13,7 +13,7 @@ Setup
 ### Shared dependencies:
 
 * postgresql
-* node.js
+* node.js (and npm)
 
 You will also need to be able to install python packages, we recommend
 using virtualenvwrapper for this.  On Debian/Ubuntu systems you can
@@ -36,6 +36,8 @@ re-active this environment with the following command:
 To install all the dependencies run:
 
     pip install -r requirements.txt
+    npm install less
+    npm install requirejs
 
 ### Configuration
 
