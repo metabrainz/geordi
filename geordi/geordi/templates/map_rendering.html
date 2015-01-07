@@ -31,10 +31,14 @@
 {%- endmacro -%}
 
 {%- macro render_title(map) -%}{# Assumes we have a name. #}
-  {%- if 'release' in map -%}
+  {%- if 'artist' in map -%}
+    Artist: {{ comma_list(map.artist.name, before="“", after="”") }}
+  {%- elif 'release' in map -%}
     Release: {{ comma_list(map.release.name, before="“", after="”") }}
   {%- elif 'recording' in map -%}
     Recording: {{ comma_list(map.recording.name, before="“", after="”") }}
+  {%- elif 'work' in map -%}
+    Work: {{ comma_list(map.work.name, before="“", after="”") }}
   {%- endif -%}
 {%- endmacro -%}
 
