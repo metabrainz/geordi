@@ -27,6 +27,11 @@
         {%- if recording.isrcs -%}{{ info_table_row('ISRCs:', comma_list(recording.isrcs)) }}{%- endif -%}
         {%- if recording.tags -%}{{ info_table_row('Genres:', comma_list(recording.tags)) }}{%- endif -%}
     </tbody></table>
+  {%- elif 'work' in item.map -%}
+    {%- set work = item.map.work -%}
+    <table class="table table-striped"><tbody>
+        {%- if work.composers -%}{{ info_table_row('Composers:', render_relationships(work.composers, 'work%composers', item.links)) }}{%- endif -%}
+    </tbody></table>
   {%- endif -%}
 {%- endmacro -%}
 
@@ -84,6 +89,18 @@
     {%- endif -%}
   {%- endif -%}
   {%- if artist.join_phrase -%}{{ artist.join_phrase }}{%- else %} {% endif -%}
+{%- endmacro -%}
+
+{%- macro render_relationships(rels, prefix, links={}) -%}
+    {%- for rel in rels -%}
+        {%- set link_key = [prefix, loop.index0, 'target']|join('%') -%}
+        {%- if link_key in links -%}
+            {{ linked(links[link_key], rel.target) }}
+        {%- else -%}
+            {{ rel.target }}
+        {%- endif -%}
+        {%- if not loop.last %}, {% endif -%}
+    {%- endfor -%}
 {%- endmacro -%}
 
 {%- macro render_labels(labels, links={}) -%}
