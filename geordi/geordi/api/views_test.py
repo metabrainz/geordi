@@ -32,6 +32,19 @@ class APIViewsTestCase(GeordiTestCase):
         response = self.client.get("/api/1/item/missing/links")
         self.assert404(response)
 
+    def test_item_matches(self):
+        item = Item.create()
+
+        response = self.client.get("/api/1/item/%s/matches" % item.id)
+        self.assert200(response)
+        response = self.client.get("/api/1/item/0%s/matches" % item.id)
+        self.assert200(response)
+
+        response = self.client.get("/api/1/item/%s0/matches" % item.id)
+        self.assert404(response)
+        response = self.client.get("/api/1/item/missing/matches")
+        self.assert404(response)
+
     def test_list_indexes(self):
         response = self.client.get("/api/1/data")
         self.assert200(response)

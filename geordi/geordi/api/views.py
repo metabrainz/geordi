@@ -34,6 +34,18 @@ def item_links(item_id):
         ))
     return jsonify(links=links)
 
+@api.route('/item/<int:item_id>/matches')
+@login_required
+def item_matches(item_id):
+    current = RawMatch.get_by_item(item_id, superseded=False)
+    previous = RawMatch.get_by_item(item_id, superseded=True)
+    return jsonify({
+        'matches': {
+            'current': current[0].to_dict() if current else None,
+            'superseded': [match.to_dict() for match in previous]
+        }
+    })
+
 @api.route('/data')
 def list_indexes():
     """Get list of indexes.
