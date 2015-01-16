@@ -35,7 +35,6 @@ def item_links(item_id):
     return jsonify(links=links)
 
 @api.route('/item/<int:item_id>/matches')
-@login_required
 def item_matches(item_id):
     current = RawMatch.get_by_item(item_id, superseded=False)
     previous = RawMatch.get_by_item(item_id, superseded=True)
