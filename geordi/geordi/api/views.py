@@ -2,6 +2,7 @@ from flask import Blueprint, abort, jsonify
 from geordi.data.model import db
 from geordi.data.model.item import Item
 from geordi.data.model.item_data import ItemData
+from geordi.data.model.raw_match import RawMatch
 
 api = Blueprint('api', __name__)
 
