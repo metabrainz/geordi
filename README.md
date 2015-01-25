@@ -13,12 +13,15 @@ Setup
 ### Shared dependencies:
 
 * postgresql
+* node.js (and npm)
 
 You will also need to be able to install python packages, we recommend
 using virtualenvwrapper for this.  On Debian/Ubuntu systems you can
 install that with:
 
     sudo apt-get install virtualenvwrapper
+
+You will also need to add the appropriate lines to your `.bashrc` file.
 
 ### Python dependencies:
 
@@ -33,6 +36,7 @@ re-active this environment with the following command:
 To install all the dependencies run:
 
     pip install -r requirements.txt
+    npm install .
 
 ### Configuration
 
@@ -42,8 +46,11 @@ and make any other needed changes.
 
 ### Creating database
 
+(You may need to specify the postgres superuser with `-U postgres` in the commands below)
+
 To create a database matching the default configuration run:
 
+    createuser geordi
     createdb -O geordi geordi
 
 Then create the schema by running:
