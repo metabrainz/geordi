@@ -13,7 +13,7 @@
   <h2>Mapped Data</h2>
   {{ render_map(item) }}
 
-  <p class="lead"><a href="{{ url_for('frontend.item_links', item_id=item.id) }}">View linked items</a></p>
+  <p class="lead"><a href="{{ url_for('frontend.item_links', item_id=item.id) }}">View {{ len(item.items_linked) }} linked item(s)</a></p>
 
   <h2>Raw Data</h2>
   <ul style="list-style-type: none; padding: 0">
