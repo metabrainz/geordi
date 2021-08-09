@@ -3,7 +3,7 @@ geordi
 
 This project allows the consumption of arbitrary data, for use as a data source and matching tool.
 
-![Geordi La Forge](http://images1.wikia.nocookie.net/__cb20120205164005/memoryalpha/en/images/thumb/d/d9/Geordi_La_Forge_2368.jpg/158px-Geordi_La_Forge_2368.jpg)
+![Geordi La Forge](/geordi.jpg)
 
 It's named after [Geordi La Forge](http://en.memory-alpha.org/wiki/Geordi_La_Forge), in reference to [MusicBrainz Picard](https://github.com/musicbrainz/picard).
 
